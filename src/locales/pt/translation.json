@@ -1,0 +1,45 @@
+{
+  "common": {
+    "clientes": "Clientes",
+    "compras": "Compras",
+    "ventas": "Ventas",
+    "productos": "Productos",
+    "proveedores": "Proveedores",
+    "notas-de-pedido": "Notas de pedido",
+    "facturacion": "Facturación",
+    "dashboard": "Dashboard",
+    "usuarios": "Usuarios"
+  },
+  "error404": {
+    "comeBack": "Return to Home",
+    "notFound": "Sorry, page not found!"
+  },
+  "header": {
+    "changeLanguage": "Change language",
+    "changeTheme": "Change theme",
+    "darkTheme": "Dark",
+    "lightTheme": "Light",
+    "logout": "Logout",
+    "nightMode": {
+      "from": "From",
+      "title": "Nightmode",
+      "to": "To"
+    },
+    "notifications": {
+      "noNotifications": "No notifications yet",
+      "readAll": "Mark all as read",
+      "serverError": "The server is not responding, try again later",
+      "viewAll": "View all"
+    }
+  },
+  "login": {
+    "loginInfo": "Enter your email address and password to access admin panel",
+    "login": "Login",
+    "password": "Password",
+    "email": "Email",
+    "logout": "Cerrar sesión"
+  },
+  "serverError": {
+    "main": "Internal server error"
+  }
+}
