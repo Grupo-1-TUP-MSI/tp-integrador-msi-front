@@ -1,10 +1,12 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React from 'react';
 import { Table } from 'components/common/Table/Table';
-import { Button, Space, TablePaginationConfig } from 'antd';
-import { getTableData, Pagination } from 'api/table.api';
+import { Button, Input, Select, Space } from 'antd';
+import { Pagination } from 'api/table.api';
 import { useTranslation } from 'react-i18next';
-import { useMounted } from '@app/hooks/useMounted';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { useQuery } from '@tanstack/react-query';
+import { getUsuarios } from '@app/api/usuarios.api';
+import { Roles, Usuario } from '@app/models/models';
 
 const initialPagination: Pagination = {
   current: 1,
@@ -12,31 +14,24 @@ const initialPagination: Pagination = {
 };
 
 export const UsuariosPage = () => {
-  const [tableData, setTableData] = useState<{ data: any[]; pagination: Pagination; loading: boolean }>({
-    data: [],
-    pagination: initialPagination,
-    loading: false,
-  });
   const { t } = useTranslation();
-  const { isMounted } = useMounted();
+  const [searchUsuario, setSearchUsuario] = React.useState('');
+  const [filterRol, setFilterRol] = React.useState(null);
 
-  const fetch = useCallback(
-    (pagination: Pagination) => {
-      const res = getTableData(pagination);
-      if (isMounted.current) {
-        setTableData({ data: res.data, pagination: res.pagination, loading: false });
-      }
+  const {
+    data: usuariosData,
+    isLoading: isLoadingUsuarios,
+    isRefetching: isRefetchingUsuarios,
+  } = useQuery(
+    ['usuarios'],
+    async () => {
+      return await getUsuarios();
     },
-    [isMounted],
+    {
+      keepPreviousData: true,
+      refetchOnWindowFocus: false,
+    },
   );
-
-  useEffect(() => {
-    fetch(initialPagination);
-  }, [fetch]);
-
-  const handleTableChange = (pagination: TablePaginationConfig) => {
-    fetch(pagination);
-  };
 
   const columns = [
     {
@@ -47,7 +42,7 @@ export const UsuariosPage = () => {
     },
     {
       title: t('common.email'),
-      dataIndex: 'email',
+      dataIndex: 'usuario',
       key: 'email',
     },
     {
@@ -61,14 +56,14 @@ export const UsuariosPage = () => {
       dataIndex: 'acciones',
       width: '10%',
       key: 'acciones',
-      render: (text: string, item: any) => {
+      render: (text: string, usuario: Usuario) => {
         return (
           <Space>
             <Button
               icon={<EditOutlined />}
               type="text"
               onClick={() => {
-                console.log('Editar', item);
+                console.log('Editar', usuario);
               }}
             ></Button>
             <Button icon={<DeleteOutlined />} type="text" danger onClick={() => console.log('borrar')}></Button>
@@ -80,13 +75,43 @@ export const UsuariosPage = () => {
 
   return (
     <>
-      {t('common.usuarios')}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '1rem',
+        }}
+      >
+        <Input
+          placeholder={t('table.buscarUsuario')}
+          value={searchUsuario}
+          onChange={(e) => setSearchUsuario(e.target.value)}
+        />
+        <Select
+          placeholder={t('common.rol')}
+          value={filterRol}
+          onChange={(value) => setFilterRol(value)}
+          style={{ width: 300, marginLeft: 10 }}
+          allowClear
+        >
+          {Object.values(Roles).map((rol, i) => (
+            <Select.Option key={i} value={rol}>
+              {rol}
+            </Select.Option>
+          ))}
+        </Select>
+      </div>
       <Table
         columns={columns}
-        dataSource={tableData.data}
-        pagination={tableData.pagination}
-        loading={tableData.loading}
-        onChange={handleTableChange}
+        dataSource={usuariosData?.filter((usuario: Usuario) => {
+          return (
+            usuario.usuario.toLowerCase().includes(searchUsuario.toLowerCase()) &&
+            (filterRol === null || usuario.rol === filterRol)
+          );
+        })}
+        pagination={initialPagination}
+        loading={isLoadingUsuarios || isRefetchingUsuarios}
         scroll={{ x: 800 }}
         locale={{
           filterTitle: t('table.filterTitle'),

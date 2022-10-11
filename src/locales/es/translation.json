@@ -45,6 +45,7 @@
     "logout": "Cerrar sesión"
   },
   "table": {
+    "buscarUsuario": "Buscar usuario",
     "filterTitle": "Filtrar menú",
     "filterConfirm": "OK",
     "filterReset": "Reset",
