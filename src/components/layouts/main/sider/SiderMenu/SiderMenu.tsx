@@ -2,10 +2,22 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
 import * as S from './SiderMenu.styles';
-import { sidebarNavigation, SidebarNavigationItem } from '../sidebarNavigation';
+import {
+  adminSidebarNavigation,
+  compradorSidebarNavigation,
+  vendedorSidebarNavigation,
+  SidebarNavigationItem,
+} from '../sidebarNavigation';
 import { Divider, Menu } from 'antd';
 import { RollbackOutlined } from '@ant-design/icons';
+import { readRole } from '@app/services/localStorage.service';
 
+const sidebarNavigation =
+  readRole() === 'Comprador'
+    ? compradorSidebarNavigation
+    : readRole() === 'Vendedor'
+    ? vendedorSidebarNavigation
+    : adminSidebarNavigation;
 interface SiderContentProps {
   setCollapsed: (isCollapsed: boolean) => void;
 }

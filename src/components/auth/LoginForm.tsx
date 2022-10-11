@@ -9,7 +9,7 @@ import * as S from './LoginForm.styles';
 import * as Auth from '@app/components/layouts/AuthLayout/AuthLayout.styles';
 
 interface LoginFormData {
-  email: string;
+  usuario: string;
   password: string;
 }
 
@@ -37,7 +37,7 @@ export const LoginForm: React.FC = () => {
         <Auth.FormTitle>{t('login.login')}</Auth.FormTitle>
         <S.LoginDescription>{t('login.loginInfo')}</S.LoginDescription>
         <Auth.FormItem
-          name="email"
+          name="usuario"
           label={t('login.email')}
           rules={[
             { required: true, message: t('common.requiredField') },

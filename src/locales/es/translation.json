@@ -1,14 +1,19 @@
 {
   "common": {
+    "acciones": "Acciones",
     "clientes": "Clientes",
     "compras": "Compras",
-    "ventas": "Ventas",
+    "dashboard": "Dashboard",
+    "email": "Email",
+    "facturacion": "Facturación",
+    "ganancias": "Ganancias",
+    "id": "ID",
+    "notas-de-pedido": "Notas de pedido",
     "productos": "Productos",
     "proveedores": "Proveedores",
-    "notas-de-pedido": "Notas de pedido",
-    "facturacion": "Facturación",
-    "dashboard": "Dashboard",
-    "usuarios": "Usuarios"
+    "rol": "Rol",
+    "usuarios": "Usuarios",
+    "ventas": "Ventas"
   },
   "error404": {
     "comeBack": "Return to Home",
@@ -38,6 +43,25 @@
     "password": "Password",
     "email": "Email",
     "logout": "Cerrar sesión"
+  },
+  "table": {
+    "filterTitle": "Filtrar menú",
+    "filterConfirm": "OK",
+    "filterReset": "Reset",
+    "filterEmptyText": "No hay filtros",
+    "filterCheckall": "Seleccionar todos los filtros",
+    "filterSearchPlaceholder": "Buscar en los filtros",
+    "emptyText": "No hay datos.",
+    "selectAll": "Seleccionar todo",
+    "selectInvert": "Invertir selección",
+    "selectNone": "Deseleccionar todo",
+    "selectionAll": "Seleccionar todos los datos",
+    "sortTitle": "Ordenar",
+    "expand": "Expandir fila",
+    "collapse": "Colapsar fila",
+    "triggerDesc": "Click para ordenar en orden descendente",
+    "triggerAsc": "Click para ordenar en orden ascendente",
+    "cancelSort": "Click para cancelar el ordenamiento"
   },
   "serverError": {
     "main": "Internal server error"
