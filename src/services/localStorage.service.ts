@@ -8,6 +8,14 @@ export const readToken = (): string => {
   return localStorage.getItem('token') || '';
 };
 
+export const persistRole = (role: string): void => {
+  localStorage.setItem('role', role);
+};
+
+export const readRole = (): string => {
+  return localStorage.getItem('role') || '';
+};
+
 export const persistUser = (user: User): void => {
   localStorage.setItem('user', JSON.stringify(user));
 };

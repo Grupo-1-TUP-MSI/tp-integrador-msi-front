@@ -1,5 +1,12 @@
 import React from 'react';
-import { FormOutlined, UserOutlined } from '@ant-design/icons';
+import {
+  DashboardOutlined,
+  SettingOutlined,
+  ShopOutlined,
+  ShoppingCartOutlined,
+  TagsOutlined,
+  UserOutlined,
+} from '@ant-design/icons';
 
 export interface SidebarNavigationItem {
   title: string;
@@ -9,17 +16,17 @@ export interface SidebarNavigationItem {
   icon?: React.ReactNode;
 }
 
-export const sidebarNavigation: SidebarNavigationItem[] = [
+export const adminSidebarNavigation: SidebarNavigationItem[] = [
   {
     title: 'common.dashboard',
     key: 'dashboard',
-    icon: <UserOutlined />,
+    icon: <DashboardOutlined />,
     url: '/',
   },
   {
     title: 'common.compras',
     key: 'compras',
-    icon: <FormOutlined />,
+    icon: <ShoppingCartOutlined />,
     children: [
       {
         title: 'common.proveedores',
@@ -36,7 +43,7 @@ export const sidebarNavigation: SidebarNavigationItem[] = [
   {
     title: 'common.ventas',
     key: 'ventas',
-    icon: <FormOutlined />,
+    icon: <ShopOutlined />,
     children: [
       {
         title: 'common.clientes',
@@ -53,13 +60,66 @@ export const sidebarNavigation: SidebarNavigationItem[] = [
   {
     title: 'common.productos',
     key: 'productos',
-    icon: <FormOutlined />,
+    icon: <TagsOutlined />,
     url: '/productos',
   },
   {
     title: 'common.usuarios',
     key: 'usuarios',
-    icon: <FormOutlined />,
+    icon: <UserOutlined />,
     url: '/usuarios',
+  },
+  {
+    title: 'common.ganancias',
+    key: 'ganancias',
+    icon: <SettingOutlined />,
+    url: '/ganancias',
+  },
+];
+
+export const compradorSidebarNavigation: SidebarNavigationItem[] = [
+  {
+    title: 'common.compras',
+    key: 'compras',
+    icon: <ShoppingCartOutlined />,
+    children: [
+      {
+        title: 'common.proveedores',
+        key: 'proveedores',
+        url: '/compras/proveedores',
+      },
+      {
+        title: 'common.notas-de-pedido',
+        key: 'notas-de-pedido',
+        url: '/compras/notas-de-pedido',
+      },
+    ],
+  },
+
+  {
+    title: 'common.productos',
+    key: 'productos',
+    icon: <TagsOutlined />,
+    url: '/productos',
+  },
+];
+
+export const vendedorSidebarNavigation: SidebarNavigationItem[] = [
+  {
+    title: 'common.ventas',
+    key: 'ventas',
+    icon: <ShopOutlined />,
+    children: [
+      {
+        title: 'common.clientes',
+        key: 'clientes',
+        url: '/ventas/clientes',
+      },
+      {
+        title: 'common.facturacion',
+        key: 'facturacion',
+        url: '/ventas/facturacion',
+      },
+    ],
   },
 ];

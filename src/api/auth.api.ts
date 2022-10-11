@@ -7,14 +7,16 @@ export interface AuthData {
 }
 
 export interface LoginRequest {
-  email: string;
+  usuario: string;
   password: string;
 }
 
 export interface LoginResponse {
   token: string;
   user: User;
+  role: string;
 }
 
-export const login = (loginPayload: LoginRequest): Promise<LoginResponse> =>
-  httpApi.post<LoginResponse>('login', { ...loginPayload }).then(({ data }) => data);
+export const login = (loginPayload: LoginRequest): Promise<LoginResponse> => {
+  return httpApi.post('usuarios/login', loginPayload).then((res) => res.data);
+};
