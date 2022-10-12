@@ -1,9 +1,9 @@
 import React from 'react';
 
-export const ProveedoresPage = () => {
+export const ProveedoresPage: React.FC = () => {
   return <div>ProveedoresPage</div>;
 };
 
-export const ProveedoresForm = () => {
+export const ProveedoresForm: React.FC = () => {
   return <div>ProveedoresPage</div>;
 };

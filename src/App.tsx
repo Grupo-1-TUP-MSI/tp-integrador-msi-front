@@ -12,6 +12,9 @@ import { usePWA } from './hooks/usePWA';
 import { useThemeWatcher } from './hooks/useThemeWatcher';
 import { useAppSelector } from './hooks/reduxHooks';
 import { themeObject } from './styles/themes/themeVariables';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const queryClient = new QueryClient();
 
 const App: React.FC = () => {
   const { language } = useLanguage();
@@ -27,9 +30,11 @@ const App: React.FC = () => {
     <>
       <meta name="theme-color" content={themeObject[theme].primary} />
       <GlobalStyle />
-      <ConfigProvider locale={language === 'es' ? esES : ptPT}>
-        <AppRouter />
-      </ConfigProvider>
+      <QueryClientProvider client={queryClient}>
+        <ConfigProvider locale={language === 'es' ? esES : ptPT}>
+          <AppRouter />
+        </ConfigProvider>
+      </QueryClientProvider>
     </>
   );
 };
