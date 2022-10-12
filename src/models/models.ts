@@ -1,4 +1,4 @@
-export const Roles = ['Administrador', 'Comprador', 'Vendedor'];
+export const Roles = ['ADMINISTRADOR', 'COMPRADOR', 'VENDEDOR'];
 
 export interface Usuario {
   id?: number;

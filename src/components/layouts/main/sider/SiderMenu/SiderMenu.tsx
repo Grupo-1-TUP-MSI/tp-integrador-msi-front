@@ -64,7 +64,7 @@ const SiderMenu: React.FC<SiderContentProps> = ({ setCollapsed }) => {
           </Menu.SubMenu>
         ) : nav.title == 'common.productos' ? (
           <>
-            <Divider />
+            <Divider key="divider" />
             <Menu.Item key={nav.key} title="" icon={nav.icon}>
               <Link to={nav.url || ''}>{t(nav.title)}</Link>
             </Menu.Item>

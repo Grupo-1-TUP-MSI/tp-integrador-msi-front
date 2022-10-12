@@ -1,19 +1,13 @@
 import React from 'react';
 import { Table } from 'components/common/Table/Table';
 import { Button, Input, Select, Space } from 'antd';
-import { Pagination } from 'api/table.api';
 import { useTranslation } from 'react-i18next';
-import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
 import { getUsuarios } from '@app/api/usuarios.api';
 import { Roles, Usuario } from '@app/models/models';
 
-const initialPagination: Pagination = {
-  current: 1,
-  pageSize: 5,
-};
-
-export const UsuariosPage = () => {
+export const UsuariosPage: React.FC = () => {
   const { t } = useTranslation();
   const [searchUsuario, setSearchUsuario] = React.useState('');
   const [filterRol, setFilterRol] = React.useState(null);
@@ -83,6 +77,24 @@ export const UsuariosPage = () => {
           marginBottom: '1rem',
         }}
       >
+        <h1 style={{ color: '#404040' }}>{t('common.usuarios')}</h1>
+        <Button
+          style={{
+            color: 'var(--success-color)',
+          }}
+          icon={<PlusOutlined />}
+          type="text"
+          onClick={() => console.log('borrar')}
+        ></Button>
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '1rem',
+        }}
+      >
         <Input
           placeholder={t('table.buscarUsuario')}
           value={searchUsuario}
@@ -95,7 +107,7 @@ export const UsuariosPage = () => {
           style={{ width: 300, marginLeft: 10 }}
           allowClear
         >
-          {Object.values(Roles).map((rol, i) => (
+          {Roles.map((rol, i) => (
             <Select.Option key={i} value={rol}>
               {rol}
             </Select.Option>
@@ -107,10 +119,9 @@ export const UsuariosPage = () => {
         dataSource={usuariosData?.filter((usuario: Usuario) => {
           return (
             usuario.usuario.toLowerCase().includes(searchUsuario.toLowerCase()) &&
-            (filterRol === null || usuario.rol === filterRol)
+            (!filterRol || usuario.rol === filterRol)
           );
         })}
-        pagination={initialPagination}
         loading={isLoadingUsuarios || isRefetchingUsuarios}
         scroll={{ x: 800 }}
         locale={{
@@ -132,11 +143,14 @@ export const UsuariosPage = () => {
           triggerAsc: t('table.triggerAsc'),
           cancelSort: t('table.cancelSort'),
         }}
+        pagination={{
+          pageSize: 5,
+        }}
       />
     </>
   );
 };
 
-export const UsuariosForm = () => {
+export const UsuariosForm: React.FC = () => {
   return <div>UsuariosPage</div>;
 };
