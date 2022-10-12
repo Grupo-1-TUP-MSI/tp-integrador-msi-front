@@ -3,17 +3,24 @@
     "acciones": "Acciones",
     "clientes": "Clientes",
     "compras": "Compras",
+    "confirmPassword": "Confirmar contraseña",
     "dashboard": "Dashboard",
     "email": "Email",
+    "errorMessage": "Error, algo sucedió.",
     "facturacion": "Facturación",
     "ganancias": "Ganancias",
     "id": "ID",
     "notas-de-pedido": "Notas de pedido",
+    "password": "Contraseña",
     "productos": "Productos",
     "proveedores": "Proveedores",
     "rol": "Rol",
+    "successMessage": "Operación exitosa.",
     "usuarios": "Usuarios",
-    "ventas": "Ventas"
+    "ventas": "Ventas",
+    "requiredField": "Campo requerido",
+    "passwordsDontMatch": "Las contraseñas no coinciden",
+    "notValidEmail": "Email no válido"
   },
   "error404": {
     "comeBack": "Return to Home",
@@ -44,6 +51,14 @@
     "email": "Email",
     "logout": "Cerrar sesión"
   },
+  "notifications": {
+    "usuarioCreado": "Usuario creado con éxito!",
+    "usuarioActualizado": "Usuario actualizado con éxito!",
+    "usuarioEliminado": "Usuario eliminado con éxito!",
+    "usuarioNoEliminado": "No se pudo eliminar el usuario.",
+    "usuarioNoActualizado": "No se pudo actualizar el usuario.",
+    "usuarioNoCreado": "No se pudo crear el usuario."
+  },
   "table": {
     "buscarUsuario": "Buscar usuario",
     "filterTitle": "Filtrar menú",
@@ -63,6 +78,11 @@
     "triggerDesc": "Click para ordenar en orden descendente",
     "triggerAsc": "Click para ordenar en orden ascendente",
     "cancelSort": "Click para cancelar el ordenamiento"
+  },
+  "titles": {
+    "creandoUsuario": "Creando usuario",
+    "editandoUsuario": "Editando usuario",
+    "eliminandoUsuario": "Eliminando usuario"
   },
   "serverError": {
     "main": "Internal server error"

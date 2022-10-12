@@ -21,14 +21,7 @@ export interface BaseFormInterface<T> extends React.FC<T> {
 export const BaseForm: BaseFormInterface<BaseFormProps> = ({ onFinishFailed, layout = 'vertical', ...props }) => {
   const { t } = useTranslation();
 
-  const onFinishFailedDefault = (error: ValidateErrorEntity<unknown>) => {
-    notificationController.error({
-      message: t('common.error'),
-      description: error.errorFields[0].errors,
-    });
-  };
-
-  return <Form onFinishFailed={onFinishFailed || onFinishFailedDefault} layout={layout} {...props} />;
+  return <Form layout={layout} {...props} />;
 };
 
 BaseForm.Title = BaseFormTitle;

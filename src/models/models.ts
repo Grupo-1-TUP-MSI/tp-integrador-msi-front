@@ -5,6 +5,6 @@ export interface Usuario {
   usuario: string;
   password: string;
   rol?: string;
-  idrol?: number;
+  idRol?: number;
   estado?: true;
 }
