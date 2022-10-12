@@ -1,14 +1,20 @@
 import React from 'react';
 import { Table } from 'components/common/Table/Table';
-import { Button, Input, Select, Space } from 'antd';
+import { Button, Col, Input, Row, Select, Space } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
-import { useQuery } from '@tanstack/react-query';
-import { getUsuarios } from '@app/api/usuarios.api';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { getUsuarios, postUsuario } from '@app/api/usuarios.api';
 import { Roles, Usuario } from '@app/models/models';
+import { Navigate, useNavigate } from 'react-router';
+import { notificationController } from '@app/controllers/notificationController';
+import { BaseForm } from '@app/components/common/forms/BaseForm/BaseForm';
+import FormItem from 'antd/es/form/FormItem';
+import { FormInput, FormInputPassword, SubmitButton } from '@app/components/layouts/AuthLayout/AuthLayout.styles';
 
 export const UsuariosPage: React.FC = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [searchUsuario, setSearchUsuario] = React.useState('');
   const [filterRol, setFilterRol] = React.useState(null);
 
@@ -84,7 +90,7 @@ export const UsuariosPage: React.FC = () => {
           }}
           icon={<PlusOutlined />}
           type="text"
-          onClick={() => console.log('borrar')}
+          onClick={() => navigate('/usuarios/alta')}
         ></Button>
       </div>
       <div
@@ -152,5 +158,122 @@ export const UsuariosPage: React.FC = () => {
 };
 
 export const UsuariosForm: React.FC = () => {
-  return <div>UsuariosPage</div>;
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+
+  const { mutate: handleCreate, isLoading } = useMutation(
+    ['postUsuario'],
+    async (values: any) => {
+      postUsuario({
+        usuario: values.usuario,
+        password: values.password,
+        idRol: values.rol,
+      });
+    },
+    {
+      onSuccess: (res: any) => {
+        if (res?.status !== 400) {
+          notificationController.success({
+            message: t('common.successMessage'),
+            description: t('notifications.usuarioCreado'),
+            duration: 3000,
+          });
+          navigate('/usuarios');
+        } else {
+          throw new Error('Error al crear usuario');
+        }
+      },
+      onError: (error: Error) => {
+        notificationController.error({
+          message: t('common.errorMessage'),
+          description: t('notifications.usuarioNoCreado'),
+          duration: 3000,
+        });
+      },
+    },
+  );
+
+  return (
+    <div>
+      <Row>
+        <Col offset={8} span={8}>
+          <h1>{t('titles.creandoUsuario')}</h1>
+          <BaseForm layout="vertical" onFinish={handleCreate} requiredMark="optional">
+            <FormItem
+              name="usuario"
+              label={t('common.email')}
+              rules={[
+                { required: true, message: t('common.requiredField') },
+                {
+                  type: 'email',
+                  message: t('common.notValidEmail'),
+                },
+              ]}
+            >
+              <FormInput placeholder={t('common.email')} />
+            </FormItem>
+            <FormItem
+              label={t('common.password')}
+              name="password"
+              rules={[{ required: true, message: t('common.requiredField') }]}
+            >
+              <FormInputPassword placeholder={t('common.password')} />
+            </FormItem>
+            <FormItem
+              label={t('common.confirmPassword')}
+              name="confirmPassword"
+              rules={[
+                { required: true, message: t('common.requiredField') },
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    if (value !== getFieldValue('password')) {
+                      return Promise.reject(t('common.passwordsDontMatch'));
+                    } else {
+                      return Promise.resolve();
+                    }
+                  },
+                }),
+              ]}
+            >
+              <FormInputPassword placeholder={t('common.password')} />
+            </FormItem>
+
+            <FormItem
+              label={t('common.rol')}
+              name="rol"
+              rules={[{ required: true, message: t('common.requiredField') }]}
+            >
+              <Select placeholder={t('common.rol')} allowClear>
+                {Roles.map((rol, i) => (
+                  <Select.Option key={i} value={i + 1}>
+                    {rol}
+                  </Select.Option>
+                ))}
+              </Select>
+            </FormItem>
+
+            <BaseForm.Item noStyle>
+              <SubmitButton type="primary" htmlType="submit" loading={isLoading}>
+                {t('login.login')}
+              </SubmitButton>
+            </BaseForm.Item>
+          </BaseForm>
+          {/* /* <Select
+            placeholder={t('common.rol')}
+            value={filterRol}
+            onChange={(value) => setFilterRol(value)}
+            style={{ width: 300, marginLeft: 10 }}
+            allowClear
+          >
+            {Roles.map((rol, i) => (
+              <Select.Option key={i} value={rol}>
+                {rol}
+              </Select.Option>
+            ))}
+          </Select>
+            <Input placeholder={t('common.email')} /> */}
+        </Col>
+      </Row>
+    </div>
+  );
 };
