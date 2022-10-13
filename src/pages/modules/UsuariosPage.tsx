@@ -265,7 +265,7 @@ export const UsuariosForm: React.FC = () => {
       if (res?.status !== 400) {
         notificationController.success({
           message: t('common.successMessage'),
-          description: t('notifications.usuarioEditado'),
+          description: t('notifications.usuarioActualizado'),
           duration: 3000,
         });
         navigate('/usuarios');
@@ -276,7 +276,7 @@ export const UsuariosForm: React.FC = () => {
     onError: (error: Error) => {
       notificationController.error({
         message: t('common.errorMessage'),
-        description: t('notifications.usuarioNoEditado'),
+        description: t('notifications.usuarioNoActualizado'),
         duration: 3000,
       });
     },
