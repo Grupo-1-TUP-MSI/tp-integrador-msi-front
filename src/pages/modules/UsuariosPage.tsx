@@ -1,26 +1,29 @@
 import React from 'react';
-import { Table } from 'components/common/Table/Table';
-import { Button, Col, Input, Row, Select, Space } from 'antd';
+import { Button, Checkbox, Col, Input, Modal, Row, Select, Space } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { getUsuarios, postUsuario } from '@app/api/usuarios.api';
+import { deleteUsuario, getUsuarios, postUsuario } from '@app/api/usuarios.api';
 import { Roles, Usuario } from '@app/models/models';
-import { Navigate, useNavigate } from 'react-router';
+import { useNavigate } from 'react-router';
 import { notificationController } from '@app/controllers/notificationController';
 import { BaseForm } from '@app/components/common/forms/BaseForm/BaseForm';
 import FormItem from 'antd/es/form/FormItem';
 import { FormInput, FormInputPassword, SubmitButton } from '@app/components/layouts/AuthLayout/AuthLayout.styles';
+import { Table } from '@app/components/common/Table/Table';
 
 export const UsuariosPage: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchUsuario, setSearchUsuario] = React.useState('');
   const [filterRol, setFilterRol] = React.useState(null);
-
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [filterEstado, setFilterEstado] = React.useState(true);
+  const [usuario, setUsuario] = React.useState<Usuario | null>(null);
   const {
     data: usuariosData,
     isLoading: isLoadingUsuarios,
+    refetch: refetchUsuarios,
     isRefetching: isRefetchingUsuarios,
   } = useQuery(
     ['usuarios'],
@@ -28,16 +31,48 @@ export const UsuariosPage: React.FC = () => {
       return await getUsuarios();
     },
     {
-      keepPreviousData: true,
+      keepPreviousData: false,
       refetchOnWindowFocus: false,
     },
   );
+
+  const { mutate: eliminarUsuario, isLoading: isLoadingDelete } = useMutation(
+    ['deleteUsuario'],
+    async (id: number) => {
+      deleteUsuario(id);
+    },
+    {
+      onSuccess: (res: any) => {
+        if (res?.status !== 400) {
+          notificationController.success({
+            message: t('common.successMessage'),
+            description: t('notifications.usuarioEliminado'),
+            duration: 3000,
+          });
+          setIsModalOpen(false);
+          refetchUsuarios();
+        } else {
+          throw new Error('Error al eliminar usuario');
+        }
+      },
+      onError: (error: Error) => {
+        notificationController.error({
+          message: t('common.errorMessage'),
+          description: t('notifications.usuarioNoEliminado'),
+          duration: 3000,
+        });
+      },
+    },
+  );
+
+  const handleDelete = (record: any) => {
+    eliminarUsuario(record.id);
+  };
 
   const columns = [
     {
       title: t('common.id'),
       dataIndex: 'id',
-      key: 'id',
       width: '5%',
     },
     {
@@ -53,28 +88,66 @@ export const UsuariosPage: React.FC = () => {
     },
     {
       title: t('common.acciones'),
-      dataIndex: 'acciones',
       width: '10%',
       key: 'acciones',
-      render: (text: string, usuario: Usuario) => {
-        return (
-          <Space>
-            <Button
-              icon={<EditOutlined />}
-              type="text"
-              onClick={() => {
-                console.log('Editar', usuario);
-              }}
-            ></Button>
-            <Button icon={<DeleteOutlined />} type="text" danger onClick={() => console.log('borrar')}></Button>
-          </Space>
-        );
-      },
+      render: (text: any, record: any) => (
+        <Space>
+          <Button
+            icon={<EditOutlined />}
+            disabled={!record.estado}
+            type="text"
+            onClick={() => {
+              navigate(`/usuarios/${record.id}`);
+            }}
+          ></Button>
+          <Button
+            icon={<DeleteOutlined />}
+            disabled={!record.estado}
+            type="text"
+            danger
+            onClick={() => {
+              setIsModalOpen(true);
+              setUsuario(record);
+            }}
+          ></Button>
+        </Space>
+      ),
     },
   ];
 
+  const usuariosFiltrados = () => {
+    const arr = usuariosData
+      ?.filter((usuario: Usuario) => {
+        return usuario.usuario.toLowerCase().includes(searchUsuario.toLowerCase());
+      })
+      .filter((usuario: Usuario) => {
+        return !!filterEstado ? usuario.estado === filterEstado : true;
+      })
+      .filter((usuario: Usuario) => {
+        return !filterRol || usuario.rol === filterRol;
+      })
+      .sort((a: Usuario, b: Usuario) => {
+        return (a.id as number) - (b.id as number);
+      });
+
+    return arr;
+  };
+
   return (
     <>
+      <Modal
+        title={t('notifications.eliminandoElemento')}
+        visible={isModalOpen}
+        onOk={() => {
+          handleDelete(usuario);
+        }}
+        onCancel={() => setIsModalOpen(false)}
+        confirmLoading={isLoadingDelete}
+        okText={t('common.confirmar')}
+        cancelText={t('common.cancelar')}
+      >
+        <p>{t('notifications.confirmarEliminacion')}</p>
+      </Modal>
       <div
         style={{
           display: 'flex',
@@ -83,11 +156,14 @@ export const UsuariosPage: React.FC = () => {
           marginBottom: '1rem',
         }}
       >
-        <h1 style={{ color: '#404040' }}>{t('common.usuarios')}</h1>
+        <h1 style={{ color: 'var(--timeline-background)' }}>{t('common.usuarios')}</h1>
+
         <Button
           style={{
             color: 'var(--success-color)',
+            borderRadius: '2rem',
           }}
+          className="success-button"
           icon={<PlusOutlined />}
           type="text"
           onClick={() => navigate('/usuarios/alta')}
@@ -119,15 +195,18 @@ export const UsuariosPage: React.FC = () => {
             </Select.Option>
           ))}
         </Select>
+        <Checkbox
+          checked={filterEstado}
+          onChange={(e) => setFilterEstado(e.target.checked)}
+          style={{ width: 300, marginLeft: 10, borderRadius: 0 }}
+        >
+          {t('common.verBorrados')}
+        </Checkbox>
       </div>
       <Table
+        rowKey={(record) => record.id}
         columns={columns}
-        dataSource={usuariosData?.filter((usuario: Usuario) => {
-          return (
-            usuario.usuario.toLowerCase().includes(searchUsuario.toLowerCase()) &&
-            (!filterRol || usuario.rol === filterRol)
-          );
-        })}
+        dataSource={usuariosFiltrados()}
         loading={isLoadingUsuarios || isRefetchingUsuarios}
         scroll={{ x: 800 }}
         locale={{
@@ -149,9 +228,6 @@ export const UsuariosPage: React.FC = () => {
           triggerAsc: t('table.triggerAsc'),
           cancelSort: t('table.cancelSort'),
         }}
-        pagination={{
-          pageSize: 5,
-        }}
       />
     </>
   );
@@ -160,6 +236,7 @@ export const UsuariosPage: React.FC = () => {
 export const UsuariosForm: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [isEdit, setIsEdit] = React.useState(false);
 
   const { mutate: handleCreate, isLoading } = useMutation(
     ['postUsuario'],
@@ -254,24 +331,10 @@ export const UsuariosForm: React.FC = () => {
 
             <BaseForm.Item noStyle>
               <SubmitButton type="primary" htmlType="submit" loading={isLoading}>
-                {t('login.login')}
+                {isEdit ? t('common.editar') : t('common.confirmar')}
               </SubmitButton>
             </BaseForm.Item>
           </BaseForm>
-          {/* /* <Select
-            placeholder={t('common.rol')}
-            value={filterRol}
-            onChange={(value) => setFilterRol(value)}
-            style={{ width: 300, marginLeft: 10 }}
-            allowClear
-          >
-            {Roles.map((rol, i) => (
-              <Select.Option key={i} value={rol}>
-                {rol}
-              </Select.Option>
-            ))}
-          </Select>
-            <Input placeholder={t('common.email')} /> */}
         </Col>
       </Row>
     </div>

@@ -18,5 +18,7 @@ export const putUsuario = (usuario: Usuario) => {
 };
 
 export const deleteUsuario = (id: number) => {
-  return httpApi.delete(`usuarios/${id}`).then((res) => res.data.data);
+  if (id) {
+    return httpApi.delete(`usuarios/${id}`).then((res) => res.data.data);
+  }
 };

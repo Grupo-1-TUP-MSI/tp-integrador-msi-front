@@ -93,7 +93,7 @@ export const darkColorsTheme: ITheme = {
   borderBase: '#a9a9a9',
   disable: '#7e7e7e',
   disabledBg: '#1A1E2244',
-  layoutBodyBg: '#1A1E2288',
+  layoutBodyBg: '#1b1b1b',
   layoutHeaderBg: '#1A1E2288',
   layoutSiderBg: '#1A1E22',
   inputPlaceholder: 'rgba(255, 255, 255, 0.5)',
