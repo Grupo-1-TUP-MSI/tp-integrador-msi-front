@@ -3,6 +3,9 @@
     "acciones": "Acciones",
     "clientes": "Clientes",
     "compras": "Compras",
+    "editar": "Editar",
+    "cancelar": "Cancelar",
+    "confirmar": "Confirmar",
     "confirmPassword": "Confirmar contraseña",
     "dashboard": "Dashboard",
     "email": "Email",
@@ -20,7 +23,8 @@
     "ventas": "Ventas",
     "requiredField": "Campo requerido",
     "passwordsDontMatch": "Las contraseñas no coinciden",
-    "notValidEmail": "Email no válido"
+    "notValidEmail": "Email no válido",
+    "verBorrados": "Filtrar borrados"
   },
   "error404": {
     "comeBack": "Return to Home",
@@ -57,7 +61,9 @@
     "usuarioEliminado": "Usuario eliminado con éxito!",
     "usuarioNoEliminado": "No se pudo eliminar el usuario.",
     "usuarioNoActualizado": "No se pudo actualizar el usuario.",
-    "usuarioNoCreado": "No se pudo crear el usuario."
+    "usuarioNoCreado": "No se pudo crear el usuario.",
+    "confirmarEliminacion": "¿Está seguro de eliminar este elemento?",
+    "eliminandoElemento": "Eliminando elemento..."
   },
   "table": {
     "buscarUsuario": "Buscar usuario",
