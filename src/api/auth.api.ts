@@ -18,5 +18,5 @@ export interface LoginResponse {
 }
 
 export const login = (loginPayload: LoginRequest): Promise<LoginResponse> => {
-  return httpApi.post('usuarios/login', loginPayload).then((res) => res.data);
+  return httpApi.post('auth/signin', loginPayload).then((res) => res.data);
 };

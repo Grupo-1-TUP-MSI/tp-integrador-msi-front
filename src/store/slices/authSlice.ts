@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { login, LoginRequest, LoginResponse } from '@app/api/auth.api';
-import { setUser } from '@app/store/slices/userSlice';
 import { deleteToken, deleteUser, persistRole, persistToken, readToken } from '@app/services/localStorage.service';
 
 export interface AuthSlice {
@@ -11,9 +10,8 @@ const initialState: AuthSlice = {
   token: readToken(),
 };
 
-export const doLogin = createAsyncThunk('auth/doLogin', async (loginPayload: LoginRequest, { dispatch }) =>
+export const doLogin = createAsyncThunk('auth/doLogin', async (loginPayload: LoginRequest) =>
   login(loginPayload).then((res: LoginResponse) => {
-    dispatch(setUser(res.user));
     persistToken(res.token);
     persistRole(res.role);
 
@@ -21,10 +19,9 @@ export const doLogin = createAsyncThunk('auth/doLogin', async (loginPayload: Log
   }),
 );
 
-export const doLogout = createAsyncThunk('auth/doLogout', (payload, { dispatch }) => {
+export const doLogout = createAsyncThunk('auth/doLogout', (payload) => {
   deleteToken();
   deleteUser();
-  dispatch(setUser(null));
 });
 
 const authSlice = createSlice({
