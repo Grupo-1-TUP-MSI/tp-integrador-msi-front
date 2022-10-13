@@ -1,11 +1,11 @@
-import React from 'react';
-import { Button, Checkbox, Col, Input, Modal, Row, Select, Space } from 'antd';
+import React, { useEffect } from 'react';
+import { Button, Checkbox, Col, Form, Input, Modal, Row, Select, Space, Spin } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { deleteUsuario, getUsuarios, postUsuario } from '@app/api/usuarios.api';
+import { deleteUsuario, getUsuario, getUsuarios, postUsuario, putUsuario } from '@app/api/usuarios.api';
 import { Roles, Usuario } from '@app/models/models';
-import { useNavigate } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { notificationController } from '@app/controllers/notificationController';
 import { BaseForm } from '@app/components/common/forms/BaseForm/BaseForm';
 import FormItem from 'antd/es/form/FormItem';
@@ -25,45 +25,33 @@ export const UsuariosPage: React.FC = () => {
     isLoading: isLoadingUsuarios,
     refetch: refetchUsuarios,
     isRefetching: isRefetchingUsuarios,
-  } = useQuery(
-    ['usuarios'],
-    async () => {
-      return await getUsuarios();
-    },
-    {
-      keepPreviousData: false,
-      refetchOnWindowFocus: false,
-    },
-  );
+  } = useQuery(['usuarios'], getUsuarios, {
+    keepPreviousData: false,
+    refetchOnWindowFocus: false,
+  });
 
-  const { mutate: eliminarUsuario, isLoading: isLoadingDelete } = useMutation(
-    ['deleteUsuario'],
-    async (id: number) => {
-      deleteUsuario(id);
-    },
-    {
-      onSuccess: (res: any) => {
-        if (res?.status !== 400) {
-          notificationController.success({
-            message: t('common.successMessage'),
-            description: t('notifications.usuarioEliminado'),
-            duration: 3000,
-          });
-          setIsModalOpen(false);
-          refetchUsuarios();
-        } else {
-          throw new Error('Error al eliminar usuario');
-        }
-      },
-      onError: (error: Error) => {
-        notificationController.error({
-          message: t('common.errorMessage'),
-          description: t('notifications.usuarioNoEliminado'),
+  const { mutate: eliminarUsuario, isLoading: isLoadingDelete } = useMutation(deleteUsuario, {
+    onSuccess: (res: { status: number }) => {
+      if (res?.status !== 400) {
+        notificationController.success({
+          message: t('common.successMessage'),
+          description: t('notifications.usuarioEliminado'),
           duration: 3000,
         });
-      },
+        setIsModalOpen(false);
+        refetchUsuarios();
+      } else {
+        throw new Error('Error al eliminar usuario');
+      }
     },
-  );
+    onError: (error: Error) => {
+      notificationController.error({
+        message: t('common.errorMessage'),
+        description: t('notifications.usuarioNoEliminado'),
+        duration: 3000,
+      });
+    },
+  });
 
   const handleDelete = (record: any) => {
     eliminarUsuario(record.id);
@@ -236,46 +224,103 @@ export const UsuariosPage: React.FC = () => {
 export const UsuariosForm: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { id } = useParams();
   const [isEdit, setIsEdit] = React.useState(false);
+  const [form] = Form.useForm();
 
-  const { mutate: handleCreate, isLoading } = useMutation(
-    ['postUsuario'],
-    async (values: any) => {
-      postUsuario({
+  const { data: usuarioData, isLoading: isLoadingUsuario } = useQuery(
+    ['getUsuario'],
+    () => getUsuario(parseInt(id as string)),
+    {
+      keepPreviousData: false,
+      refetchOnWindowFocus: false,
+      enabled: !!id,
+    },
+  );
+
+  const { mutate: handleCreate, isLoading } = useMutation(postUsuario, {
+    onSuccess: (res: any) => {
+      if (res?.status !== 400) {
+        notificationController.success({
+          message: t('common.successMessage'),
+          description: t('notifications.usuarioCreado'),
+          duration: 3000,
+        });
+        navigate('/usuarios');
+      } else {
+        throw new Error('Error al crear usuario');
+      }
+    },
+    onError: (error: Error) => {
+      notificationController.error({
+        message: t('common.errorMessage'),
+        description: t('notifications.usuarioNoCreado'),
+        duration: 3000,
+      });
+    },
+  });
+
+  const { mutate: handleEdit, isLoading: isLoadingEdit } = useMutation(putUsuario, {
+    onSuccess: (res: any) => {
+      if (res?.status !== 400) {
+        notificationController.success({
+          message: t('common.successMessage'),
+          description: t('notifications.usuarioActualizado'),
+          duration: 3000,
+        });
+        navigate('/usuarios');
+      } else {
+        throw new Error('Error al editar usuario');
+      }
+    },
+    onError: (error: Error) => {
+      notificationController.error({
+        message: t('common.errorMessage'),
+        description: t('notifications.usuarioNoActualizado'),
+        duration: 3000,
+      });
+    },
+  });
+  useEffect(() => {
+    if (id && !isLoadingUsuario) {
+      setIsEdit(true);
+      form.setFieldsValue({
+        id: id,
+        usuario: usuarioData?.usuario,
+        rol: usuarioData?.rol,
+      });
+    }
+  }, [usuarioData, isLoadingUsuario, form, id]);
+
+  const handleSubmit = (values: any) => {
+    if (isEdit) {
+      const user = {
+        id: parseInt(id as string),
         usuario: values.usuario,
         password: values.password,
         idRol: values.rol,
-      });
-    },
-    {
-      onSuccess: (res: any) => {
-        if (res?.status !== 400) {
-          notificationController.success({
-            message: t('common.successMessage'),
-            description: t('notifications.usuarioCreado'),
-            duration: 3000,
-          });
-          navigate('/usuarios');
-        } else {
-          throw new Error('Error al crear usuario');
-        }
-      },
-      onError: (error: Error) => {
-        notificationController.error({
-          message: t('common.errorMessage'),
-          description: t('notifications.usuarioNoCreado'),
-          duration: 3000,
-        });
-      },
-    },
-  );
+      };
+      handleEdit(user);
+    } else {
+      const user = {
+        usuario: values.usuario,
+        password: values.password,
+        idRol: values.rol,
+      };
+      handleCreate(user);
+    }
+  };
+
+  if (isLoadingUsuario && isEdit) {
+    return <Spin />;
+  }
 
   return (
     <div>
       <Row>
         <Col offset={8} span={8}>
-          <h1>{t('titles.creandoUsuario')}</h1>
-          <BaseForm layout="vertical" onFinish={handleCreate} requiredMark="optional">
+          <BaseForm layout="vertical" onFinish={handleSubmit} requiredMark="optional" form={form}>
+            <h1>{isEdit ? t('titles.editandoUsuario') : t('titles.creandoUsuario')}</h1>
             <FormItem
               name="usuario"
               label={t('common.email')}
@@ -330,7 +375,7 @@ export const UsuariosForm: React.FC = () => {
             </FormItem>
 
             <BaseForm.Item noStyle>
-              <SubmitButton type="primary" htmlType="submit" loading={isLoading}>
+              <SubmitButton type="primary" htmlType="submit" loading={isLoading || isLoadingEdit}>
                 {isEdit ? t('common.editar') : t('common.confirmar')}
               </SubmitButton>
             </BaseForm.Item>
