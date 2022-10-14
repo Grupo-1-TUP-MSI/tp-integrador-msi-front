@@ -30,4 +30,14 @@ export const resetCss = css`
   img {
     display: block;
   }
+
+  .deleted-row {
+    background-color: #f8d7da;
+    opacity: 0.8;
+  }
+
+  .no-stock-row {
+    background-color: #f8d11133;
+    opacity: 0.8;
+  }
 `;
