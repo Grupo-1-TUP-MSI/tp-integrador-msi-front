@@ -39,7 +39,7 @@ export const ProductosPage: React.FC = () => {
     data: proveedoresData,
     isLoading: isLoadingProveedores,
     isRefetching: isRefetchingProveedores,
-  } = useQuery(['productos'], getProveedores, {
+  } = useQuery(['proveedores'], getProveedores, {
     keepPreviousData: false,
     refetchOnWindowFocus: false,
   });
@@ -50,7 +50,7 @@ export const ProductosPage: React.FC = () => {
         notificationController.success({
           message: t('common.successMessage'),
           description: t('notifications.productoEliminado'),
-          duration: 3000,
+          duration: 3,
         });
         setIsModalOpen(false);
         refetchProductos();
@@ -62,7 +62,7 @@ export const ProductosPage: React.FC = () => {
       notificationController.error({
         message: t('common.errorMessage'),
         description: t('notifications.productoNoEliminado'),
-        duration: 3000,
+        duration: 3,
       });
     },
   });
@@ -149,7 +149,7 @@ export const ProductosPage: React.FC = () => {
         return !!filterEstado ? producto.estado === filterEstado : true;
       })
       .filter((producto: Producto) => {
-        return !!filterProveedor ? producto.proveedor === filterProveedor : true;
+        return !!filterProveedor ? producto.idProveedor === filterProveedor : true;
       })
       .filter((producto: Producto) => {
         return !!filterStock ? producto.stock || 0 > 0 : true;
@@ -226,9 +226,9 @@ export const ProductosPage: React.FC = () => {
           loading={isLoadingProveedores || isRefetchingProveedores}
           style={{ width: '60%', display: 'flex', justifyContent: 'flex-end' }}
         >
-          {proveedoresData?.map((proveedores: Proveedor, i: number) => (
-            <Select.Option key={i} value={proveedores}>
-              {proveedores}
+          {proveedoresData?.map((proveedor: Proveedor, i: number) => (
+            <Select.Option key={i} value={proveedor.id}>
+              {proveedor.id + ' - ' + proveedor.nombre}
             </Select.Option>
           ))}
         </Select>
@@ -343,13 +343,22 @@ export const ProductosForm: React.FC = () => {
     },
   );
 
+  const {
+    data: proveedoresData,
+    isLoading: isLoadingProveedores,
+    isRefetching: isRefetchingProveedores,
+  } = useQuery(['proveedores'], getProveedores, {
+    keepPreviousData: false,
+    refetchOnWindowFocus: false,
+  });
+
   const { mutate: handleCreate, isLoading } = useMutation(postProducto, {
     onSuccess: (res: any) => {
       if (res?.status !== 400) {
         notificationController.success({
           message: t('common.successMessage'),
           description: t('notifications.productoCreado'),
-          duration: 3000,
+          duration: 3,
         });
         navigate('/productos');
       } else {
@@ -360,7 +369,7 @@ export const ProductosForm: React.FC = () => {
       notificationController.error({
         message: t('common.errorMessage'),
         description: t('notifications.productoNoCreado'),
-        duration: 3000,
+        duration: 3,
       });
     },
   });
@@ -371,7 +380,7 @@ export const ProductosForm: React.FC = () => {
         notificationController.success({
           message: t('common.successMessage'),
           description: t('notifications.productoActualizado'),
-          duration: 3000,
+          duration: 3,
         });
         navigate('/productos');
       } else {
@@ -382,17 +391,21 @@ export const ProductosForm: React.FC = () => {
       notificationController.error({
         message: t('common.errorMessage'),
         description: t('notifications.productoNoActualizado'),
-        duration: 3000,
+        duration: 3,
       });
     },
   });
+
   useEffect(() => {
     if (id && !isLoadingProducto) {
       setIsEdit(true);
       form.setFieldsValue({
         id: id,
-        producto: productoData?.producto,
-        rol: productoData?.rol,
+        nombre: productoData?.nombre,
+        descripcion: productoData?.descripcion,
+        precio: productoData?.precio,
+        stockminimo: productoData?.stockminimo,
+        proveedor: productoData?.idProveedor,
       });
     }
   }, [productoData, isLoadingProducto, form, id]);
@@ -402,63 +415,78 @@ export const ProductosForm: React.FC = () => {
       const producto = {
         id: parseInt(id as string),
         nombre: values.nombre,
-        precio: values.precio,
-        stockminimo: values.stockminimo,
-        idProveedor: values.idProveedor,
+        descripcion: values.descripcion,
+        precio: parseInt(values.precio),
+        stockminimo: parseInt(values.stockminimo),
+        idProveedor: parseInt(values.proveedor),
       };
       handleEdit(producto);
     } else {
       const producto = {
         nombre: values.nombre,
-        precio: values.precio,
-        stockminimo: values.stockminimo,
-        idProveedor: values.proveedor,
+        descripcion: values.descripcion,
+        precio: parseInt(values.precio),
+        stockminimo: parseInt(values.stockminimo),
+        idProveedor: parseInt(values.proveedor),
       };
       handleCreate(producto);
     }
   };
 
-  if (isLoadingProducto && isEdit) {
+  if ((isLoadingProducto || isLoadingProveedores) && isEdit) {
     return <Spin />;
   }
 
   return (
     <div>
       <Row>
-        <Col offset={8} span={8}>
+        <Col offset={6} span={12}>
           <BaseForm layout="vertical" onFinish={handleSubmit} requiredMark="optional" form={form}>
             <h1>{isEdit ? t('titles.editandoProducto') : t('titles.creandoProducto')}</h1>
             <FormItem
               name="nombre"
               label={t('common.nombre')}
               rules={[{ required: true, message: t('common.requiredField') }]}
+              requiredMark
             >
               <FormInput />
             </FormItem>
-            <FormItem
-              name="precio"
-              label={t('common.precio')}
-              rules={[{ required: true, message: t('common.requiredField') }]}
-            >
+            <FormItem name="descripcion" label={t('common.descripcion')} requiredMark>
               <FormInput />
             </FormItem>
-            <FormItem
-              name="stockminimo"
-              label={t('common.stockminimo')}
-              rules={[{ required: true, message: t('common.requiredField') }]}
-            >
-              <FormInput />
-            </FormItem>
+            <Row>
+              <Col span={11}>
+                <FormItem
+                  requiredMark
+                  name="precio"
+                  label={t('common.precio')}
+                  rules={[{ required: true, message: t('common.requiredField') }]}
+                >
+                  <InputNumber style={{ width: '100%' }} min={0} />
+                </FormItem>
+              </Col>
+              <Col span={11} offset={2}>
+                <FormItem
+                  requiredMark
+                  name="stockminimo"
+                  label={t('common.stockminimo')}
+                  rules={[{ required: true, message: t('common.requiredField') }]}
+                >
+                  <InputNumber style={{ width: '100%' }} min={1} />
+                </FormItem>
+              </Col>
+            </Row>
 
             <FormItem
+              requiredMark
               label={t('common.proveedor')}
               name="proveedor"
               rules={[{ required: true, message: t('common.requiredField') }]}
             >
-              <Select allowClear>
-                {Roles.map((proveedor, i) => (
-                  <Select.Option key={i} value={i + 1}>
-                    {proveedor}
+              <Select allowClear loading={isLoadingProveedores || isRefetchingProveedores}>
+                {proveedoresData?.map((proveedor: Proveedor, i: number) => (
+                  <Select.Option key={i} value={proveedor.id}>
+                    {proveedor.id + ' - ' + proveedor.nombre}
                   </Select.Option>
                 ))}
               </Select>
