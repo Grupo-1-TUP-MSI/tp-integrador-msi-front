@@ -15,7 +15,7 @@ export interface Producto {
   precio: number;
   stock?: number;
   stockminimo: number;
-  idproveedor?: number;
+  idProveedor?: number;
   proveedor?: string;
   estado?: boolean;
 }

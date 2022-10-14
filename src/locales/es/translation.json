@@ -1,5 +1,6 @@
 {
   "common": {
+    "descripcion": "Descripción",
     "acciones": "Acciones",
     "clientes": "Clientes",
     "compras": "Compras",

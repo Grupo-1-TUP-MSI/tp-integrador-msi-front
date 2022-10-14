@@ -36,7 +36,7 @@ export const UsuariosPage: React.FC = () => {
         notificationController.success({
           message: t('common.successMessage'),
           description: t('notifications.usuarioEliminado'),
-          duration: 3000,
+          duration: 3,
         });
         setIsModalOpen(false);
         refetchUsuarios();
@@ -48,7 +48,7 @@ export const UsuariosPage: React.FC = () => {
       notificationController.error({
         message: t('common.errorMessage'),
         description: t('notifications.usuarioNoEliminado'),
-        duration: 3000,
+        duration: 3,
       });
     },
   });
@@ -165,13 +165,8 @@ export const UsuariosPage: React.FC = () => {
           marginBottom: '1rem',
         }}
       >
-        <Input
-          placeholder={t('table.buscarUsuario')}
-          value={searchUsuario}
-          onChange={(e) => setSearchUsuario(e.target.value)}
-        />
+        <Input value={searchUsuario} onChange={(e) => setSearchUsuario(e.target.value)} />
         <Select
-          placeholder={t('common.rol')}
           value={filterRol}
           onChange={(value) => setFilterRol(value)}
           style={{ width: 300, marginLeft: 10 }}
@@ -244,7 +239,7 @@ export const UsuariosForm: React.FC = () => {
         notificationController.success({
           message: t('common.successMessage'),
           description: t('notifications.usuarioCreado'),
-          duration: 3000,
+          duration: 3,
         });
         navigate('/usuarios');
       } else {
@@ -255,7 +250,7 @@ export const UsuariosForm: React.FC = () => {
       notificationController.error({
         message: t('common.errorMessage'),
         description: t('notifications.usuarioNoCreado'),
-        duration: 3000,
+        duration: 3,
       });
     },
   });
@@ -266,7 +261,7 @@ export const UsuariosForm: React.FC = () => {
         notificationController.success({
           message: t('common.successMessage'),
           description: t('notifications.usuarioActualizado'),
-          duration: 3000,
+          duration: 3,
         });
         navigate('/usuarios');
       } else {
@@ -277,7 +272,7 @@ export const UsuariosForm: React.FC = () => {
       notificationController.error({
         message: t('common.errorMessage'),
         description: t('notifications.usuarioNoActualizado'),
-        duration: 3000,
+        duration: 3,
       });
     },
   });
@@ -322,6 +317,7 @@ export const UsuariosForm: React.FC = () => {
           <BaseForm layout="vertical" onFinish={handleSubmit} requiredMark="optional" form={form}>
             <h1>{isEdit ? t('titles.editandoUsuario') : t('titles.creandoUsuario')}</h1>
             <FormItem
+              requiredMark
               name="usuario"
               label={t('common.email')}
               rules={[
@@ -332,16 +328,18 @@ export const UsuariosForm: React.FC = () => {
                 },
               ]}
             >
-              <FormInput placeholder={t('common.email')} />
+              <FormInput />
             </FormItem>
             <FormItem
+              requiredMark
               label={t('common.password')}
               name="password"
               rules={[{ required: true, message: t('common.requiredField') }]}
             >
-              <FormInputPassword placeholder={t('common.password')} />
+              <FormInputPassword />
             </FormItem>
             <FormItem
+              requiredMark
               label={t('common.confirmPassword')}
               name="confirmPassword"
               rules={[
@@ -357,15 +355,16 @@ export const UsuariosForm: React.FC = () => {
                 }),
               ]}
             >
-              <FormInputPassword placeholder={t('common.password')} />
+              <FormInputPassword />
             </FormItem>
 
             <FormItem
+              requiredMark
               label={t('common.rol')}
               name="rol"
               rules={[{ required: true, message: t('common.requiredField') }]}
             >
-              <Select placeholder={t('common.rol')} allowClear>
+              <Select allowClear>
                 {Roles.map((rol, i) => (
                   <Select.Option key={i} value={i + 1}>
                     {rol}
