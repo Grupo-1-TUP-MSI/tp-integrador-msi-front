@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Button, Checkbox, Col, Form, Input, InputNumber, Modal, Row, Select, Space, Spin } from 'antd';
+import { Button, Checkbox, Col, Form, Input, InputNumber, Modal, Row, Select, Space, Spin, Tooltip } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -38,7 +38,6 @@ export const ProductosPage: React.FC = () => {
   const {
     data: proveedoresData,
     isLoading: isLoadingProveedores,
-    refetch: refetchProveedores,
     isRefetching: isRefetchingProveedores,
   } = useQuery(['productos'], getProveedores, {
     keepPreviousData: false,
@@ -83,6 +82,11 @@ export const ProductosPage: React.FC = () => {
       dataIndex: 'nombre',
       key: 'nombre',
       width: '40%',
+      render: (text: any, record: any) => (
+        <Tooltip placement="top" title={record.descripcion}>
+          <span>{record.nombre}</span>
+        </Tooltip>
+      ),
     },
     {
       title: t('common.proveedor'),
@@ -293,6 +297,7 @@ export const ProductosPage: React.FC = () => {
       )}
       <Table
         rowKey={(record) => record.id}
+        rowClassName={(record) => (!record.estado ? 'deleted-row' : record.stock < 0 ? 'no-stock-row' : '')}
         columns={columns}
         dataSource={productosFiltrados()}
         loading={isLoadingProductos || isRefetchingProductos}

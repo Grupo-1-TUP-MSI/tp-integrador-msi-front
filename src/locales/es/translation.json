@@ -30,7 +30,7 @@
     "stockminimo": "Stock mínimo",
     "stock": "Stock actual",
     "proveedor": "Proveedor",
-    "verSinStock": "Filtrar sin stock"
+    "verSinStock": "Ocultar sin stock"
   },
   "error404": {
     "comeBack": "Return to Home",
