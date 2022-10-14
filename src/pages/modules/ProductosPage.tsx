@@ -401,8 +401,11 @@ export const ProductosForm: React.FC = () => {
       setIsEdit(true);
       form.setFieldsValue({
         id: id,
-        producto: productoData?.producto,
-        rol: productoData?.rol,
+        nombre: productoData?.nombre,
+        descripcion: productoData?.descripcion,
+        precio: productoData?.precio,
+        stockminimo: productoData?.stockminimo,
+        proveedor: productoData?.idProveedor,
       });
     }
   }, [productoData, isLoadingProducto, form, id]);
@@ -412,6 +415,7 @@ export const ProductosForm: React.FC = () => {
       const producto = {
         id: parseInt(id as string),
         nombre: values.nombre,
+        descripcion: values.descripcion,
         precio: parseInt(values.precio),
         stockminimo: parseInt(values.stockminimo),
         idProveedor: parseInt(values.proveedor),
@@ -420,6 +424,7 @@ export const ProductosForm: React.FC = () => {
     } else {
       const producto = {
         nombre: values.nombre,
+        descripcion: values.descripcion,
         precio: parseInt(values.precio),
         stockminimo: parseInt(values.stockminimo),
         idProveedor: parseInt(values.proveedor),
