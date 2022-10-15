@@ -165,12 +165,17 @@ export const UsuariosPage: React.FC = () => {
           marginBottom: '1rem',
         }}
       >
-        <Input value={searchUsuario} onChange={(e) => setSearchUsuario(e.target.value)} />
+        <Input
+          value={searchUsuario}
+          onChange={(e) => setSearchUsuario(e.target.value)}
+          placeholder={t('table.buscarUsuario')}
+        />
         <Select
           value={filterRol}
           onChange={(value) => setFilterRol(value)}
           style={{ width: 300, marginLeft: 10 }}
           allowClear
+          placeholder={t('common.rol')}
         >
           {Roles.map((rol, i) => (
             <Select.Option key={i} value={rol}>
@@ -188,6 +193,7 @@ export const UsuariosPage: React.FC = () => {
       </div>
       <Table
         rowKey={(record) => record.id}
+        rowClassName={(record) => (!record.estado ? 'deleted-row' : '')}
         columns={columns}
         dataSource={usuariosFiltrados()}
         loading={isLoadingUsuarios || isRefetchingUsuarios}
