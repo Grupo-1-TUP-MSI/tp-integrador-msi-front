@@ -1,5 +1,7 @@
 {
   "common": {
+    "actualizarStock": "Actualizar Stock",
+    "newStock": "Nuevo stock",
     "descripcion": "Descripción",
     "acciones": "Acciones",
     "clientes": "Clientes",
@@ -25,7 +27,7 @@
     "requiredField": "Campo requerido",
     "passwordsDontMatch": "Las contraseñas no coinciden",
     "notValidEmail": "Email no válido",
-    "verBorrados": "Filtrar borrados",
+    "verBorrados": "Ocultar borrados",
     "nombre": "Nombre",
     "precio": "Precio unitario",
     "stockminimo": "Stock mínimo",
@@ -63,6 +65,7 @@
     "logout": "Cerrar sesión"
   },
   "notifications": {
+    "actualizandoStock": "Actualizando stock",
     "productoCreado": "Producto creado con éxito!",
     "productoActualizado": "Producto actualizado con éxito!",
     "productoEliminado": "Producto eliminado con éxito!",

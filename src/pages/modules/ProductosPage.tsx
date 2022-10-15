@@ -1,9 +1,16 @@
 import React, { useEffect } from 'react';
 import { Button, Checkbox, Col, Form, Input, InputNumber, Modal, Row, Select, Space, Spin, Tooltip } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, PlusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { deleteProducto, getProducto, getProductos, postProducto, putProducto } from '@app/api/productos.api';
+import {
+  deleteProducto,
+  getProducto,
+  getProductos,
+  postProducto,
+  putProducto,
+  updateStock,
+} from '@app/api/productos.api';
 import { Roles, Producto, Proveedor } from '@app/models/models';
 import { useNavigate, useParams } from 'react-router';
 import { notificationController } from '@app/controllers/notificationController';
@@ -20,11 +27,13 @@ export const ProductosPage: React.FC = () => {
   const [searchProducto, setSearchProducto] = React.useState('');
   const [minPrecio, setMinPrecio] = React.useState(0);
   const [maxPrecio, setMaxPrecio] = React.useState(0);
-  const [filterStock, setFilterStock] = React.useState(true);
+  const [filterStock, setFilterStock] = React.useState(false);
   const [filterProveedor, setFilterProveedor] = React.useState(null);
   const [filterEstado, setFilterEstado] = React.useState(true);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [producto, setProducto] = React.useState<Producto | null>(null);
+  const [modalStockOpen, setModalStockOpen] = React.useState(false);
+  const [newStock, setNewStock] = React.useState(0);
   const { isDesktop } = useResponsive();
   const {
     data: productosData,
@@ -67,6 +76,33 @@ export const ProductosPage: React.FC = () => {
     },
   });
 
+  const { mutate: actualizarStock, isLoading: isLoadingStock } = useMutation(
+    ['updateStock'],
+    () => updateStock(producto?.id as any, newStock),
+    {
+      onSuccess: (res: { status: number }) => {
+        if (res?.status !== 400) {
+          notificationController.success({
+            message: t('common.successMessage'),
+            description: t('notifications.productoActualizado'),
+            duration: 3,
+          });
+          setModalStockOpen(false);
+          refetchProductos();
+        } else {
+          throw new Error('Error al actualizar producto');
+        }
+      },
+      onError: (error: Error) => {
+        notificationController.error({
+          message: t('common.errorMessage'),
+          description: t('notifications.productoNoActualizado'),
+          duration: 3,
+        });
+      },
+    },
+  );
+
   const handleDelete = (record: any) => {
     eliminarProducto(record.id);
   };
@@ -83,7 +119,7 @@ export const ProductosPage: React.FC = () => {
       key: 'nombre',
       width: '40%',
       render: (text: any, record: any) => (
-        <Tooltip placement="top" title={record.descripcion}>
+        <Tooltip placement="top" title={record.descripcion} trigger="hover" destroyTooltipOnHide>
           <span>{record.nombre}</span>
         </Tooltip>
       ),
@@ -117,6 +153,17 @@ export const ProductosPage: React.FC = () => {
       key: 'acciones',
       render: (text: any, record: any) => (
         <Space>
+          <Tooltip placement="top" title={t('common.actualizarStock')} trigger="hover" destroyTooltipOnHide>
+            <Button
+              icon={<PlusCircleOutlined />}
+              disabled={!record.estado}
+              type="text"
+              onClick={() => {
+                setModalStockOpen(true);
+                setProducto(record);
+              }}
+            ></Button>
+          </Tooltip>
           <Button
             icon={<EditOutlined />}
             disabled={!record.estado}
@@ -181,6 +228,25 @@ export const ProductosPage: React.FC = () => {
         cancelText={t('common.cancelar')}
       >
         <p>{t('notifications.confirmarEliminacion')}</p>
+      </Modal>
+      <Modal
+        title={t('notifications.actualizandoStock')}
+        visible={modalStockOpen}
+        onOk={() => actualizarStock()}
+        onCancel={() => setModalStockOpen(false)}
+        confirmLoading={isLoadingStock}
+        okText={t('common.confirmar')}
+        cancelText={t('common.cancelar')}
+      >
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+          }}
+        >
+          <div style={{ marginLeft: '3rem', marginRight: '1.2rem' }}>{t('common.newStock')}:</div>
+          <InputNumber value={newStock} onChange={setNewStock} />
+        </div>
       </Modal>
       <div
         style={{
