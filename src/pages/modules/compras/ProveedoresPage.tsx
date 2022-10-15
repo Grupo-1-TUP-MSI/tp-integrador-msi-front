@@ -378,7 +378,7 @@ export const ProveedoresForm: React.FC = () => {
                     label={t('common.tipoDocumento')}
                     rules={[{ required: true, message: t('common.requiredField') }]}
                   >
-                    <Select allowClear>
+                    <Select allowClear disabled={isEdit}>
                       {TiposDocumento.map((td, i) => (
                         <Select.Option key={i} value={i + 1}>
                           {td}
@@ -394,7 +394,7 @@ export const ProveedoresForm: React.FC = () => {
                     label={t('common.documento')}
                     rules={[{ required: true, message: t('common.requiredField') }]}
                   >
-                    <FormInput />
+                    <FormInput disabled={isEdit} />
                   </FormItem>
                 </Col>
               </Row>
@@ -484,7 +484,7 @@ export const ProveedoresForm: React.FC = () => {
                     label={t('common.tipoDocumento')}
                     rules={[{ required: true, message: t('common.requiredField') }]}
                   >
-                    <Select allowClear>
+                    <Select allowClear disabled={isEdit}>
                       {TiposDocumento.map((td, i) => (
                         <Select.Option key={i} value={i + 1}>
                           {td}
@@ -500,7 +500,7 @@ export const ProveedoresForm: React.FC = () => {
                     label={t('common.documento')}
                     rules={[{ required: true, message: t('common.requiredField') }]}
                   >
-                    <FormInput />
+                    <FormInput disabled={isEdit} />
                   </FormItem>
                 </Col>
               </Row>
