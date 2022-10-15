@@ -11,6 +11,7 @@ import FormItem from 'antd/es/form/FormItem';
 import { FormInput, FormInputPassword, SubmitButton } from '@app/components/layouts/AuthLayout/AuthLayout.styles';
 import { Table } from '@app/components/common/Table/Table';
 import { getClientes, getCliente, postCliente, putCliente, deleteCliente } from '../../../api/clientes.api';
+import { useResponsive } from '@app/hooks/useResponsive';
 
 export const ClientesPage: React.FC = () => {
   const { t } = useTranslation();
@@ -31,8 +32,8 @@ export const ClientesPage: React.FC = () => {
   });
 
   const { mutate: eliminarCliente, isLoading: isLoadingDelete } = useMutation(deleteCliente, {
-    onSuccess: (res: { status: number }) => {
-      if (res?.status !== 400) {
+    onSuccess: (res) => {
+      if (res !== 400) {
         notificationController.success({
           message: t('common.successMessage'),
           description: t('notifications.clienteEliminado'),
@@ -62,7 +63,7 @@ export const ClientesPage: React.FC = () => {
       title: t('common.documento'),
       dataIndex: 'documento',
       key: 'documento',
-      render: (text: any, record: any) => TiposDocumento[record.idtipodocumento] + ' ' + record.documento,
+      render: (text: any, record: any) => TiposDocumento[record.idtipodocumento - 1] + ' ' + record.documento,
     },
     {
       title: t('common.nombre'),
@@ -73,7 +74,7 @@ export const ClientesPage: React.FC = () => {
       title: t('common.tipoiva'),
       dataIndex: 'tipoiva',
       key: 'tipoiva',
-      render: (text: any, record: any) => TiposIVA[record.tipoiva],
+      render: (text: any, record: any) => TiposIVA[record.tipoiva - 1],
     },
 
     {
@@ -126,7 +127,7 @@ export const ClientesPage: React.FC = () => {
       ?.filter((cliente: Cliente) => {
         return (
           cliente.nombre.toLowerCase().includes(searchCliente.toLowerCase()) ||
-          `${TiposDocumento[cliente.idtipodocumento as number]} ${cliente.documento}`
+          `${TiposDocumento[(cliente.idtipodocumento as number) - 1]} ${cliente.documento}`
             .toLowerCase()
             .includes(searchCliente.toLowerCase())
         );
@@ -135,7 +136,7 @@ export const ClientesPage: React.FC = () => {
         return !!filterEstado ? cliente.estado === filterEstado : true;
       })
       .filter((cliente: Cliente) => {
-        return filterTipoIVA ? TiposIVA[cliente.tipoiva] === filterTipoIVA : true;
+        return filterTipoIVA ? TiposIVA[cliente.tipoiva - 1] === filterTipoIVA : true;
       })
       .sort((a: Cliente, b: Cliente) => {
         return (a.id as number) - (b.id as number);
@@ -251,6 +252,7 @@ export const ClientesForm: React.FC = () => {
   const { id } = useParams();
   const [isEdit, setIsEdit] = React.useState(false);
   const [form] = Form.useForm();
+  const { isDesktop } = useResponsive();
 
   const { data: clienteData, isLoading: isLoadingCliente } = useQuery(
     ['getCliente'],
@@ -264,13 +266,13 @@ export const ClientesForm: React.FC = () => {
 
   const { mutate: handleCreate, isLoading } = useMutation(postCliente, {
     onSuccess: (res: any) => {
-      if (res?.status !== 400) {
+      if (res !== 400) {
         notificationController.success({
           message: t('common.successMessage'),
           description: t('notifications.clienteCreado'),
           duration: 3,
         });
-        navigate('ventas/clientes');
+        navigate('/ventas/clientes');
       } else {
         throw new Error('Error al crear cliente');
       }
@@ -286,7 +288,7 @@ export const ClientesForm: React.FC = () => {
 
   const { mutate: handleEdit, isLoading: isLoadingEdit } = useMutation(putCliente, {
     onSuccess: (res: any) => {
-      if (res?.status !== 400) {
+      if (res !== 400) {
         notificationController.success({
           message: t('common.successMessage'),
           description: t('notifications.clienteActualizado'),
@@ -310,8 +312,14 @@ export const ClientesForm: React.FC = () => {
       setIsEdit(true);
       form.setFieldsValue({
         id: id,
-        cliente: clienteData?.cliente,
-        rol: clienteData?.rol,
+        nombre: clienteData?.nombre,
+        tipoiva: clienteData?.tipoiva,
+        tipoDocumento: clienteData?.idtipodocumento,
+        documento: clienteData?.documento,
+        direccion: clienteData?.direccion,
+        cp: clienteData?.cp,
+        telefono: clienteData?.telefono,
+        email: clienteData?.email,
       });
     }
   }, [clienteData, isLoadingCliente, form, id]);
@@ -322,7 +330,7 @@ export const ClientesForm: React.FC = () => {
         id: parseInt(id as string),
         nombre: values.nombre,
         tipoiva: values.tipoiva,
-        idtipodocumento: values.idtipodocumento,
+        idtipodocumento: values.tipoDocumento,
         documento: values.documento,
         direccion: values.direccion,
         cp: values.cp,
@@ -334,7 +342,7 @@ export const ClientesForm: React.FC = () => {
       const cliente = {
         nombre: values.nombre,
         tipoiva: values.tipoiva,
-        idtipodocumento: values.idtipodocumento,
+        idtipodocumento: values.tipoDocumento,
         documento: values.documento,
         direccion: values.direccion,
         cp: values.cp,
@@ -352,73 +360,219 @@ export const ClientesForm: React.FC = () => {
   return (
     <div>
       <Row>
-        <Col offset={8} span={8}>
-          <BaseForm layout="vertical" onFinish={handleSubmit} requiredMark="optional" form={form}>
-            <h1>{isEdit ? t('titles.editandoCliente') : t('titles.creandoCliente')}</h1>
-            <FormItem
-              requiredMark
-              name="cliente"
-              label={t('common.email')}
-              rules={[
-                { required: true, message: t('common.requiredField') },
-                {
-                  type: 'email',
-                  message: t('common.notValidEmail'),
-                },
-              ]}
-            >
-              <FormInput />
-            </FormItem>
-            <FormItem
-              requiredMark
-              label={t('common.password')}
-              name="password"
-              rules={[{ required: true, message: t('common.requiredField') }]}
-            >
-              <FormInputPassword />
-            </FormItem>
-            <FormItem
-              requiredMark
-              label={t('common.confirmPassword')}
-              name="confirmPassword"
-              rules={[
-                { required: true, message: t('common.requiredField') },
-                ({ getFieldValue }) => ({
-                  validator(_, value) {
-                    if (value !== getFieldValue('password')) {
-                      return Promise.reject(t('common.passwordsDontMatch'));
-                    } else {
-                      return Promise.resolve();
-                    }
-                  },
-                }),
-              ]}
-            >
-              <FormInputPassword />
-            </FormItem>
-
-            <FormItem
-              requiredMark
-              label={t('common.rol')}
-              name="rol"
-              rules={[{ required: true, message: t('common.requiredField') }]}
-            >
-              <Select allowClear>
-                {Roles.map((rol, i) => (
-                  <Select.Option key={i} value={i + 1}>
-                    {rol}
-                  </Select.Option>
-                ))}
-              </Select>
-            </FormItem>
-
-            <BaseForm.Item noStyle>
-              <SubmitButton type="primary" htmlType="submit" loading={isLoading || isLoadingEdit}>
-                {isEdit ? t('common.editar') : t('common.confirmar')}
-              </SubmitButton>
-            </BaseForm.Item>
-          </BaseForm>
-        </Col>
+        {isDesktop ? (
+          <Col offset={6} span={12}>
+            <BaseForm layout="vertical" onFinish={handleSubmit} requiredMark="optional" form={form}>
+              <h1>{isEdit ? t('titles.editandoCliente') : t('titles.creandoCliente')}</h1>
+              <Row>
+                <Col span={6}>
+                  <FormItem
+                    requiredMark
+                    name="tipoDocumento"
+                    label={t('common.tipoDocumento')}
+                    rules={[{ required: true, message: t('common.requiredField') }]}
+                  >
+                    <Select allowClear>
+                      {TiposDocumento.map((td, i) => (
+                        <Select.Option key={i} value={i + 1}>
+                          {td}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </FormItem>
+                </Col>
+                <Col span={17} offset={1}>
+                  <FormItem
+                    requiredMark
+                    name="documento"
+                    label={t('common.documento')}
+                    rules={[{ required: true, message: t('common.requiredField') }]}
+                  >
+                    <FormInput />
+                  </FormItem>
+                </Col>
+              </Row>
+              <Row>
+                <Col span={6}>
+                  <FormItem
+                    requiredMark
+                    name="tipoiva"
+                    label={t('common.tipoiva')}
+                    rules={[{ required: true, message: t('common.requiredField') }]}
+                  >
+                    <Select allowClear>
+                      {TiposIVA.map((iva, i) => (
+                        <Select.Option key={i} value={i + 1}>
+                          {iva}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </FormItem>
+                </Col>
+                <Col span={17} offset={1}>
+                  <FormItem
+                    requiredMark
+                    name="nombre"
+                    label={t('common.cpnombre')}
+                    rules={[{ required: true, message: t('common.requiredField') }]}
+                  >
+                    <FormInput />
+                  </FormItem>
+                </Col>
+              </Row>
+              <Row>
+                <Col span={16}>
+                  <FormItem
+                    requiredMark
+                    name="direccion"
+                    label={t('common.direccion')}
+                    rules={[{ required: true, message: t('common.requiredField') }]}
+                  >
+                    <FormInput />
+                  </FormItem>
+                </Col>
+                <Col span={7} offset={1}>
+                  <FormItem
+                    requiredMark
+                    name="cp"
+                    label={t('common.cp')}
+                    rules={[{ required: true, message: t('common.requiredField') }]}
+                  >
+                    <FormInput />
+                  </FormItem>
+                </Col>
+              </Row>
+              <Row>
+                <Col span={11}>
+                  <FormItem requiredMark name="telefono" label={t('common.telefono')}>
+                    <FormInput />
+                  </FormItem>
+                </Col>
+                <Col span={12} offset={1}>
+                  <FormItem
+                    requiredMark
+                    name="email"
+                    label={t('common.email')}
+                    rules={[{ required: true, message: t('common.requiredField') }]}
+                  >
+                    <FormInput />
+                  </FormItem>
+                </Col>
+              </Row>
+              <BaseForm.Item noStyle>
+                <SubmitButton type="primary" htmlType="submit" loading={isLoading || isLoadingEdit}>
+                  {isEdit ? t('common.editar') : t('common.confirmar')}
+                </SubmitButton>
+              </BaseForm.Item>
+            </BaseForm>
+          </Col>
+        ) : (
+          <Col span={24}>
+            <BaseForm layout="vertical" onFinish={handleSubmit} requiredMark="optional" form={form}>
+              <h1>{isEdit ? t('titles.editandoCliente') : t('titles.creandoCliente')}</h1>
+              <Row>
+                <Col span={6}>
+                  <FormItem
+                    requiredMark
+                    name="tipoDocumento"
+                    label={t('common.tipoDocumento')}
+                    rules={[{ required: true, message: t('common.requiredField') }]}
+                  >
+                    <Select allowClear>
+                      {TiposDocumento.map((td, i) => (
+                        <Select.Option key={i} value={i + 1}>
+                          {td}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </FormItem>
+                </Col>
+                <Col span={17} offset={1}>
+                  <FormItem
+                    requiredMark
+                    name="documento"
+                    label={t('common.documento')}
+                    rules={[{ required: true, message: t('common.requiredField') }]}
+                  >
+                    <FormInput />
+                  </FormItem>
+                </Col>
+              </Row>
+              <Row>
+                <Col span={6}>
+                  <FormItem
+                    requiredMark
+                    name="tipoiva"
+                    label={t('common.tipoiva')}
+                    rules={[{ required: true, message: t('common.requiredField') }]}
+                  >
+                    <Select allowClear>
+                      {TiposIVA.map((iva, i) => (
+                        <Select.Option key={i} value={i + 1}>
+                          {iva}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </FormItem>
+                </Col>
+                <Col span={17} offset={1}>
+                  <FormItem
+                    requiredMark
+                    name="nombre"
+                    label={t('common.cpnombre')}
+                    rules={[{ required: true, message: t('common.requiredField') }]}
+                  >
+                    <FormInput />
+                  </FormItem>
+                </Col>
+              </Row>
+              <Row>
+                <Col span={16}>
+                  <FormItem
+                    requiredMark
+                    name="direccion"
+                    label={t('common.direccion')}
+                    rules={[{ required: true, message: t('common.requiredField') }]}
+                  >
+                    <FormInput />
+                  </FormItem>
+                </Col>
+                <Col span={7} offset={1}>
+                  <FormItem
+                    requiredMark
+                    name="cp"
+                    label={t('common.cp')}
+                    rules={[{ required: true, message: t('common.requiredField') }]}
+                  >
+                    <FormInput />
+                  </FormItem>
+                </Col>
+              </Row>
+              <Row>
+                <Col span={11}>
+                  <FormItem requiredMark name="telefono" label={t('common.telefono')}>
+                    <FormInput />
+                  </FormItem>
+                </Col>
+                <Col span={12} offset={1}>
+                  <FormItem
+                    requiredMark
+                    name="email"
+                    label={t('common.email')}
+                    rules={[{ required: true, message: t('common.requiredField') }]}
+                  >
+                    <FormInput />
+                  </FormItem>
+                </Col>
+              </Row>
+              <BaseForm.Item noStyle>
+                <SubmitButton type="primary" htmlType="submit" loading={isLoading || isLoadingEdit}>
+                  {isEdit ? t('common.editar') : t('common.confirmar')}
+                </SubmitButton>
+              </BaseForm.Item>
+            </BaseForm>
+          </Col>
+        )}
       </Row>
     </div>
   );

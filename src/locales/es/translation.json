@@ -37,7 +37,10 @@
     "tipoiva": "Tipo de IVA",
     "documento": "Documento",
     "direccion": "Dirección",
-    "telefono": "Teléfono"
+    "telefono": "Teléfono",
+    "tipoDocumento": "Tipo de documento",
+    "cpnombre": "Razon social / Nombre",
+    "cp": "Código postal"
   },
   "error404": {
     "comeBack": "Return to Home",

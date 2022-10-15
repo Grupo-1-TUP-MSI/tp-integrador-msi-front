@@ -31,8 +31,8 @@ export const UsuariosPage: React.FC = () => {
   });
 
   const { mutate: eliminarUsuario, isLoading: isLoadingDelete } = useMutation(deleteUsuario, {
-    onSuccess: (res: { status: number }) => {
-      if (res?.status !== 400) {
+    onSuccess: (res) => {
+      if (res !== 400) {
         notificationController.success({
           message: t('common.successMessage'),
           description: t('notifications.usuarioEliminado'),
@@ -241,7 +241,7 @@ export const UsuariosForm: React.FC = () => {
 
   const { mutate: handleCreate, isLoading } = useMutation(postUsuario, {
     onSuccess: (res: any) => {
-      if (res?.status !== 400) {
+      if (res !== 400) {
         notificationController.success({
           message: t('common.successMessage'),
           description: t('notifications.usuarioCreado'),
@@ -263,7 +263,7 @@ export const UsuariosForm: React.FC = () => {
 
   const { mutate: handleEdit, isLoading: isLoadingEdit } = useMutation(putUsuario, {
     onSuccess: (res: any) => {
-      if (res?.status !== 400) {
+      if (res !== 400) {
         notificationController.success({
           message: t('common.successMessage'),
           description: t('notifications.usuarioActualizado'),

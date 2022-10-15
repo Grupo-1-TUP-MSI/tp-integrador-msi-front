@@ -9,12 +9,7 @@ export const getUsuario = (id: number) => {
   return httpApi.get(`usuarios/${id}`).then((res) => res.data.data);
 };
 
-export const postUsuario = (user: any) => {
-  const usuario = {
-    usuario: user.usuario,
-    password: user.password,
-    idRol: user.rol,
-  };
+export const postUsuario = (usuario: Usuario) => {
   return httpApi.post('usuarios', usuario).then((res) => res.data.data);
 };
 
