@@ -1,4 +1,10 @@
 export const Roles = ['ADMINISTRADOR', 'COMPRADOR', 'VENDEDOR'];
+export const TiposPago = ['EFECTIVO', 'MERCADOPAGO'];
+export const TipoVenta = ['SALON', 'ONLINE'];
+export const TipoCompra = ['LOCAL', 'EXTERIOR'];
+export const TiposDocumento = ['DNI', 'CUIT', 'CUIL', 'PASAPORTE'];
+export const EstadoNP = ['PEND_ACEPTACION', 'PEND_ENTREGA', 'CERRADA', 'RECHAZADA'];
+export const TiposIVA = ['I', 'M', 'C'];
 
 export interface Usuario {
   id?: number;
@@ -20,6 +26,18 @@ export interface Producto {
   estado?: boolean;
 }
 
+export interface Cliente {
+  id?: number;
+  nombre: string;
+  tipoiva: number;
+  idtipodocumento?: number;
+  documento: string;
+  direccion: string;
+  cp: string;
+  telefono: string;
+  email: string;
+  estado?: boolean;
+}
 export interface Proveedor {
   id?: number;
   nombre: string;

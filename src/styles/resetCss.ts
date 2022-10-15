@@ -32,7 +32,7 @@ export const resetCss = css`
   }
 
   .deleted-row {
-    background-color: #f8d7da;
+    filter: sepia(100%) saturate(300%) brightness(200%) hue-rotate(200deg);
     opacity: 0.8;
   }
 

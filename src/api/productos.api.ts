@@ -21,6 +21,6 @@ export const deleteProducto = (id: number) => {
   return httpApi.delete(`productos/${id}`).then((res) => res.data.data);
 };
 
-export const updateStock = (id: number, cantidad: number) => {
-  return httpApi.put(`productos/${id}/stock`, { cantidad }).then((res) => res.data.data);
+export const updateStock = (id: number, stock: number) => {
+  return httpApi.put(`productos/${id}/stock`, { stock }).then((res) => res.data.data);
 };

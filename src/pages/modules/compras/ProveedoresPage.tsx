@@ -1,9 +1,431 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { Button, Checkbox, Col, Form, Input, Modal, Row, Select, Space, Spin } from 'antd';
+import { useTranslation } from 'react-i18next';
+import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { Roles, Proveedor, TiposIVA, TiposDocumento } from '@app/models/models';
+import { useNavigate, useParams } from 'react-router';
+import { notificationController } from '@app/controllers/notificationController';
+import { BaseForm } from '@app/components/common/forms/BaseForm/BaseForm';
+import FormItem from 'antd/es/form/FormItem';
+import { FormInput, FormInputPassword, SubmitButton } from '@app/components/layouts/AuthLayout/AuthLayout.styles';
+import { Table } from '@app/components/common/Table/Table';
+import {
+  getProveedores,
+  getProveedor,
+  postProveedor,
+  putProveedor,
+  deleteProveedor,
+} from '../../../api/proveedores.api';
 
 export const ProveedoresPage: React.FC = () => {
-  return <div>ProveedoresPage</div>;
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const [searchProveedor, setSearchProveedor] = React.useState('');
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [filterEstado, setFilterEstado] = React.useState(true);
+  const [proveedor, setProveedor] = React.useState<Proveedor | null>(null);
+  const [filterTipoIVA, setFilterTipoIVA] = React.useState(null);
+  const {
+    data: proveedoresData,
+    isLoading: isLoadingProveedores,
+    refetch: refetchProveedores,
+    isRefetching: isRefetchingProveedores,
+  } = useQuery(['proveedores'], getProveedores, {
+    keepPreviousData: false,
+    refetchOnWindowFocus: false,
+  });
+
+  const { mutate: eliminarProveedor, isLoading: isLoadingDelete } = useMutation(deleteProveedor, {
+    onSuccess: (res: { status: number }) => {
+      if (res?.status !== 400) {
+        notificationController.success({
+          message: t('common.successMessage'),
+          description: t('notifications.proveedorEliminado'),
+          duration: 3,
+        });
+        setIsModalOpen(false);
+        refetchProveedores();
+      } else {
+        throw new Error('Error al eliminar proveedor');
+      }
+    },
+    onError: (error: Error) => {
+      notificationController.error({
+        message: t('common.errorMessage'),
+        description: t('notifications.proveedorNoEliminado'),
+        duration: 3,
+      });
+    },
+  });
+
+  const handleDelete = (record: any) => {
+    eliminarProveedor(record.id);
+  };
+
+  const columns = [
+    {
+      title: t('common.documento'),
+      dataIndex: 'documento',
+      key: 'documento',
+      render: (text: any, record: any) => TiposDocumento[record.idtipodocumento] + ' ' + record.documento,
+    },
+    {
+      title: t('common.nombre'),
+      dataIndex: 'nombre',
+      key: 'nombre',
+    },
+    {
+      title: t('common.tipoiva'),
+      dataIndex: 'tipoiva',
+      key: 'tipoiva',
+      render: (text: any, record: any) => TiposIVA[record.tipoiva],
+    },
+
+    {
+      title: t('common.direccion'),
+      dataIndex: 'direccion',
+      key: 'direccion',
+      render: (text: any, record: any) => record.direccion + ', CP: ' + record.cp,
+    },
+    {
+      title: t('common.telefono'),
+      dataIndex: 'telefono',
+      key: 'telefono',
+    },
+    {
+      title: t('common.email'),
+      dataIndex: 'email',
+      key: 'email',
+    },
+    {
+      title: t('common.acciones'),
+      width: '10%',
+      key: 'acciones',
+      render: (text: any, record: any) => (
+        <Space>
+          <Button
+            icon={<EditOutlined />}
+            disabled={!record.estado}
+            type="text"
+            onClick={() => {
+              navigate(`/compras/proveedores/${record.id}`);
+            }}
+          ></Button>
+          <Button
+            icon={<DeleteOutlined />}
+            disabled={!record.estado}
+            type="text"
+            danger
+            onClick={() => {
+              setIsModalOpen(true);
+              setProveedor(record);
+            }}
+          ></Button>
+        </Space>
+      ),
+    },
+  ];
+
+  const proveedoresFiltrados = () => {
+    const arr = proveedoresData
+      ?.filter((proveedor: Proveedor) => {
+        return (
+          proveedor.nombre.toLowerCase().includes(searchProveedor.toLowerCase()) ||
+          `${TiposDocumento[proveedor.idtipodocumento as number]} ${proveedor.documento}`
+            .toLowerCase()
+            .includes(searchProveedor.toLowerCase())
+        );
+      })
+      .filter((proveedor: Proveedor) => {
+        return !!filterEstado ? proveedor.estado === filterEstado : true;
+      })
+      .filter((proveedor: Proveedor) => {
+        return filterTipoIVA ? TiposIVA[proveedor.tipoiva] === filterTipoIVA : true;
+      })
+      .sort((a: Proveedor, b: Proveedor) => {
+        return (a.id as number) - (b.id as number);
+      });
+
+    return arr;
+  };
+
+  return (
+    <>
+      <Modal
+        title={t('notifications.eliminandoElemento')}
+        visible={isModalOpen}
+        onOk={() => {
+          handleDelete(proveedor);
+        }}
+        onCancel={() => setIsModalOpen(false)}
+        confirmLoading={isLoadingDelete}
+        okText={t('common.confirmar')}
+        cancelText={t('common.cancelar')}
+      >
+        <p>{t('notifications.confirmarEliminacion')}</p>
+      </Modal>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '1rem',
+        }}
+      >
+        <h1 style={{ color: 'var(--timeline-background)' }}>{t('common.proveedores')}</h1>
+
+        <Button
+          style={{
+            color: 'var(--success-color)',
+            borderRadius: '2rem',
+          }}
+          className="success-button"
+          icon={<PlusOutlined />}
+          type="text"
+          onClick={() => navigate('/compras/proveedores/alta')}
+        ></Button>
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '1rem',
+        }}
+      >
+        <Input
+          value={searchProveedor}
+          onChange={(e) => setSearchProveedor(e.target.value)}
+          placeholder={t('table.buscarProveedor')}
+        />
+        <Select
+          value={filterTipoIVA}
+          onChange={(value) => setFilterTipoIVA(value)}
+          style={{ width: 200, marginLeft: '1rem' }}
+          placeholder={t('common.tipoiva')}
+          allowClear
+        >
+          {TiposIVA.map((iva, i) => (
+            <Select.Option key={i} value={iva}>
+              {iva}
+            </Select.Option>
+          ))}
+        </Select>
+        <Checkbox
+          checked={filterEstado}
+          onChange={(e) => setFilterEstado(e.target.checked)}
+          style={{ width: 300, marginLeft: 10, borderRadius: 0 }}
+        >
+          {t('common.verBorrados')}
+        </Checkbox>
+      </div>
+      <Table
+        rowKey={(record) => record.id}
+        rowClassName={(record) => (!record.estado ? 'deleted-row' : '')}
+        columns={columns}
+        dataSource={proveedoresFiltrados()}
+        loading={isLoadingProveedores || isRefetchingProveedores}
+        scroll={{ x: 800 }}
+        locale={{
+          filterTitle: t('table.filterTitle'),
+          filterConfirm: t('table.filterConfirm'),
+          filterReset: t('table.filterReset'),
+          filterEmptyText: t('table.filterEmptyText'),
+          filterCheckall: t('table.filterCheckall'),
+          filterSearchPlaceholder: t('table.filterSearchPlaceholder'),
+          emptyText: t('table.emptyText'),
+          selectAll: t('table.selectAll'),
+          selectInvert: t('table.selectInvert'),
+          selectNone: t('table.selectNone'),
+          selectionAll: t('table.selectionAll'),
+          sortTitle: t('table.sortTitle'),
+          expand: t('table.expand'),
+          collapse: t('table.collapse'),
+          triggerDesc: t('table.triggerDesc'),
+          triggerAsc: t('table.triggerAsc'),
+          cancelSort: t('table.cancelSort'),
+        }}
+      />
+    </>
+  );
 };
 
 export const ProveedoresForm: React.FC = () => {
-  return <div>ProveedoresPage</div>;
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const [isEdit, setIsEdit] = React.useState(false);
+  const [form] = Form.useForm();
+
+  const { data: proveedorData, isLoading: isLoadingProveedor } = useQuery(
+    ['getProveedor'],
+    () => getProveedor(parseInt(id as string)),
+    {
+      keepPreviousData: false,
+      refetchOnWindowFocus: false,
+      enabled: !!id,
+    },
+  );
+
+  const { mutate: handleCreate, isLoading } = useMutation(postProveedor, {
+    onSuccess: (res: any) => {
+      if (res?.status !== 400) {
+        notificationController.success({
+          message: t('common.successMessage'),
+          description: t('notifications.proveedorCreado'),
+          duration: 3,
+        });
+        navigate('compras/proveedores');
+      } else {
+        throw new Error('Error al crear proveedor');
+      }
+    },
+    onError: (error: Error) => {
+      notificationController.error({
+        message: t('common.errorMessage'),
+        description: t('notifications.proveedorNoCreado'),
+        duration: 3,
+      });
+    },
+  });
+
+  const { mutate: handleEdit, isLoading: isLoadingEdit } = useMutation(putProveedor, {
+    onSuccess: (res: any) => {
+      if (res?.status !== 400) {
+        notificationController.success({
+          message: t('common.successMessage'),
+          description: t('notifications.proveedorActualizado'),
+          duration: 3,
+        });
+        navigate('/compras/proveedores');
+      } else {
+        throw new Error('Error al editar proveedor');
+      }
+    },
+    onError: (error: Error) => {
+      notificationController.error({
+        message: t('common.errorMessage'),
+        description: t('notifications.proveedorNoActualizado'),
+        duration: 3,
+      });
+    },
+  });
+  useEffect(() => {
+    if (id && !isLoadingProveedor) {
+      setIsEdit(true);
+      form.setFieldsValue({
+        id: id,
+        proveedor: proveedorData?.proveedor,
+        rol: proveedorData?.rol,
+      });
+    }
+  }, [proveedorData, isLoadingProveedor, form, id]);
+
+  const handleSubmit = (values: any) => {
+    if (isEdit) {
+      const proveedor = {
+        id: parseInt(id as string),
+        nombre: values.nombre,
+        tipoiva: values.tipoiva,
+        idtipodocumento: values.idtipodocumento,
+        documento: values.documento,
+        direccion: values.direccion,
+        cp: values.cp,
+        telefono: values.telefono,
+        email: values.email,
+      };
+      handleEdit(proveedor);
+    } else {
+      const proveedor = {
+        nombre: values.nombre,
+        tipoiva: values.tipoiva,
+        idtipodocumento: values.idtipodocumento,
+        documento: values.documento,
+        direccion: values.direccion,
+        cp: values.cp,
+        telefono: values.telefono,
+        email: values.email,
+      };
+      handleCreate(proveedor);
+    }
+  };
+
+  if (isLoadingProveedor && isEdit) {
+    return <Spin />;
+  }
+
+  return (
+    <div>
+      <Row>
+        <Col offset={8} span={8}>
+          <BaseForm layout="vertical" onFinish={handleSubmit} requiredMark="optional" form={form}>
+            <h1>{isEdit ? t('titles.editandoProveedor') : t('titles.creandoProveedor')}</h1>
+            <FormItem
+              requiredMark
+              name="proveedor"
+              label={t('common.email')}
+              rules={[
+                { required: true, message: t('common.requiredField') },
+                {
+                  type: 'email',
+                  message: t('common.notValidEmail'),
+                },
+              ]}
+            >
+              <FormInput />
+            </FormItem>
+            <FormItem
+              requiredMark
+              label={t('common.password')}
+              name="password"
+              rules={[{ required: true, message: t('common.requiredField') }]}
+            >
+              <FormInputPassword />
+            </FormItem>
+            <FormItem
+              requiredMark
+              label={t('common.confirmPassword')}
+              name="confirmPassword"
+              rules={[
+                { required: true, message: t('common.requiredField') },
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    if (value !== getFieldValue('password')) {
+                      return Promise.reject(t('common.passwordsDontMatch'));
+                    } else {
+                      return Promise.resolve();
+                    }
+                  },
+                }),
+              ]}
+            >
+              <FormInputPassword />
+            </FormItem>
+
+            <FormItem
+              requiredMark
+              label={t('common.rol')}
+              name="rol"
+              rules={[{ required: true, message: t('common.requiredField') }]}
+            >
+              <Select allowClear>
+                {Roles.map((rol, i) => (
+                  <Select.Option key={i} value={i + 1}>
+                    {rol}
+                  </Select.Option>
+                ))}
+              </Select>
+            </FormItem>
+
+            <BaseForm.Item noStyle>
+              <SubmitButton type="primary" htmlType="submit" loading={isLoading || isLoadingEdit}>
+                {isEdit ? t('common.editar') : t('common.confirmar')}
+              </SubmitButton>
+            </BaseForm.Item>
+          </BaseForm>
+        </Col>
+      </Row>
+    </div>
+  );
 };

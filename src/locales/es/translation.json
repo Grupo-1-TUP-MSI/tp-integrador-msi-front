@@ -33,7 +33,11 @@
     "stockminimo": "Stock mínimo",
     "stock": "Stock actual",
     "proveedor": "Proveedor",
-    "verSinStock": "Ocultar sin stock"
+    "verSinStock": "Ocultar sin stock",
+    "tipoiva": "Tipo de IVA",
+    "documento": "Documento",
+    "direccion": "Dirección",
+    "telefono": "Teléfono"
   },
   "error404": {
     "comeBack": "Return to Home",
@@ -72,6 +76,18 @@
     "productoNoEliminado": "No se pudo eliminar el producto.",
     "productoNoActualizado": "No se pudo actualizar el producto.",
     "productoNoCreado": "No se pudo crear el producto.",
+    "clienteCreado": "Cliente creado con éxito!",
+    "clienteActualizado": "Cliente actualizado con éxito!",
+    "clienteEliminado": "Cliente eliminado con éxito!",
+    "clienteNoEliminado": "No se pudo eliminar el cliente.",
+    "clienteNoActualizado": "No se pudo actualizar el cliente.",
+    "clienteNoCreado": "No se pudo crear el cliente.",
+    "proveedorCreado": "Proveedor creado con éxito!",
+    "proveedorActualizado": "Proveedor actualizado con éxito!",
+    "proveedorEliminado": "Proveedor eliminado con éxito!",
+    "proveedorNoEliminado": "No se pudo eliminar el proveedor.",
+    "proveedorNoActualizado": "No se pudo actualizar el proveedor.",
+    "proveedorNoCreado": "No se pudo crear el proveedor.",
     "usuarioCreado": "Usuario creado con éxito!",
     "usuarioActualizado": "Usuario actualizado con éxito!",
     "usuarioEliminado": "Usuario eliminado con éxito!",
@@ -82,6 +98,8 @@
     "eliminandoElemento": "Eliminando elemento..."
   },
   "table": {
+    "buscarCliente": "Buscar cliente",
+    "buscarProveedor": "Buscar proveedor",
     "buscarUsuario": "Buscar usuario",
     "buscarProducto": "Buscar producto",
     "filterTitle": "Filtrar menú",
@@ -103,6 +121,12 @@
     "cancelSort": "Click para cancelar el ordenamiento"
   },
   "titles": {
+    "creandoCliente": "Creando cliente",
+    "editandoCliente": "Editando cliente",
+    "eliminandoCliente": "Eliminando cliente",
+    "creandoProveedor": "Creando proveedor",
+    "editandoProveedor": "Editando proveedor",
+    "eliminandoProveedor": "Eliminando proveedor",
     "creandoUsuario": "Creando usuario",
     "editandoUsuario": "Editando usuario",
     "eliminandoUsuario": "Eliminando usuario",
