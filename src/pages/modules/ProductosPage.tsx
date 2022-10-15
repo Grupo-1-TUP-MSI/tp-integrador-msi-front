@@ -54,8 +54,8 @@ export const ProductosPage: React.FC = () => {
   });
 
   const { mutate: eliminarProducto, isLoading: isLoadingDelete } = useMutation(deleteProducto, {
-    onSuccess: (res: { status: number }) => {
-      if (res?.status !== 400) {
+    onSuccess: (res) => {
+      if (res !== 400) {
         notificationController.success({
           message: t('common.successMessage'),
           description: t('notifications.productoEliminado'),
@@ -67,6 +67,7 @@ export const ProductosPage: React.FC = () => {
         throw new Error('Error al eliminar producto');
       }
     },
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     onError: (error: Error) => {
       notificationController.error({
         message: t('common.errorMessage'),
@@ -78,10 +79,10 @@ export const ProductosPage: React.FC = () => {
 
   const { mutate: actualizarStock, isLoading: isLoadingStock } = useMutation(
     ['updateStock'],
-    () => updateStock(producto?.id as any, newStock),
+    () => updateStock(producto?.id as number, newStock),
     {
-      onSuccess: (res: { status: number }) => {
-        if (res?.status !== 400) {
+      onSuccess: (res) => {
+        if (res !== 400) {
           notificationController.success({
             message: t('common.successMessage'),
             description: t('notifications.productoActualizado'),
@@ -93,6 +94,7 @@ export const ProductosPage: React.FC = () => {
           throw new Error('Error al actualizar producto');
         }
       },
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       onError: (error: Error) => {
         notificationController.error({
           message: t('common.errorMessage'),
@@ -420,7 +422,7 @@ export const ProductosForm: React.FC = () => {
 
   const { mutate: handleCreate, isLoading } = useMutation(postProducto, {
     onSuccess: (res: any) => {
-      if (res?.status !== 400) {
+      if (res !== 400) {
         notificationController.success({
           message: t('common.successMessage'),
           description: t('notifications.productoCreado'),
@@ -442,7 +444,7 @@ export const ProductosForm: React.FC = () => {
 
   const { mutate: handleEdit, isLoading: isLoadingEdit } = useMutation(putProducto, {
     onSuccess: (res: any) => {
-      if (res?.status !== 400) {
+      if (res !== 400) {
         notificationController.success({
           message: t('common.successMessage'),
           description: t('notifications.productoActualizado'),
