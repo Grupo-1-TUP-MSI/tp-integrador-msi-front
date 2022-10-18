@@ -23,7 +23,6 @@ export const LoginForm: React.FC = () => {
   const handleSubmit = (values: LoginFormData) => {
     setLoading(true);
     dispatch(doLogin(values))
-      .unwrap()
       .then(() => navigate('/'))
       .catch((err) => {
         notificationController.error({ message: err.message });
