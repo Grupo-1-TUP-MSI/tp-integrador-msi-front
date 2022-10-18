@@ -65,9 +65,9 @@ export const AppRouter: React.FC = () => {
               <Route path="proveedores" element={<ProveedoresP />} />
               <Route path="proveedores/alta" element={<ProveedoresF />} />
               <Route path="proveedores/:id" element={<ProveedoresF />} />
-              <Route path="notas-de-pedido" element={<NotasDePedidoP />} />
-              <Route path="notas-de-pedido/alta" element={<NotasDePedidoF />} />
-              <Route path="notas-de-pedido/:id" element={<NotasDePedidoF />} />
+              <Route path="notapedido" element={<NotasDePedidoP />} />
+              <Route path="notapedido/alta" element={<NotasDePedidoF />} />
+              <Route path="notapedido/:id" element={<NotasDePedidoF />} />
             </Route>
             <Route path="productos" element={<ProductosP />} />
             <Route path="productos/alta" element={<ProductosF />} />
@@ -140,9 +140,9 @@ export const AppRouter: React.FC = () => {
             <Route path="proveedores" element={<ProveedoresP />} />
             <Route path="proveedores/alta" element={<ProveedoresF />} />
             <Route path="proveedores/:id" element={<ProveedoresF />} />
-            <Route path="notas-de-pedido" element={<NotasDePedidoP />} />
-            <Route path="notas-de-pedido/alta" element={<NotasDePedidoF />} />
-            <Route path="notas-de-pedido/:id" element={<NotasDePedidoF />} />
+            <Route path="notapedido" element={<NotasDePedidoP />} />
+            <Route path="notapedido/alta" element={<NotasDePedidoF />} />
+            <Route path="notapedido/:id" element={<NotasDePedidoF />} />
           </Route>
           <Route path="productos" element={<ProductosP />} />
           <Route path="productos/alta" element={<ProductosF />} />

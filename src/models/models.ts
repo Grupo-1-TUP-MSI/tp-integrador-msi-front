@@ -9,6 +9,7 @@ export const TiposIVA = ['I', 'M', 'C'];
 export interface Usuario {
   id?: number;
   usuario: string;
+  nombrecompleto: string;
   password: string;
   rol?: string;
   idRol?: number;
@@ -49,4 +50,27 @@ export interface Proveedor {
   telefono: string;
   email: string;
   estado?: boolean;
+}
+
+export interface DetalleNotaPedido {
+  id?: number;
+  producto: string;
+  cantidadPedida: number;
+  cantidadRecibida: number;
+  precio: number;
+  descuento?: number;
+}
+
+export interface NotaPedido {
+  id?: number;
+  fecha: string;
+  version: string;
+  vencimiento: string;
+  usuario: string;
+  idUsuario?: number;
+  proveedor: string;
+  idProveedor?: number;
+  idEstadoNP?: number;
+  idTipoCompra: number;
+  detalles: DetalleNotaPedido[];
 }

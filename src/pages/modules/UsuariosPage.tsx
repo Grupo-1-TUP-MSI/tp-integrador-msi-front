@@ -298,6 +298,7 @@ export const UsuariosForm: React.FC = () => {
       const user = {
         id: parseInt(id as string),
         usuario: values.usuario,
+        nombrecompleto: values.nombrecompleto,
         password: values.password,
         idRol: values.rol,
       };
@@ -305,6 +306,7 @@ export const UsuariosForm: React.FC = () => {
     } else {
       const user = {
         usuario: values.usuario,
+        nombrecompleto: values.nombrecompleto,
         password: values.password,
         idRol: values.rol,
       };
@@ -333,6 +335,14 @@ export const UsuariosForm: React.FC = () => {
                   message: t('common.notValidEmail'),
                 },
               ]}
+            >
+              <FormInput />
+            </FormItem>
+            <FormItem
+              requiredMark
+              name="nombrecompleto"
+              label={t('common.nombre')}
+              rules={[{ required: true, message: t('common.requiredField') }]}
             >
               <FormInput />
             </FormItem>
