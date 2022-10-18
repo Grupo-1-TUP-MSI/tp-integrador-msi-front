@@ -1,9 +1,30 @@
 import React, { useEffect } from 'react';
-import { Button, Checkbox, Col, Form, Input, InputNumber, Modal, Row, Select, Space, Spin, Tooltip } from 'antd';
+import {
+  Button,
+  Checkbox,
+  Col,
+  Form,
+  Input,
+  InputNumber,
+  Modal,
+  Row,
+  Select,
+  Space,
+  Spin,
+  Tooltip,
+  Typography,
+} from 'antd';
 import { useTranslation } from 'react-i18next';
-import { DeleteOutlined, EditOutlined, PlusCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import {
+  DeleteOutlined,
+  EditOutlined,
+  PlusCircleOutlined,
+  PlusOutlined,
+  UsergroupAddOutlined,
+} from '@ant-design/icons';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import {
+  agregarProveedores,
   deleteProducto,
   getProducto,
   getProductos,
@@ -11,15 +32,15 @@ import {
   putProducto,
   updateStock,
 } from '@app/api/productos.api';
-import { Roles, Producto, Proveedor } from '@app/models/models';
+import { Producto, Proveedor } from '@app/models/models';
 import { useNavigate, useParams } from 'react-router';
 import { notificationController } from '@app/controllers/notificationController';
 import { BaseForm } from '@app/components/common/forms/BaseForm/BaseForm';
 import FormItem from 'antd/es/form/FormItem';
 import { FormInput, SubmitButton } from '@app/components/layouts/AuthLayout/AuthLayout.styles';
 import { Table } from '@app/components/common/Table/Table';
-import { getProveedores } from '@app/api/proveedores.api';
 import { useResponsive } from '@app/hooks/useResponsive';
+import { getProveedores } from '@app/api/proveedores.api';
 
 export const ProductosPage: React.FC = () => {
   const { t } = useTranslation();
@@ -28,12 +49,14 @@ export const ProductosPage: React.FC = () => {
   const [minPrecio, setMinPrecio] = React.useState(0);
   const [maxPrecio, setMaxPrecio] = React.useState(0);
   const [filterStock, setFilterStock] = React.useState(false);
-  const [filterProveedor, setFilterProveedor] = React.useState(null);
   const [filterEstado, setFilterEstado] = React.useState(true);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [producto, setProducto] = React.useState<Producto | null>(null);
   const [modalStockOpen, setModalStockOpen] = React.useState(false);
   const [newStock, setNewStock] = React.useState(0);
+  const [modalProveedor, setModalProveedor] = React.useState(false);
+  const [proveedor, setProveedor] = React.useState(null);
+  const [nuevoPrecio, setNuevoPrecio] = React.useState(0);
   const { isDesktop } = useResponsive();
   const {
     data: productosData,
@@ -105,6 +128,34 @@ export const ProductosPage: React.FC = () => {
     },
   );
 
+  const { mutate: addProveedores, isLoading: isLoadingAgregarProveedores } = useMutation(
+    ['agregarProveedores'],
+    () => agregarProveedores(producto?.id as number, parseInt(`${proveedor}`), nuevoPrecio),
+    {
+      onSuccess: (res) => {
+        if (res !== 400) {
+          notificationController.success({
+            message: t('common.successMessage'),
+            description: t('notifications.proveedoresActualizados'),
+            duration: 3,
+          });
+          setModalStockOpen(false);
+          refetchProductos();
+        } else {
+          throw new Error('Error al actualizar producto');
+        }
+      },
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      onError: (error: Error) => {
+        notificationController.error({
+          message: t('common.errorMessage'),
+          description: t('notifications.proveedoresNoActualizados'),
+          duration: 3,
+        });
+      },
+    },
+  );
+
   const handleDelete = (record: any) => {
     eliminarProducto(record.id);
   };
@@ -127,17 +178,11 @@ export const ProductosPage: React.FC = () => {
       ),
     },
     {
-      title: t('common.proveedor'),
-      dataIndex: 'proveedor',
-      key: 'proveedor',
-      width: '40%',
-    },
-    {
       title: t('common.precio'),
-      dataIndex: 'precio',
-      key: 'precio',
+      dataIndex: 'preciolista',
+      key: 'preciolista',
       width: '10%',
-      render: (text: any, record: any) => <span>ARS ${record.precio}</span>,
+      render: (text: any, record: any) => <span>ARS ${record.preciolista}</span>,
     },
     {
       title: t('common.stockminimo'),
@@ -162,6 +207,17 @@ export const ProductosPage: React.FC = () => {
               type="text"
               onClick={() => {
                 setModalStockOpen(true);
+                setProducto(record);
+              }}
+            ></Button>
+          </Tooltip>
+          <Tooltip placement="top" title={t('common.agregarProveedor')} trigger="hover" destroyTooltipOnHide>
+            <Button
+              icon={<UsergroupAddOutlined />}
+              disabled={!record.estado}
+              type="text"
+              onClick={() => {
+                setModalProveedor(true);
                 setProducto(record);
               }}
             ></Button>
@@ -198,16 +254,13 @@ export const ProductosPage: React.FC = () => {
         return !!filterEstado ? producto.estado === filterEstado : true;
       })
       .filter((producto: Producto) => {
-        return !!filterProveedor ? producto.idProveedor === filterProveedor : true;
-      })
-      .filter((producto: Producto) => {
         return !!filterStock ? producto.stock || 0 > 0 : true;
       })
       .filter((producto: Producto) => {
-        return !!minPrecio ? producto.precio >= minPrecio : true;
+        return !!minPrecio ? producto.preciolista >= minPrecio : true;
       })
       .filter((producto: Producto) => {
-        return !!maxPrecio ? producto.precio <= maxPrecio : true;
+        return !!maxPrecio ? producto.preciolista <= maxPrecio : true;
       })
       .sort((a: Producto, b: Producto) => {
         return (a.id as number) - (b.id as number);
@@ -230,6 +283,65 @@ export const ProductosPage: React.FC = () => {
         cancelText={t('common.cancelar')}
       >
         <p>{t('notifications.confirmarEliminacion')}</p>
+      </Modal>
+      <Modal
+        title={t('notifications.agregandoProveedor', { producto: producto?.nombre })}
+        visible={modalProveedor}
+        onOk={() => addProveedores()}
+        onCancel={() => setModalProveedor(false)}
+        confirmLoading={isLoadingAgregarProveedores}
+        okButtonProps={{ disabled: !proveedor }}
+        okText={t('common.confirmar')}
+        cancelText={t('common.cancelar')}
+      >
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'start',
+            marginBottom: '10px',
+          }}
+        >
+          <div style={{ marginLeft: '3rem', marginRight: '1.2rem', width: '20%' }}>{t('common.nuevoProveedor')}:</div>
+          <Select
+            placeholder={t('common.proveedor')}
+            value={proveedor}
+            onChange={(value) => setProveedor(value)}
+            allowClear
+            loading={isLoadingProveedores || isRefetchingProveedores}
+            style={{ width: '60%' }}
+          >
+            {proveedoresData?.map((proveedor: Proveedor, i: number) => (
+              <Select.Option key={i} value={proveedor.id}>
+                {proveedor.id + ' - ' + proveedor.nombre}
+              </Select.Option>
+            ))}
+          </Select>
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'start',
+            marginBottom: '10px',
+          }}
+        >
+          <div style={{ marginLeft: '3rem', marginRight: '1.2rem', width: '20%' }}>{t('common.nuevoPrecio')}:</div>
+          <InputNumber value={nuevoPrecio} onChange={setNuevoPrecio} />
+        </div>
+        <Typography.Text
+          type="secondary"
+          italic
+          style={{
+            display: 'flex',
+            alignItems: 'end',
+            justifyContent: 'end',
+            textAlign: 'end',
+            fontSize: '0.8rem',
+          }}
+        >
+          {t('notifications.captionPrecio')}
+        </Typography.Text>
       </Modal>
       <Modal
         title={t('notifications.actualizandoStock')}
@@ -271,44 +383,21 @@ export const ProductosPage: React.FC = () => {
           onClick={() => navigate('/productos/alta')}
         ></Button>
       </div>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '5fr 10fr',
-          gridGap: '1rem',
-          marginBottom: '1rem',
-          justifyContent: 'flex-end',
-        }}
-      >
-        <Input
-          placeholder={t('table.buscarProducto')}
-          value={searchProducto}
-          onChange={(e) => setSearchProducto(e.target.value)}
-        />
-
-        <Select
-          placeholder={t('common.proveedor')}
-          value={filterProveedor}
-          onChange={(value) => setFilterProveedor(value)}
-          allowClear
-          loading={isLoadingProveedores || isRefetchingProveedores}
-          style={{ width: '60%', display: 'flex', justifyContent: 'flex-end' }}
-        >
-          {proveedoresData?.map((proveedor: Proveedor, i: number) => (
-            <Select.Option key={i} value={proveedor.id}>
-              {proveedor.id + ' - ' + proveedor.nombre}
-            </Select.Option>
-          ))}
-        </Select>
-      </div>
       {!isDesktop ? (
         <>
           <div
             style={{
               display: 'flex',
               alignItems: 'center',
+              justifyContent: 'space-between',
             }}
           >
+            <Input
+              placeholder={t('table.buscarProducto')}
+              value={searchProducto}
+              onChange={(e) => setSearchProducto(e.target.value)}
+              style={{ width: '100%' }}
+            />
             <div style={{ marginLeft: '3rem', marginRight: '1.2rem' }}>{t('common.precio')}:</div>
             <InputNumber placeholder="Min" style={{ width: '150px' }} value={minPrecio} onChange={setMinPrecio} />
             <div style={{ marginLeft: '0.8rem', marginRight: '0.8rem' }}>-</div>
@@ -332,7 +421,6 @@ export const ProductosPage: React.FC = () => {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: '5fr 10fr',
             gridGap: '1rem',
             marginBottom: '1rem',
           }}
@@ -343,6 +431,11 @@ export const ProductosPage: React.FC = () => {
               alignItems: 'center',
             }}
           >
+            <Input
+              placeholder={t('table.buscarProducto')}
+              value={searchProducto}
+              onChange={(e) => setSearchProducto(e.target.value)}
+            />
             <div style={{ marginLeft: '3rem', marginRight: '1.2rem' }}>{t('common.precio')}:</div>
             <InputNumber placeholder="Min" style={{ width: '150px' }} value={minPrecio} onChange={setMinPrecio} />
             <div style={{ marginLeft: '0.8rem', marginRight: '0.8rem' }}>-</div>
@@ -411,15 +504,6 @@ export const ProductosForm: React.FC = () => {
     },
   );
 
-  const {
-    data: proveedoresData,
-    isLoading: isLoadingProveedores,
-    isRefetching: isRefetchingProveedores,
-  } = useQuery(['proveedores'], getProveedores, {
-    keepPreviousData: false,
-    refetchOnWindowFocus: false,
-  });
-
   const { mutate: handleCreate, isLoading } = useMutation(postProducto, {
     onSuccess: (res: any) => {
       if (res !== 400) {
@@ -471,9 +555,8 @@ export const ProductosForm: React.FC = () => {
         id: id,
         nombre: productoData?.nombre,
         descripcion: productoData?.descripcion,
-        precio: productoData?.precio,
+        preciolista: productoData?.preciolista,
         stockminimo: productoData?.stockminimo,
-        proveedor: productoData?.idProveedor,
       });
     }
   }, [productoData, isLoadingProducto, form, id]);
@@ -484,24 +567,22 @@ export const ProductosForm: React.FC = () => {
         id: parseInt(id as string),
         nombre: values.nombre,
         descripcion: values.descripcion,
-        precio: parseInt(values.precio),
+        preciolista: parseInt(values.preciolista),
         stockminimo: parseInt(values.stockminimo),
-        idProveedor: parseInt(values.proveedor),
       };
       handleEdit(producto);
     } else {
       const producto = {
         nombre: values.nombre,
         descripcion: values.descripcion,
-        precio: parseInt(values.precio),
+        preciolista: parseInt(values.preciolista),
         stockminimo: parseInt(values.stockminimo),
-        idProveedor: parseInt(values.proveedor),
       };
       handleCreate(producto);
     }
   };
 
-  if ((isLoadingProducto || isLoadingProveedores) && isEdit) {
+  if (isLoadingProducto && isEdit) {
     return <Spin />;
   }
 
@@ -526,7 +607,7 @@ export const ProductosForm: React.FC = () => {
               <Col span={11}>
                 <FormItem
                   requiredMark
-                  name="precio"
+                  name="preciolista"
                   label={t('common.precio')}
                   rules={[{ required: true, message: t('common.requiredField') }]}
                 >
@@ -544,21 +625,6 @@ export const ProductosForm: React.FC = () => {
                 </FormItem>
               </Col>
             </Row>
-
-            <FormItem
-              requiredMark
-              label={t('common.proveedor')}
-              name="proveedor"
-              rules={[{ required: true, message: t('common.requiredField') }]}
-            >
-              <Select allowClear loading={isLoadingProveedores || isRefetchingProveedores}>
-                {proveedoresData?.map((proveedor: Proveedor, i: number) => (
-                  <Select.Option key={i} value={proveedor.id}>
-                    {proveedor.id + ' - ' + proveedor.nombre}
-                  </Select.Option>
-                ))}
-              </Select>
-            </FormItem>
 
             <BaseForm.Item noStyle>
               <SubmitButton type="primary" htmlType="submit" loading={isLoading || isLoadingEdit}>

@@ -18,7 +18,7 @@ export interface Usuario {
 export interface Producto {
   id?: number;
   nombre: string;
-  precio: number;
+  preciolista: number;
   stock?: number;
   stockminimo: number;
   idProveedor?: number;
