@@ -140,6 +140,8 @@ export const ProductosPage: React.FC = () => {
             duration: 3,
           });
           setModalProveedor(false);
+          setProveedor(null);
+          setNuevoPrecio(0);
           refetchProductos();
         } else {
           throw new Error('Error al actualizar producto');
