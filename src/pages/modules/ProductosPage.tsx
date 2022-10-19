@@ -139,7 +139,7 @@ export const ProductosPage: React.FC = () => {
             description: t('notifications.proveedoresActualizados'),
             duration: 3,
           });
-          setModalStockOpen(false);
+          setModalProveedor(false);
           refetchProductos();
         } else {
           throw new Error('Error al actualizar producto');
