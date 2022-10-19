@@ -58,7 +58,13 @@
     "cerrada": "Cerrada",
     "rechazada": "Rechazada",
     "actualizarEstado": "Actualizar estado",
-    "exportarPDF": "Exportar a PDF"
+    "exportarPDF": "Exportar a PDF",
+    "iva": "IVA unitario",
+    "cantidad": "Cantidad",
+    "importeunitario": "Importe unitario",
+    "importetotal": "Importe total",
+    "plazoentrega": "Plazo de entrega",
+    "agregarProductos": "Agregar productos"
   },
   "error404": {
     "comeBack": "Volver al inicio",
@@ -91,6 +97,7 @@
   },
   "notifications": {
     "agregandoProveedor": "Agregando proveedor",
+    "agregandoProductos": "Agregando productos",
     "captionPrecio": "Este campo habilitará la comparación de precios entre proveedores. \n Cargar en cero (0) si el proveedor no posee ese producto.",
     "proveedoresActualizados": "Proveedores actualizados",
     "proveedoresNoActualizados": "Proveedores no actualizados",
@@ -115,6 +122,10 @@
     "proveedorNoCreado": "No se pudo crear el proveedor.",
     "npEliminado": "Nota de pedido eliminada con éxito!",
     "npNoEliminado": "No se pudo eliminar la nota de pedido.",
+    "npCreada": "Nota de pedido creada con éxito!",
+    "npNoCreada": "No se pudo crear la nota de pedido.",
+    "npActualizada": "Nota de pedido actualizada con éxito!",
+    "npNoActualizada": "No se pudo actualizar la nota de pedido.",
     "usuarioCreado": "Usuario creado con éxito!",
     "usuarioActualizado": "Usuario actualizado con éxito!",
     "usuarioEliminado": "Usuario eliminado con éxito!",
@@ -164,7 +175,9 @@
     "eliminandoUsuario": "Eliminando usuario",
     "creandoProducto": "Creando producto",
     "editandoProducto": "Editando producto",
-    "eliminandoProducto": "Eliminando producto"
+    "eliminandoProducto": "Eliminando producto",
+    "editandoNP": "Editando nota de pedido",
+    "creandoNP": "Creando nota de pedido"
   },
   "serverError": {
     "main": "Internal server error"

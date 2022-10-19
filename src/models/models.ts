@@ -54,9 +54,10 @@ export interface Proveedor {
 
 export interface DetalleNotaPedido {
   id?: number;
-  producto: string;
+  idProducto?: number;
+  producto?: string;
   cantidadPedida: number;
-  cantidadRecibida: number;
+  cantidadRecibida?: number;
   precio: number;
   descuento?: number;
 }
@@ -64,13 +65,13 @@ export interface DetalleNotaPedido {
 export interface NotaPedido {
   id?: number;
   fecha: string;
-  version: string;
-  vencimiento: string;
-  usuario: string;
+  version?: string;
+  usuario?: string;
   idUsuario?: number;
-  proveedor: string;
+  proveedor?: string;
   idProveedor?: number;
   idEstadoNP?: number;
   idTipoCompra: number;
+  plazoentrega?: number;
   detalles: DetalleNotaPedido[];
 }
