@@ -26,5 +26,7 @@ export const updateStock = (id: number, stock: number) => {
 };
 
 export const agregarProveedores = (idProducto: number, idProveedor: number, nuevoPrecio: number) => {
-  return httpApi.put(`productos/proveedor`, { idProducto, idProveedor, nuevoPrecio }).then((res) => res.data.data);
+  return httpApi
+    .put(`productosproveedores`, { idproducto: idProducto, idproveedor: idProveedor, precio: nuevoPrecio })
+    .then((res) => res.data.data);
 };
