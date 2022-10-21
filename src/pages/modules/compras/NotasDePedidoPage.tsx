@@ -36,7 +36,7 @@ import {
 } from '@app/api/notasPedido.api';
 import { getUsuarios } from '@app/api/usuarios.api';
 import locale from 'antd/es/date-picker/locale/es_ES';
-import { getProductos } from '@app/api/productos.api';
+import { getProductos, getProductosDeProveedor } from '@app/api/productos.api';
 import NotaDePedido from '@app/components/shared/NotaDePedido';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
@@ -462,15 +462,24 @@ export const NotasDePedidoForm: React.FC = () => {
   const [searchProducto, setSearchProducto] = React.useState('');
   const [proveedor, setProveedor] = React.useState(null);
   const [pdf, setPdf] = React.useState(null);
+  const enabledField = Form.useWatch('idProveedor', form);
+
   const { data: proveedoresData, isLoading: isLoadingProveedores } = useQuery(['proveedores'], getProveedores, {
     keepPreviousData: false,
     refetchOnWindowFocus: false,
   });
-  const { data: productosData, isLoading: isLoadingProductos } = useQuery(['productos'], getProductos, {
+
+  const {
+    data: productosDeProveedorData,
+    isLoading: isLoadingProductosDeProveedor,
+    refetch: productosDeProveedorRefetch,
+  } = useQuery(['productoDeProveedor'], () => getProductosDeProveedor(form.getFieldValue('idProveedor')), {
     keepPreviousData: false,
     refetchOnWindowFocus: false,
+    enabled: !!enabledField,
     onSuccess: (data) => {
       setProductos(data);
+      setDetalles([]);
     },
   });
 
@@ -587,19 +596,19 @@ export const NotasDePedidoForm: React.FC = () => {
   const columns = [
     {
       title: t('common.id'),
-      dataIndex: 'id',
-      key: 'id',
+      dataIndex: 'idproducto',
+      key: 'idproducto',
       width: '5%',
     },
     {
       title: t('common.nombre'),
-      dataIndex: 'nombre',
-      key: 'nombre',
+      dataIndex: 'productoNombre',
+      key: 'productoNombre',
     },
     {
       title: t('common.importeunitario'),
-      dataIndex: 'preciolista',
-      key: 'preciolista',
+      dataIndex: 'precio',
+      key: 'precio',
       width: '5%',
     },
     {
@@ -607,7 +616,7 @@ export const NotasDePedidoForm: React.FC = () => {
       key: 'iva',
       width: '5%',
       render: (text: any, record: any) => {
-        return <span>{record.preciolista * 0.21}</span>;
+        return <span>{record.precio * 0.21}</span>;
       },
     },
     {
@@ -621,7 +630,7 @@ export const NotasDePedidoForm: React.FC = () => {
       key: 'importetotal',
       width: '5%',
       render: (text: any, record: any) => {
-        return <span>{record.preciolista * record.cantidad * 1.21}</span>;
+        return <span>{record.precio * record.cantidad * 1.21}</span>;
       },
     },
     {
@@ -632,7 +641,6 @@ export const NotasDePedidoForm: React.FC = () => {
         <Space>
           <Button
             icon={<DeleteOutlined />}
-            disabled={!record.estado}
             type="text"
             danger
             onClick={() => {
@@ -647,19 +655,19 @@ export const NotasDePedidoForm: React.FC = () => {
   const agregarProductosColumnas = [
     {
       title: t('common.id'),
-      dataIndex: 'id',
-      key: 'id',
+      dataIndex: 'idproducto',
+      key: 'idproducto',
       width: '5%',
     },
     {
       title: t('common.nombre'),
-      dataIndex: 'nombre',
-      key: 'nombre',
+      dataIndex: 'productoNombre',
+      key: 'productoNombre',
     },
     {
       title: t('common.importeunitario'),
-      dataIndex: 'preciolista',
-      key: 'preciolista',
+      dataIndex: 'precio',
+      key: 'precio',
       width: '5%',
     },
     {
@@ -673,10 +681,10 @@ export const NotasDePedidoForm: React.FC = () => {
             min={0}
             max={record.stock}
             defaultValue={0}
-            value={(productos as any).find((p: any) => p.id === record.id)?.cantidad}
+            value={(productos as any).find((p: any) => p.idproducto === record.idproducto)?.cantidad}
             onChange={(value) => {
               const newProductos = productos.map((p: any) => {
-                if (p.id === record.id) {
+                if (p.idproducto === record.idproducto) {
                   return {
                     ...p,
                     cantidad: value,
@@ -700,15 +708,15 @@ export const NotasDePedidoForm: React.FC = () => {
   };
 
   const removeProducto = (record: any) => {
-    const newDetalles = detalles.filter((d: any) => d.id !== record.id);
+    const newDetalles = detalles.filter((d: any) => d.idproducto !== record.idproducto);
     setDetalles(newDetalles);
   };
 
   const filteredProductos = () => {
-    const arr = productosData?.filter(
+    const arr = productosDeProveedorData?.filter(
       (p: any) =>
-        p.nombre.toLowerCase().includes(searchProducto.toLowerCase()) ||
-        p.id.toString().toLowerCase().includes(searchProducto.toLowerCase()),
+        p.productoNombre.toLowerCase().includes(searchProducto.toLowerCase()) ||
+        p.idproducto.toString().toLowerCase().includes(searchProducto.toLowerCase()),
     );
 
     return arr;
@@ -795,6 +803,7 @@ export const NotasDePedidoForm: React.FC = () => {
                     disabled={isEdit}
                     onChange={(value) => {
                       setProveedor(value);
+                      productosDeProveedorRefetch();
                     }}
                   >
                     {proveedoresData?.map((proveedor: Proveedor, i: number) => (
@@ -842,7 +851,6 @@ export const NotasDePedidoForm: React.FC = () => {
               <Col span={24}>
                 <Table
                   rowKey={(record) => record.id}
-                  rowClassName={(record) => (!record.estado ? 'deleted-row' : '')}
                   columns={columns}
                   dataSource={detalles}
                   loading={isEdit && isLoadingNP}
@@ -896,10 +904,9 @@ export const NotasDePedidoForm: React.FC = () => {
         </Row>
         <Table
           rowKey={(record) => record.id}
-          rowClassName={(record) => (!record.estado ? 'deleted-row' : '')}
           columns={agregarProductosColumnas}
           dataSource={filteredProductos()}
-          loading={isLoadingProductos}
+          loading={isLoadingProductosDeProveedor}
           scroll={{ x: 800 }}
           locale={{
             filterTitle: t('table.filterTitle'),
