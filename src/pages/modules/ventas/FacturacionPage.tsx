@@ -17,7 +17,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { DeleteOutlined, DownloadOutlined, EditOutlined, PlusOutlined, SubnodeOutlined } from '@ant-design/icons';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { Proveedor, TiposIVA, TiposDocumento, NotaPedido, EstadoNP, TipoCompra, Usuario } from '@app/models/models';
+import { Proveedor, TiposIVA, TiposDocumento, EstadoNP, TipoCompra, Usuario } from '@app/models/models';
 import { useNavigate, useParams } from 'react-router';
 import { notificationController } from '@app/controllers/notificationController';
 import { BaseForm } from '@app/components/common/forms/BaseForm/BaseForm';
@@ -26,14 +26,7 @@ import { FormInput, SubmitButton } from '@app/components/layouts/AuthLayout/Auth
 import { Table } from '@app/components/common/Table/Table';
 import { getProveedores } from '../../../api/proveedores.api';
 import { useResponsive } from '@app/hooks/useResponsive';
-import {
-  getNotasPedidos,
-  getNotaPedido,
-  postNotaPedido,
-  putNotaPedido,
-  deleteNotaPedido,
-  putEstado,
-} from '@app/api/notasPedido.api';
+import { getNotasPedidos, getNotaPedido, postNotaPedido, putNotaPedido, putEstado } from '@app/api/notasPedido.api';
 import { getUsuarios } from '@app/api/usuarios.api';
 import locale from 'antd/es/date-picker/locale/es_ES';
 import { getProductos } from '@app/api/productos.api';
@@ -72,28 +65,6 @@ export const FacturacionPage: React.FC = () => {
     refetchOnWindowFocus: false,
   });
 
-  const { mutate: eliminarNotaDePedido, isLoading: isLoadingDelete } = useMutation(deleteNotaPedido, {
-    onSuccess: (res) => {
-      if (res !== 400) {
-        notificationController.success({
-          message: t('common.successMessage'),
-          description: t('notifications.npEliminado'),
-          duration: 3,
-        });
-        setIsModalOpen(false);
-        refetchNotasDePedido();
-      } else {
-        throw new Error('Error al eliminar np');
-      }
-    },
-    onError: (error: Error) => {
-      notificationController.error({
-        message: t('common.errorMessage'),
-        description: t('notifications.npNoEliminado'),
-        duration: 3,
-      });
-    },
-  });
   const { mutate: cambiarEstado, isLoading: isLoadingCambiarEstado } = useMutation(
     () => putEstado(notaPedido?.id, estado),
     {
@@ -119,10 +90,6 @@ export const FacturacionPage: React.FC = () => {
       },
     },
   );
-
-  const handleDelete = (record: any) => {
-    eliminarNotaDePedido(record.id);
-  };
 
   const columns = [
     {
@@ -220,7 +187,7 @@ export const FacturacionPage: React.FC = () => {
 
   const npFiltradas = () => {
     const arr = notasDePedidoData
-      ?.filter((np: NotaPedido) => {
+      ?.filter((np: any) => {
         if (filterDates.length > 0) {
           const fecha = new Date(np.fecha);
           const fechaDesde = new Date(filterDates[0]);
@@ -229,25 +196,25 @@ export const FacturacionPage: React.FC = () => {
         }
         return true;
       })
-      .filter((np: NotaPedido) => {
+      .filter((np: any) => {
         if (filterUsuario) {
           return np?.idUsuario === filterUsuario;
         }
         return true;
       })
-      .filter((np: NotaPedido) => {
+      .filter((np: any) => {
         if (filterProveedor) {
           return np?.idproveedor === filterProveedor;
         }
         return true;
       })
-      .filter((np: NotaPedido) => {
+      .filter((np: any) => {
         if (filterEstadoNP) {
           return np.idestadonp === filterEstadoNP;
         }
         return true;
       })
-      .sort((a: NotaPedido, b: NotaPedido) => {
+      .sort((a: any, b: any) => {
         return (a.id as number) - (b.id as number);
       });
 
@@ -271,19 +238,6 @@ export const FacturacionPage: React.FC = () => {
 
   return (
     <>
-      <Modal
-        title={t('notifications.eliminandoElemento')}
-        visible={isModalOpen}
-        onOk={() => {
-          handleDelete(notaPedido);
-        }}
-        onCancel={() => setIsModalOpen(false)}
-        okText={t('common.confirmar')}
-        confirmLoading={isLoadingDelete}
-        cancelText={t('common.cancelar')}
-      >
-        <p>{t('notifications.confirmarEliminacion')}</p>
-      </Modal>
       <Modal
         title={t('notifications.cambiandoEstado')}
         visible={modalEstado}

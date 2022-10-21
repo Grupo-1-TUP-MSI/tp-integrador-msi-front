@@ -51,27 +51,3 @@ export interface Proveedor {
   email: string;
   estado?: boolean;
 }
-
-export interface DetalleNotaPedido {
-  id?: number;
-  idProducto?: number;
-  producto?: string;
-  cantidadPedida: number;
-  cantidadRecibida?: number;
-  precio: number;
-  descuento?: number;
-}
-
-export interface NotaPedido {
-  id?: number;
-  fecha: string;
-  version?: string;
-  usuario?: string;
-  idUsuario?: number;
-  proveedor?: string;
-  idproveedor?: number;
-  idestadonp?: number;
-  idtipocompra: number;
-  plazoentrega?: number;
-  detalles: DetalleNotaPedido[];
-}

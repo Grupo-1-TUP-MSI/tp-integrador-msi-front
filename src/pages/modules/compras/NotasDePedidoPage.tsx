@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
   Button,
   Col,
@@ -15,37 +15,26 @@ import {
   Typography,
 } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { DeleteOutlined, DownloadOutlined, EditOutlined, PlusOutlined, SubnodeOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, PlusOutlined, SubnodeOutlined } from '@ant-design/icons';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { Proveedor, TiposIVA, TiposDocumento, NotaPedido, EstadoNP, TipoCompra, Usuario } from '@app/models/models';
+import { Proveedor, EstadoNP, TipoCompra, Usuario } from '@app/models/models';
 import { useNavigate, useParams } from 'react-router';
 import { notificationController } from '@app/controllers/notificationController';
 import { BaseForm } from '@app/components/common/forms/BaseForm/BaseForm';
 import FormItem from 'antd/es/form/FormItem';
-import { FormInput, SubmitButton } from '@app/components/layouts/AuthLayout/AuthLayout.styles';
+import { SubmitButton } from '@app/components/layouts/AuthLayout/AuthLayout.styles';
 import { Table } from '@app/components/common/Table/Table';
 import { getProveedores } from '../../../api/proveedores.api';
 import { useResponsive } from '@app/hooks/useResponsive';
-import {
-  getNotasPedidos,
-  getNotaPedido,
-  postNotaPedido,
-  putNotaPedido,
-  deleteNotaPedido,
-  putEstado,
-} from '@app/api/notasPedido.api';
+import { getNotasPedidos, getNotaPedido, postNotaPedido, putNotaPedido, putEstado } from '@app/api/notasPedido.api';
 import { getUsuarios } from '@app/api/usuarios.api';
 import locale from 'antd/es/date-picker/locale/es_ES';
-import { getProductos, getProductosDeProveedor } from '@app/api/productos.api';
-import NotaDePedido from '@app/components/shared/NotaDePedido';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
+import { getProductosDeProveedor } from '@app/api/productos.api';
 
 export const NotasDePedidoPage: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { RangePicker } = DatePicker;
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [notaPedido, setNotaPedido] = React.useState<any>(null);
   const [filterUsuario, setFilterUsuario] = React.useState(null);
   const [filterProveedor, setFilterProveedor] = React.useState(null);
@@ -73,28 +62,6 @@ export const NotasDePedidoPage: React.FC = () => {
     refetchOnWindowFocus: false,
   });
 
-  const { mutate: eliminarNotaDePedido, isLoading: isLoadingDelete } = useMutation(deleteNotaPedido, {
-    onSuccess: (res) => {
-      if (res !== 400) {
-        notificationController.success({
-          message: t('common.successMessage'),
-          description: t('notifications.npEliminado'),
-          duration: 3,
-        });
-        setIsModalOpen(false);
-        refetchNotasDePedido();
-      } else {
-        throw new Error('Error al eliminar np');
-      }
-    },
-    onError: (error: Error) => {
-      notificationController.error({
-        message: t('common.errorMessage'),
-        description: t('notifications.npNoEliminado'),
-        duration: 3,
-      });
-    },
-  });
   const { mutate: cambiarEstado, isLoading: isLoadingCambiarEstado } = useMutation(
     () => putEstado(notaPedido?.id, estado),
     {
@@ -105,7 +72,7 @@ export const NotasDePedidoPage: React.FC = () => {
             description: t('notifications.cambioEstadoNP'),
             duration: 3,
           });
-          setIsModalOpen(false);
+          setModalEstado(false);
           refetchNotasDePedido();
         } else {
           throw new Error('Error al cambiar estado');
@@ -120,10 +87,6 @@ export const NotasDePedidoPage: React.FC = () => {
       },
     },
   );
-
-  const handleDelete = (record: any) => {
-    eliminarNotaDePedido(record.id);
-  };
 
   const columns = [
     {
@@ -208,17 +171,7 @@ export const NotasDePedidoPage: React.FC = () => {
             disabled={record.idestadonp > 1}
             type="text"
             onClick={() => {
-              navigate(`/compras/np/${record.id}`);
-            }}
-          ></Button>
-          <Button
-            icon={<DeleteOutlined />}
-            disabled={record.idestadonp !== 4}
-            type="text"
-            danger
-            onClick={() => {
-              setIsModalOpen(true);
-              setNotaPedido(record);
+              navigate(`/compras/notapedido/${record.id}`);
             }}
           ></Button>
         </Space>
@@ -228,40 +181,40 @@ export const NotasDePedidoPage: React.FC = () => {
 
   const npFiltradas = () => {
     const arr = notasDePedidoData
-      ?.filter((np: NotaPedido) => {
-        if (filterDates.length > 0) {
+      ?.filter((np: any) => {
+        if (filterDates?.length > 0) {
           const fecha = new Date(np.fecha);
-          const fechaDesde = new Date(filterDates[0]);
-          const fechaHasta = new Date(filterDates[1]);
+          const fechaDesde = new Date(filterDates[0]?.format());
+          const fechaHasta = new Date(filterDates[1]?.format());
           return fecha >= fechaDesde && fecha <= fechaHasta;
         }
         return true;
       })
-      .filter((np: NotaPedido) => {
+      .filter((np: any) => {
         if (filterUsuario) {
           return np?.idUsuario === filterUsuario;
         }
         return true;
       })
-      .filter((np: NotaPedido) => {
+      .filter((np: any) => {
         if (filterProveedor) {
           return np?.idproveedor === filterProveedor;
         }
         return true;
       })
-      .filter((np: NotaPedido) => {
+      .filter((np: any) => {
         if (filterTipoCompra) {
           return np?.idtipocompra === filterTipoCompra;
         }
         return true;
       })
-      .filter((np: NotaPedido) => {
+      .filter((np: any) => {
         if (filterEstadoNP) {
           return np.idestadonp === filterEstadoNP;
         }
         return true;
       })
-      .sort((a: NotaPedido, b: NotaPedido) => {
+      .sort((a: any, b: any) => {
         return (a.id as number) - (b.id as number);
       });
 
@@ -270,19 +223,6 @@ export const NotasDePedidoPage: React.FC = () => {
 
   return (
     <>
-      <Modal
-        title={t('notifications.eliminandoElemento')}
-        visible={isModalOpen}
-        onOk={() => {
-          handleDelete(notaPedido);
-        }}
-        onCancel={() => setIsModalOpen(false)}
-        okText={t('common.confirmar')}
-        confirmLoading={isLoadingDelete}
-        cancelText={t('common.cancelar')}
-      >
-        <p>{t('notifications.confirmarEliminacion')}</p>
-      </Modal>
       <Modal
         title={t('notifications.cambiandoEstado')}
         visible={modalEstado}
@@ -353,22 +293,24 @@ export const NotasDePedidoPage: React.FC = () => {
       >
         <Typography.Text style={{ width: '30%', textAlign: 'right' }}>{t('table.filtrarFecha')}:</Typography.Text>
         <RangePicker
-          showTime
+          allowClear
           style={{ width: '100%', marginLeft: '1rem', marginRight: '1rem' }}
+          format="DD/MM/YYYY"
           locale={locale}
           value={filterDates}
-          onChange={(value, dateString) => {
-            setFilterDates(dateString);
+          onChange={(value) => {
+            setFilterDates(value);
           }}
         />
         <Typography.Text style={{ width: '30%', textAlign: 'right' }}>{t('table.filtrarVencimiento')}:</Typography.Text>
         <RangePicker
-          showTime
+          allowClear
           style={{ width: '100%', marginLeft: '1rem' }}
+          format="DD/MM/YYYY"
           locale={locale}
           value={filterExpiration}
-          onChange={(value, dateString) => {
-            setFilterExpiration(dateString);
+          onChange={(value) => {
+            setFilterExpiration(value);
           }}
         />
       </div>
@@ -508,16 +450,20 @@ export const NotasDePedidoForm: React.FC = () => {
       onSuccess: (data) => {
         setIsEdit(true);
         form.setFieldsValue({
-          id: id,
-          nombre: data?.nombre,
-          tipoiva: data?.tipoiva,
-          tipoDocumento: data?.idtipodocumento,
-          documento: data?.documento,
-          direccion: data?.direccion,
-          cp: data?.cp,
-          telefono: data?.telefono,
-          email: data?.email,
+          id: data.id,
+          fecha: data?.fecha,
+          idProveedor: data?.idproveedor,
+          idTipoCompra: data?.idtipocompra,
+          plazoentrega: data?.plazoentrega,
         });
+        setDetalles(
+          data?.detalles.map((detalle: any) => ({
+            ...detalle,
+            idproducto: detalle.id,
+            productoNombre: detalle.producto,
+            cantidad: detalle.cantidadpedida,
+          })),
+        );
       },
     },
   );
@@ -531,7 +477,6 @@ export const NotasDePedidoForm: React.FC = () => {
           duration: 3,
         });
 
-        imprimirPDF(res.id);
         navigate('/compras/notapedido');
       } else {
         throw new Error('Error al crear nota de pedido');
@@ -555,7 +500,6 @@ export const NotasDePedidoForm: React.FC = () => {
           duration: 3,
         });
 
-        imprimirPDF(res.id);
         navigate('/compras/notapedido');
       } else {
         throw new Error('Error al editar nota de pedido');
@@ -581,9 +525,9 @@ export const NotasDePedidoForm: React.FC = () => {
         plazoentrega: values?.plazoentrega,
         detalles: detalles.map((d: any) => {
           return {
-            idProducto: d.id,
+            idProducto: d.idproducto,
             cantidadPedida: d.cantidad,
-            precio: parseInt(d.preciolista),
+            precio: parseInt(d.precio),
           };
         }),
       };
@@ -591,14 +535,15 @@ export const NotasDePedidoForm: React.FC = () => {
     } else {
       const np = {
         fecha: values?.fecha,
-        idproveedor: values?.idProveedor,
-        idtipocompra: values?.idTipoCompra,
+        idProveedor: values?.idProveedor,
+        idTipoCompra: values?.idTipoCompra,
+        idUsuario: 5,
         plazoentrega: values?.plazoentrega,
         detalles: detalles.map((d: any) => {
           return {
-            idProducto: d.id,
-            cantidadPedida: d.cantidad,
-            precio: parseInt(d.preciolista),
+            idproducto: d.idproducto,
+            cantidadpedida: d.cantidad,
+            precio: parseInt(d.precio),
           };
         }),
       };
@@ -740,27 +685,9 @@ export const NotasDePedidoForm: React.FC = () => {
   if (isLoadingNP && isEdit) {
     return <Spin />;
   }
-  const imprimirPDF = (codigo: any) => {
-    const clonedDoc: any = document.getElementById('#nota-de-pedido-form')?.cloneNode(true);
-    html2canvas(clonedDoc, {
-      onclone: function (clonedDoc) {
-        (clonedDoc as any).getElementById('nota-de-pedido').style.display = 'block';
-      },
-    }).then((canvas) => {
-      const img = canvas.toDataURL('image/jpeg');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const width = pdf.internal.pageSize.getWidth();
-      const height = pdf.internal.pageSize.getHeight();
-      pdf.addImage(img, 'JPEG', 0, 0, width, height);
-      pdf.save(`nota-de-pedido-${codigo}.pdf`);
-    });
-  };
 
   return (
     <div id="nota-de-pedido-form">
-      <div style={{ display: 'none' }}>
-        <NotaDePedido nota={pdf} />
-      </div>
       {/* #region Formulario  */}
       <Row>
         <Col span={24}>
@@ -778,28 +705,11 @@ export const NotasDePedidoForm: React.FC = () => {
                 </SubmitButton>
               </BaseForm.Item>
             </Row>
-            <Row>
-              <Col span={6}>
-                <FormItem
-                  requiredMark
-                  name="fecha"
-                  label={t('common.fecha')}
-                  rules={[{ required: true, message: t('common.requiredField') }]}
-                >
-                  <DatePicker showToday style={{ width: '100%' }} locale={locale} />
-                </FormItem>
-              </Col>
-              <Col span={6} offset={1}>
-                <FormItem
-                  requiredMark
-                  name="plazoentrega"
-                  label={t('common.plazoentrega')}
-                  rules={[{ required: true, message: t('common.requiredField') }]}
-                >
-                  <InputNumber addonAfter="días." style={{ width: '100%' }} />
-                </FormItem>
-              </Col>
-            </Row>
+            <p>
+              {t('common.fecha') +
+                `: ${new Date(form.getFieldValue('fecha')).toLocaleDateString() || new Date().toLocaleDateString()}`}
+            </p>
+
             <Row
               style={{
                 display: 'flex',
@@ -845,8 +755,17 @@ export const NotasDePedidoForm: React.FC = () => {
                   </Select>
                 </FormItem>
               </Col>
-
-              <Col offset={9} span={1}>
+              <Col span={6} offset={1}>
+                <FormItem
+                  requiredMark
+                  name="plazoentrega"
+                  label={t('common.plazoentrega')}
+                  rules={[{ required: true, message: t('common.requiredField') }]}
+                >
+                  <InputNumber addonAfter="días." style={{ width: '100%' }} />
+                </FormItem>
+              </Col>
+              <Col offset={3} span={1}>
                 <Button
                   style={{
                     color: 'var(--success-color)',

@@ -1,4 +1,3 @@
-import { NotaPedido } from './../models/models';
 import { httpApi } from '@app/api/http.api';
 
 export const getNotasPedidos = () => {
@@ -10,16 +9,12 @@ export const getNotaPedido = (id: number) => {
   return httpApi.get(`np/${id}`).then((res) => res.data.data);
 };
 
-export const postNotaPedido = (np: NotaPedido) => {
+export const postNotaPedido = (np: any) => {
   return httpApi.post('np', np).then((res) => res.data.data);
 };
 
-export const putNotaPedido = (np: NotaPedido) => {
+export const putNotaPedido = (np: any) => {
   return httpApi.put(`np/${np.id}`, np).then((res) => res.data.data);
-};
-
-export const deleteNotaPedido = (id: number) => {
-  return httpApi.delete(`np/${id}`).then((res) => res.data.data);
 };
 
 export const putEstado = (id: number, estado: any) => {
