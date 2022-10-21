@@ -37,6 +37,9 @@ import {
 import { getUsuarios } from '@app/api/usuarios.api';
 import locale from 'antd/es/date-picker/locale/es_ES';
 import { getProductos } from '@app/api/productos.api';
+import NotaDePedido from '@app/components/shared/NotaDePedido';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 export const NotasDePedidoPage: React.FC = () => {
   const { t } = useTranslation();
@@ -458,6 +461,7 @@ export const NotasDePedidoForm: React.FC = () => {
   const [modalVisible, setModalVisible] = React.useState(false);
   const [searchProducto, setSearchProducto] = React.useState('');
   const [proveedor, setProveedor] = React.useState(null);
+  const [pdf, setPdf] = React.useState(null);
   const { data: proveedoresData, isLoading: isLoadingProveedores } = useQuery(['proveedores'], getProveedores, {
     keepPreviousData: false,
     refetchOnWindowFocus: false,
@@ -502,6 +506,8 @@ export const NotasDePedidoForm: React.FC = () => {
           description: t('notifications.npCreada'),
           duration: 3,
         });
+
+        imprimirPDF(res.id);
         navigate('/compras/notapedido');
       } else {
         throw new Error('Error al crear nota de pedido');
@@ -524,6 +530,8 @@ export const NotasDePedidoForm: React.FC = () => {
           description: t('notifications.npActualizada'),
           duration: 3,
         });
+
+        imprimirPDF(res.id);
         navigate('/compras/notapedido');
       } else {
         throw new Error('Error al editar nota de pedido');
@@ -539,6 +547,7 @@ export const NotasDePedidoForm: React.FC = () => {
   });
 
   const handleSubmit = (values: any) => {
+    setPdf(values);
     if (isEdit) {
       const np = {
         id: parseInt(id as string),
@@ -708,9 +717,27 @@ export const NotasDePedidoForm: React.FC = () => {
   if (isLoadingNP && isEdit) {
     return <Spin />;
   }
+  const imprimirPDF = (codigo: any) => {
+    const clonedDoc: any = document.getElementById('#nota-de-pedido-form')?.cloneNode(true);
+    html2canvas(clonedDoc, {
+      onclone: function (clonedDoc) {
+        (clonedDoc as any).getElementById('nota-de-pedido').style.display = 'block';
+      },
+    }).then((canvas) => {
+      const img = canvas.toDataURL('image/jpeg');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const width = pdf.internal.pageSize.getWidth();
+      const height = pdf.internal.pageSize.getHeight();
+      pdf.addImage(img, 'JPEG', 0, 0, width, height);
+      pdf.save(`nota-de-pedido-${codigo}.pdf`);
+    });
+  };
 
   return (
-    <div>
+    <div id="nota-de-pedido-form">
+      <div style={{ display: 'none' }}>
+        <NotaDePedido nota={pdf} />
+      </div>
       {/* #region Formulario  */}
       <Row>
         <Col span={24}>

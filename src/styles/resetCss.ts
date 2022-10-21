@@ -40,4 +40,32 @@ export const resetCss = css`
     background-color: #f8d11133;
     opacity: 0.8;
   }
+
+  .tipoComprobante {
+    font-size: 3rem;
+    width: 80px;
+    height: 80px;
+    border: 1px solid var(--primary-color);
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    left: 50%;
+    background-color: white;
+    color: #000;
+  }
+
+  .detalle {
+    /* aplicar borde a toda la tabla */
+    border: 1px solid #000;
+  }
+
+  .tabla-detalle {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  b {
+    margin: 0 0.5rem;
+  }
 `;
