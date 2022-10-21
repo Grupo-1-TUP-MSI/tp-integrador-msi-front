@@ -50,6 +50,7 @@ export const NotasDePedidoPage: React.FC = () => {
   const [filterUsuario, setFilterUsuario] = React.useState(null);
   const [filterProveedor, setFilterProveedor] = React.useState(null);
   const [filterEstadoNP, setFilterEstadoNP] = React.useState<number | null>(null);
+  const [filterTipoCompra, setFilterTipoCompra] = React.useState<number | null>(null);
   const [filterDates, setFilterDates] = React.useState<any>([]);
   const [filterExpiration, setFilterExpiration] = React.useState<any>([]);
   const [modalEstado, setModalEstado] = React.useState(false);
@@ -127,23 +128,31 @@ export const NotasDePedidoPage: React.FC = () => {
   const columns = [
     {
       title: t('common.numero'),
-      dataIndex: 'numero',
-      key: 'numero',
+      dataIndex: 'id',
+      key: 'id',
+      render: (text: any, record: any) => {
+        return (
+          <span>
+            {record.id}
+            {record.version > 1 ? `.${record.version}` : ''}
+          </span>
+        );
+      },
     },
     {
       title: t('common.fecha'),
       dataIndex: 'fecha',
       key: 'fecha',
       render: (text: any, record: any) => {
-        return <span>{new Date(record.fecha).toLocaleString('es')}</span>;
+        return <span>{new Date(record.fecha).toLocaleDateString('es')}</span>;
       },
     },
     {
-      title: t('common.plazoentrega'),
-      dataIndex: 'plazoentrega',
-      key: 'plazoentrega',
+      title: t('common.vencimiento'),
+      dataIndex: 'vencimiento',
+      key: 'vencimiento',
       render: (text: any, record: any) => {
-        return <span>{record.plazoentrega + ' dias.'}</span>;
+        return <span>{new Date(record.vencimiento).toLocaleDateString('es')}</span>;
       },
     },
     {
@@ -158,15 +167,15 @@ export const NotasDePedidoPage: React.FC = () => {
     },
     {
       title: t('common.estadonp'),
-      dataIndex: 'estadonp',
-      key: 'estadonp',
-      render: (text: any, record: any) => textoPorEstado(record.estadonp),
+      dataIndex: 'idestadonp',
+      key: 'idestadonp',
+      render: (text: any, record: any) => t('common.' + EstadoNP[record.idestadonp - 1]),
     },
     {
       title: t('common.tipocompra'),
-      dataIndex: 'tipocompra',
-      key: 'tipocompra',
-      render: (text: any, record: any) => TipoCompra[record.tipocompra - 1],
+      dataIndex: 'idtipocompra',
+      key: 'idtipocompra',
+      render: (text: any, record: any) => TipoCompra[record.idtipocompra - 1],
     },
     {
       title: t('common.acciones'),
@@ -177,7 +186,7 @@ export const NotasDePedidoPage: React.FC = () => {
           <Tooltip placement="top" title={t('common.actualizarEstado')} trigger="hover" destroyTooltipOnHide>
             <Button
               icon={<SubnodeOutlined />}
-              disabled={!record.estado}
+              disabled={record.idestadonp === 4}
               type="text"
               onClick={() => {
                 setModalEstado(true);
@@ -185,19 +194,18 @@ export const NotasDePedidoPage: React.FC = () => {
               }}
             ></Button>
           </Tooltip>
-          <Tooltip placement="top" title={t('common.exportarPDF')} trigger="hover" destroyTooltipOnHide>
+          {/* <Tooltip placement="top" title={t('common.exportarPDF')} trigger="hover" destroyTooltipOnHide>
             <Button
               icon={<DownloadOutlined />}
-              disabled={!record.estado}
               type="text"
               onClick={() => {
                 console.log('exportarPDF');
               }}
             ></Button>
-          </Tooltip>
+          </Tooltip> */}
           <Button
             icon={<EditOutlined />}
-            disabled={record.estadonp > 1}
+            disabled={record.idestadonp > 1}
             type="text"
             onClick={() => {
               navigate(`/compras/np/${record.id}`);
@@ -205,7 +213,7 @@ export const NotasDePedidoPage: React.FC = () => {
           ></Button>
           <Button
             icon={<DeleteOutlined />}
-            disabled={!record.estado}
+            disabled={record.idestadonp !== 4}
             type="text"
             danger
             onClick={() => {
@@ -237,13 +245,19 @@ export const NotasDePedidoPage: React.FC = () => {
       })
       .filter((np: NotaPedido) => {
         if (filterProveedor) {
-          return np?.idProveedor === filterProveedor;
+          return np?.idproveedor === filterProveedor;
+        }
+        return true;
+      })
+      .filter((np: NotaPedido) => {
+        if (filterTipoCompra) {
+          return np?.idtipocompra === filterTipoCompra;
         }
         return true;
       })
       .filter((np: NotaPedido) => {
         if (filterEstadoNP) {
-          return np.idEstadoNP === filterEstadoNP;
+          return np.idestadonp === filterEstadoNP;
         }
         return true;
       })
@@ -252,21 +266,6 @@ export const NotasDePedidoPage: React.FC = () => {
       });
 
     return arr;
-  };
-
-  const textoPorEstado = (estado: any) => {
-    switch (estado) {
-      case EstadoNP[0]:
-        return t('common.pendienteAceptacion');
-      case EstadoNP[1]:
-        return t('common.pendienteEntrega');
-      case EstadoNP[2]:
-        return t('common.cerrada');
-      case EstadoNP[3]:
-        return t('common.rechazada');
-      default:
-        return '';
-    }
   };
 
   return (
@@ -312,11 +311,14 @@ export const NotasDePedidoPage: React.FC = () => {
             allowClear
             style={{ width: '60%' }}
           >
-            {EstadoNP?.filter((e) => e > estado).map((estado, i: number) => (
-              <Select.Option key={i} value={estado}>
-                {textoPorEstado(estado)}
-              </Select.Option>
-            ))}
+            {EstadoNP.map((estado, i: number) => {
+              if (i + 1 <= notaPedido?.idestadonp) return null;
+              return (
+                <Select.Option key={i} value={i + 1}>
+                  {t(`common.${EstadoNP[i]}`)}
+                </Select.Option>
+              );
+            })}
           </Select>
         </div>
       </Modal>
@@ -405,6 +407,19 @@ export const NotasDePedidoPage: React.FC = () => {
           ))}
         </Select>
         <Select
+          value={filterTipoCompra}
+          onChange={(value) => setFilterTipoCompra(value)}
+          style={{ width: '100%', marginLeft: '1rem' }}
+          placeholder={t('table.filtrarTiposCompra')}
+          allowClear
+        >
+          {TipoCompra.map((estado, i: number) => (
+            <Select.Option key={i} value={i + 1}>
+              {t(`common.${TipoCompra[i]}`)}
+            </Select.Option>
+          ))}
+        </Select>
+        <Select
           value={filterEstadoNP}
           onChange={(value) => setFilterEstadoNP(value)}
           style={{ width: '100%', marginLeft: '1rem' }}
@@ -412,15 +427,15 @@ export const NotasDePedidoPage: React.FC = () => {
           allowClear
         >
           {EstadoNP.map((estado, i: number) => (
-            <Select.Option key={i} value={estado}>
-              {textoPorEstado(estado)}
+            <Select.Option key={i} value={i + 1}>
+              {t(`common.${EstadoNP[i]}`)}
             </Select.Option>
           ))}
         </Select>
       </div>
       <Table
         rowKey={(record) => record.id}
-        rowClassName={(record) => (!record.estado ? 'deleted-row' : '')}
+        rowClassName={(record) => (record.idestadonp === 4 ? 'deleted-row' : '')}
         columns={columns}
         dataSource={npFiltradas()}
         loading={isLoadingNotasDePedido || isLoadingProveedores || isLoadingUsuarios || isRefetchingNotasDePedido}
@@ -561,8 +576,8 @@ export const NotasDePedidoForm: React.FC = () => {
       const np = {
         id: parseInt(id as string),
         fecha: values?.fecha,
-        idProveedor: values?.idProveedor,
-        idTipoCompra: values?.idTipoCompra,
+        idproveedor: values?.idProveedor,
+        idtipocompra: values?.idTipoCompra,
         plazoentrega: values?.plazoentrega,
         detalles: detalles.map((d: any) => {
           return {
@@ -576,8 +591,8 @@ export const NotasDePedidoForm: React.FC = () => {
     } else {
       const np = {
         fecha: values?.fecha,
-        idProveedor: values?.idProveedor,
-        idTipoCompra: values?.idTipoCompra,
+        idproveedor: values?.idProveedor,
+        idtipocompra: values?.idTipoCompra,
         plazoentrega: values?.plazoentrega,
         detalles: detalles.map((d: any) => {
           return {

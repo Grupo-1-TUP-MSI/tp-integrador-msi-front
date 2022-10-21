@@ -237,13 +237,13 @@ export const FacturacionPage: React.FC = () => {
       })
       .filter((np: NotaPedido) => {
         if (filterProveedor) {
-          return np?.idProveedor === filterProveedor;
+          return np?.idproveedor === filterProveedor;
         }
         return true;
       })
       .filter((np: NotaPedido) => {
         if (filterEstadoNP) {
-          return np.idEstadoNP === filterEstadoNP;
+          return np.idestadonp === filterEstadoNP;
         }
         return true;
       })
@@ -559,8 +559,8 @@ export const FacturacionForm: React.FC = () => {
       const np = {
         id: parseInt(id as string),
         fecha: values?.fecha,
-        idProveedor: values?.idProveedor,
-        idTipoCompra: values?.idTipoCompra,
+        idproveedor: values?.idProveedor,
+        idtipocompra: values?.idTipoCompra,
         plazoentrega: values?.plazoentrega,
         detalles: detalles.map((d: any) => {
           return {
@@ -574,8 +574,8 @@ export const FacturacionForm: React.FC = () => {
     } else {
       const np = {
         fecha: values?.fecha,
-        idProveedor: values?.idProveedor,
-        idTipoCompra: values?.idTipoCompra,
+        idproveedor: values?.idProveedor,
+        idtipocompra: values?.idTipoCompra,
         plazoentrega: values?.plazoentrega,
         detalles: detalles.map((d: any) => {
           return {

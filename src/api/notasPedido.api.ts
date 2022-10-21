@@ -23,5 +23,5 @@ export const deleteNotaPedido = (id: number) => {
 };
 
 export const putEstado = (id: number, estado: any) => {
-  return httpApi.put(`np/estado/${id}`, { estado }).then((res) => res.data.data);
+  return httpApi.put(`np/estado/${id}`, { idEstadoNP: estado }).then((res) => res.data.data);
 };
