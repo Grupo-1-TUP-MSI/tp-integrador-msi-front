@@ -311,11 +311,14 @@ export const NotasDePedidoPage: React.FC = () => {
             allowClear
             style={{ width: '60%' }}
           >
-            {EstadoNP.map((estado, i: number) => (
-              <Select.Option key={i} value={i + 1}>
-                {t(`common.${EstadoNP[i]}`)}
-              </Select.Option>
-            ))}
+            {EstadoNP.map((estado, i: number) => {
+              if (i + 1 <= notaPedido?.idestadonp) return null;
+              return (
+                <Select.Option key={i} value={i + 1}>
+                  {t(`common.${EstadoNP[i]}`)}
+                </Select.Option>
+              );
+            })}
           </Select>
         </div>
       </Modal>
