@@ -69,9 +69,9 @@ export interface NotaPedido {
   usuario?: string;
   idUsuario?: number;
   proveedor?: string;
-  idProveedor?: number;
-  idEstadoNP?: number;
-  idTipoCompra: number;
+  idproveedor?: number;
+  idestadonp?: number;
+  idtipocompra: number;
   plazoentrega?: number;
   detalles: DetalleNotaPedido[];
 }
