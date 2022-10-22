@@ -220,7 +220,7 @@ export const NotasDePedidoPage: React.FC = () => {
         },
       },
       business: {
-        name: 'ColorCor S.A',
+        name: 'ColorCor S.A.',
         address: 'Zapiola 77',
         phone: '(0351) 155622138',
         email: 'compras@colorcor.com.ar',
@@ -549,7 +549,7 @@ export const NotasDePedidoForm: React.FC = () => {
   const [searchProducto, setSearchProducto] = React.useState('');
   const [proveedor, setProveedor] = React.useState(null);
   const enabledField = Form.useWatch('idProveedor', form);
-  const [imprimirPDF, setImprimirPDF] = React.useState(false);
+  const [isImprimirPDF, setImprimirPDF] = React.useState(false);
 
   const { data: proveedoresData, isLoading: isLoadingProveedores } = useQuery(['proveedores'], getProveedores, {
     keepPreviousData: false,
@@ -604,7 +604,7 @@ export const NotasDePedidoForm: React.FC = () => {
     {
       keepPreviousData: false,
       refetchOnWindowFocus: false,
-      enabled: imprimirPDF,
+      enabled: isImprimirPDF,
       onSuccess: (data) => {
         const props = {
           outputType: OutputType.Save,
@@ -632,7 +632,7 @@ export const NotasDePedidoForm: React.FC = () => {
             },
           },
           business: {
-            name: 'ColorCor S.A',
+            name: 'ColorCor S.A.',
             address: 'Zapiola 77',
             phone: '(0351) 155622138',
             email: 'compras@colorcor.com.ar',
@@ -736,7 +736,7 @@ export const NotasDePedidoForm: React.FC = () => {
           description: t('notifications.npCreada'),
           duration: 3,
         });
-        imprimirPDF2(res.id);
+        imprimirPDF(res.id);
         setImprimirPDF(true);
         navigate('/compras/notapedido');
       } else {
@@ -760,7 +760,7 @@ export const NotasDePedidoForm: React.FC = () => {
           description: t('notifications.npActualizada'),
           duration: 3,
         });
-
+        imprimirPDF(res.id);
         setImprimirPDF(true);
 
         navigate('/compras/notapedido');
@@ -813,7 +813,7 @@ export const NotasDePedidoForm: React.FC = () => {
     }
   };
 
-  const imprimirPDF2 = async (id: number) => {
+  const imprimirPDF = async (id: number) => {
     const data = await getNotaPedidoPDF(id);
     console.log(data);
     const props: any = {
@@ -842,7 +842,7 @@ export const NotasDePedidoForm: React.FC = () => {
         },
       },
       business: {
-        name: 'ColorCor S.A',
+        name: 'ColorCor S.A.',
         address: 'Zapiola 77',
         phone: '(0351) 155622138',
         email: 'compras@colorcor.com.ar',
