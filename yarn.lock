@@ -10545,7 +10545,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jspdf@npm:^2.5.1":
+"jspdf-invoice-template@npm:^1.4.3":
+  version: 1.4.3
+  resolution: "jspdf-invoice-template@npm:1.4.3"
+  dependencies:
+    jspdf: ^2.3.1
+  checksum: c44baa47df5a4175829af02080c0fc6273f5aa0b854693b79858a3a9dc60efb3017a83859bc88114533c3720bd401d2d32f8d6af6ff7162188da93d2e50df438
+  languageName: node
+  linkType: hard
+
+"jspdf@npm:^2.3.1, jspdf@npm:^2.5.1":
   version: 2.5.1
   resolution: "jspdf@npm:2.5.1"
   dependencies:
@@ -17507,6 +17516,7 @@ __metadata:
     husky: ^6.0.0
     i18next: ^20.4.0
     jspdf: ^2.5.1
+    jspdf-invoice-template: ^1.4.3
     leaflet: ^1.7.1
     less: ^4.1.2
     less-plugin-clean-css: ^1.5.1

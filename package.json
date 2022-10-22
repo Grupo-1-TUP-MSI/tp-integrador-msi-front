@@ -21,6 +21,7 @@
     "html2canvas": "^1.4.1",
     "i18next": "^20.4.0",
     "jspdf": "^2.5.1",
+    "jspdf-invoice-template": "^1.4.3",
     "leaflet": "^1.7.1",
     "patch-package": "^6.4.7",
     "pigeon-maps": "^0.19.7",
