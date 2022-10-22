@@ -2,14 +2,12 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Col, Row, Space } from 'antd';
 import { Notification } from 'components/common/Notification/Notification';
-import { capitalize } from 'utils/utils';
-import { Notification as NotificationType } from '@app/api/notifications.api';
-import { notificationsSeverities } from 'constants/notificationsSeverities';
 import * as S from './NotificationsOverlay.styles';
+import { useNavigate } from 'react-router-dom';
 
 interface NotificationsOverlayProps {
-  notifications: NotificationType[];
-  setNotifications: (state: NotificationType[]) => void;
+  notifications: any;
+  setNotifications: (state: any) => void;
 }
 
 export const NotificationsOverlay: React.FC<NotificationsOverlayProps> = ({
@@ -18,19 +16,24 @@ export const NotificationsOverlay: React.FC<NotificationsOverlayProps> = ({
   ...props
 }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   const noticesList = useMemo(
     () =>
-      notifications.map((notification, index) => {
-        const type = notificationsSeverities.find((dbSeverity) => dbSeverity.id === notification.id)?.name;
-
+      notifications.map((notification: any, index: any) => {
         return (
-          <Notification
+          <div
             key={index}
-            type={type || 'warning'}
-            title={capitalize(type || 'warning')}
-            description={t(notification.description)}
-          />
+            onClick={() =>
+              navigate('/productos', { state: { id: notification.id, description: notification.description } })
+            }
+          >
+            <Notification
+              type="warning"
+              title={t('notifications.alertaStock')}
+              description={t(notification.description)}
+            />
+          </div>
         );
       }),
     [notifications, t],
@@ -45,14 +48,14 @@ export const NotificationsOverlay: React.FC<NotificationsOverlayProps> = ({
               {noticesList}
             </Space>
           ) : (
-            <S.Text>{t('header.notifications.noNotifications')}</S.Text>
+            <S.Text>{t('notifications.noNotifications')}</S.Text>
           )}
         </Col>
         <Col span={24}>
           <Row gutter={[10, 10]}>
             <Col span={24}>
               <S.Btn type="ghost" onClick={() => setNotifications([])}>
-                {t('header.notifications.readAll')}
+                {t('notifications.readAll')}
               </S.Btn>
             </Col>
           </Row>

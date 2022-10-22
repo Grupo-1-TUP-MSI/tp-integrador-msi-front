@@ -89,6 +89,7 @@
     "ventas": "Ventas",
     "verBorrados": "Ocultar borrados",
     "verSinStock": "Ocultar sin stock",
+    "verStockMinimo": "Filtrar productos que no superen el stock mínimo",
     "pendienteAceptacion": "Pendiente de aceptación",
     "pendienteEntrega": "Pendiente de entrega",
     "cerrada": "Cerrada",
@@ -116,12 +117,6 @@
       "from": "From",
       "title": "Nightmode",
       "to": "To"
-    },
-    "notifications": {
-      "noNotifications": "No notifications yet",
-      "readAll": "Mark all as read",
-      "serverError": "The server is not responding, try again later",
-      "viewAll": "View all"
     }
   },
   "login": {
@@ -132,6 +127,7 @@
     "logout": "Cerrar sesión"
   },
   "notifications": {
+    "alertaStock": "Producto no cumple con el stock mínimo",
     "agregandoProveedor": "Agregando proveedor",
     "agregandoProductos": "Agregando productos",
     "captionPrecio": "Este campo habilitará la comparación de precios entre proveedores. \n Cargar en cero (0) si el proveedor no posee ese producto.",
@@ -170,7 +166,11 @@
     "usuarioNoActualizado": "No se pudo actualizar el usuario.",
     "usuarioNoCreado": "No se pudo crear el usuario.",
     "confirmarEliminacion": "¿Está seguro de eliminar este elemento?",
-    "eliminandoElemento": "Eliminando elemento..."
+    "eliminandoElemento": "Eliminando elemento...",
+    "noNotifications": "No hay notificaciones",
+    "readAll": "Marcar todas como leídas",
+    "cambioEstadoNP": "Nota de Pedido cambió de estado",
+    "noCambioEstadoNP": "No se pudo cambiar el estado de la nota de pedido"
   },
   "table": {
     "buscarCliente": "Buscar cliente",

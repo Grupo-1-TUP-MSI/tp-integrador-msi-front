@@ -5,7 +5,6 @@ export const getNotasPedidos = () => {
 };
 
 export const getNotaPedido = (id: number) => {
-  console.log(id);
   return httpApi.get(`np/${id}`).then((res) => res.data.data);
 };
 
