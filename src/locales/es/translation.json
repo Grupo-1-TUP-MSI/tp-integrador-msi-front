@@ -1,5 +1,29 @@
 {
+  "charts": {
+    "promedio": "Promedio",
+    "barras": {
+      "compras": "Compras",
+      "ventas": "Ventas",
+      "meses": {
+        "enero": "Enero",
+        "febrero": "Febrero",
+        "marzo": "Marzo",
+        "abril": "Abril",
+        "mayo": "Mayo",
+        "junio": "Junio",
+        "julio": "Julio",
+        "agosto": "Agosto",
+        "septiembre": "Septiembre",
+        "octubre": "Octubre",
+        "noviembre": "Noviembre",
+        "diciembre": "Diciembre"
+      }
+    }
+  },
   "common": {
+    "demorado": "Demorado",
+    "prontoVencimiento": "Pronto vencimiento",
+    "aTiempo": "A tiempo",
     "estado": "Estado",
     "nuevoEstado": "Nuevo estado",
     "PEND_ACEPTACION": "Pendiente de Aceptación",
@@ -191,7 +215,8 @@
     "editandoProducto": "Editando producto",
     "eliminandoProducto": "Eliminando producto",
     "editandoNP": "Editando nota de pedido",
-    "creandoNP": "Creando nota de pedido"
+    "creandoNP": "Creando nota de pedido",
+    "ultimosPendientesEntrega": "Últimos pendientes de entrega"
   },
   "serverError": {
     "main": "Internal server error"
