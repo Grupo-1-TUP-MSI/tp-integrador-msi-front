@@ -33,7 +33,7 @@ import {
   updateStock,
 } from '@app/api/productos.api';
 import { Producto, Proveedor } from '@app/models/models';
-import { useNavigate, useParams } from 'react-router';
+import { useLocation, useNavigate, useParams } from 'react-router';
 import { notificationController } from '@app/controllers/notificationController';
 import { BaseForm } from '@app/components/common/forms/BaseForm/BaseForm';
 import FormItem from 'antd/es/form/FormItem';
@@ -45,10 +45,12 @@ import { getProveedores } from '@app/api/proveedores.api';
 export const ProductosPage: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { state } = useLocation();
   const [searchProducto, setSearchProducto] = React.useState('');
   const [minPrecio, setMinPrecio] = React.useState(0);
   const [maxPrecio, setMaxPrecio] = React.useState(0);
   const [filterStock, setFilterStock] = React.useState(false);
+  const [filterStockMinimo, setFilterStockMinimo] = React.useState(false);
   const [filterEstado, setFilterEstado] = React.useState(true);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [producto, setProducto] = React.useState<Producto | null>(null);
@@ -58,6 +60,14 @@ export const ProductosPage: React.FC = () => {
   const [proveedor, setProveedor] = React.useState(null);
   const [nuevoPrecio, setNuevoPrecio] = React.useState(0);
   const { isDesktop } = useResponsive();
+
+  useEffect(() => {
+    if (!!state) {
+      const { description } = state as any;
+      setSearchProducto(description || '');
+    }
+  }, [state]);
+
   const {
     data: productosData,
     isLoading: isLoadingProductos,
@@ -256,6 +266,9 @@ export const ProductosPage: React.FC = () => {
         return !!filterEstado ? producto.estado === filterEstado : true;
       })
       .filter((producto: Producto) => {
+        return !!filterStockMinimo ? producto.stockminimo > (producto.stock || 0) : true;
+      })
+      .filter((producto: Producto) => {
         return !!filterStock ? producto.stock || 0 > 0 : true;
       })
       .filter((producto: Producto) => {
@@ -411,6 +424,9 @@ export const ProductosPage: React.FC = () => {
               alignItems: 'center',
             }}
           >
+            <Checkbox checked={filterStockMinimo} onChange={(e) => setFilterStockMinimo(e.target.checked)}>
+              {t('common.verStockMinimo')}
+            </Checkbox>
             <Checkbox checked={filterStock} onChange={(e) => setFilterStock(e.target.checked)}>
               {t('common.verSinStock')}
             </Checkbox>
@@ -449,6 +465,9 @@ export const ProductosPage: React.FC = () => {
               alignItems: 'center',
             }}
           >
+            <Checkbox checked={filterStockMinimo} onChange={(e) => setFilterStockMinimo(e.target.checked)}>
+              {t('common.verStockMinimo')}
+            </Checkbox>
             <Checkbox checked={filterStock} onChange={(e) => setFilterStock(e.target.checked)}>
               {t('common.verSinStock')}
             </Checkbox>
