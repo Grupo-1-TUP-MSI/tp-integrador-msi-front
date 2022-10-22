@@ -220,7 +220,7 @@ export const NotasDePedidoPage: React.FC = () => {
         },
       },
       business: {
-        name: 'ColorCor S.A',
+        name: 'ColorCor S.A.',
         address: 'Zapiola 77',
         phone: '(0351) 155622138',
         email: 'compras@colorcor.com.ar',
@@ -549,7 +549,7 @@ export const NotasDePedidoForm: React.FC = () => {
   const [searchProducto, setSearchProducto] = React.useState('');
   const [proveedor, setProveedor] = React.useState(null);
   const enabledField = Form.useWatch('idProveedor', form);
-  const [imprimirPDF, setImprimirPDF] = React.useState(false);
+  const [isImprimirPDF, setImprimirPDF] = React.useState(false);
 
   const { data: proveedoresData, isLoading: isLoadingProveedores } = useQuery(['proveedores'], getProveedores, {
     keepPreviousData: false,
@@ -604,7 +604,7 @@ export const NotasDePedidoForm: React.FC = () => {
     {
       keepPreviousData: false,
       refetchOnWindowFocus: false,
-      enabled: imprimirPDF,
+      enabled: isImprimirPDF,
       onSuccess: (data) => {
         const props = {
           outputType: OutputType.Save,
@@ -632,7 +632,7 @@ export const NotasDePedidoForm: React.FC = () => {
             },
           },
           business: {
-            name: 'ColorCor S.A',
+            name: 'ColorCor S.A.',
             address: 'Zapiola 77',
             phone: '(0351) 155622138',
             email: 'compras@colorcor.com.ar',
@@ -736,7 +736,7 @@ export const NotasDePedidoForm: React.FC = () => {
           description: t('notifications.npCreada'),
           duration: 3,
         });
-
+        imprimirPDF(res.id);
         setImprimirPDF(true);
         navigate('/compras/notapedido');
       } else {
@@ -760,7 +760,7 @@ export const NotasDePedidoForm: React.FC = () => {
           description: t('notifications.npActualizada'),
           duration: 3,
         });
-
+        imprimirPDF(res.id);
         setImprimirPDF(true);
 
         navigate('/compras/notapedido');
@@ -811,6 +811,125 @@ export const NotasDePedidoForm: React.FC = () => {
       };
       handleCreate(np);
     }
+  };
+
+  const imprimirPDF = async (id: number) => {
+    const data = await getNotaPedidoPDF(id);
+    console.log(data);
+    const props: any = {
+      outputType: OutputType.Save,
+      returnJsPDFDocObject: true,
+      fileName: `ColorCor F00${data.id}-V00${data.version}`,
+      orientationLandscape: false,
+      compress: true,
+      logo: {
+        src: 'https://i.postimg.cc/3w2KmPdm/logo.png',
+        width: 25, //aspect ratio = width/height
+        height: 25,
+        margin: {
+          top: 0, //negative or positive num, from the current position
+          left: 0, //negative or positive num, from the current position
+        },
+      },
+      stamp: {
+        inAllPages: true,
+        src: 'https://i.postimg.cc/YCCvCcKC/qr-code.jpg',
+        width: 20, //aspect ratio = width/height
+        height: 20,
+        margin: {
+          top: 0, //negative or positive num, from the current position
+          left: 0, //negative or positive num, from the current position
+        },
+      },
+      business: {
+        name: 'ColorCor S.A.',
+        address: 'Zapiola 77',
+        phone: '(0351) 155622138',
+        email: 'compras@colorcor.com.ar',
+
+        website: 'https://colorcor.netlify.app/',
+      },
+      contact: {
+        label: 'Nota de Pedido para:',
+        name: data.proveedor.nombre,
+        address: data.proveedor.direccion,
+        phone: data.proveedor.telefono,
+        email: data.proveedor.email,
+      },
+      invoice: {
+        label: 'Nota de Pedido#: ',
+        num: `${data.id} Version: ${data.version}`,
+        invDate: `Fecha de elaboracion: ${data.fechaLocale}`,
+        invGenDate: `Fecha de entrega: ${data.vencimientoLocale}`,
+        headerBorder: false,
+        tableBodyBorder: false,
+        header: [
+          {
+            title: '#',
+            style: {
+              width: 10,
+            },
+          },
+          {
+            title: 'Producto',
+            style: {
+              width: 30,
+            },
+          },
+          {
+            title: 'Descripcion',
+            style: {
+              width: 70,
+            },
+          },
+          { title: 'Precio Unitario' },
+          { title: 'Cantidad' },
+          { title: 'Total' },
+        ],
+        table: Array.from(data.detalles, (item: any, index) => [
+          index + 1,
+          item.producto,
+          item.descripcion,
+          item.precio.toLocaleString(),
+          item.cantidadpedida,
+          (parseFloat(item.precio) * parseFloat(item.cantidadpedida)).toLocaleString(),
+        ]),
+        additionalRows: [
+          {
+            col1: 'Gravado:',
+            col2: data.acumGravado.toLocaleString(),
+            col3: 'ALL',
+            style: {
+              fontSize: 10, //optional, default 12
+            },
+          },
+          {
+            col1: 'IVA:',
+            col2: data.acumIVA.toLocaleString(),
+            col3: '%',
+            style: {
+              fontSize: 10, //optional, default 12
+            },
+          },
+          {
+            col1: 'Total:',
+            col2: data.acumTotal.toLocaleString(),
+            col3: 'ALL',
+            style: {
+              fontSize: 14, //optional, default 12
+            },
+          },
+        ],
+      },
+      footer: {
+        text: 'Esta nota de pedido se ha creado via web y es un documento valido.',
+      },
+      pageEnable: true,
+      pageLabel: 'Page ',
+    };
+    const pdfObj = jsPDFInvoiceTemplate(props);
+
+    //console.log(pdfObj);
   };
 
   // #region Productos
