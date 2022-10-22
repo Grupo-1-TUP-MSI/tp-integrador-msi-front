@@ -8,6 +8,10 @@ export const getNotaPedido = (id: number) => {
   return httpApi.get(`np/${id}`).then((res) => res.data.data);
 };
 
+export const getNotaPedidoPDF = (id: number) => {
+  return httpApi.get(`np/pdf/${id}`).then((res) => res.data.data);
+};
+
 export const postNotaPedido = (np: any) => {
   return httpApi.post('np', np).then((res) => res.data.data);
 };
