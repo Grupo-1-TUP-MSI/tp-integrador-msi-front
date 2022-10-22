@@ -545,11 +545,9 @@ export const NotasDePedidoForm: React.FC = () => {
   const [detalles, setDetalles] = React.useState([]);
   const [productos, setProductos] = React.useState([]);
   const [form] = Form.useForm();
-  const { isDesktop } = useResponsive();
   const [modalVisible, setModalVisible] = React.useState(false);
   const [searchProducto, setSearchProducto] = React.useState('');
   const [proveedor, setProveedor] = React.useState(null);
-  const [pdf, setPdf] = React.useState(null);
   const enabledField = Form.useWatch('idProveedor', form);
   const [imprimirPDF, setImprimirPDF] = React.useState(false);
 
@@ -780,7 +778,6 @@ export const NotasDePedidoForm: React.FC = () => {
   });
 
   const handleSubmit = (values: any) => {
-    setPdf(values);
     if (isEdit) {
       const np = {
         id: parseInt(id as string),
