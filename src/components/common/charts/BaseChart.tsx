@@ -58,7 +58,6 @@ export const BaseChart: React.FC<BaseChartProps> = ({ option, width, height, onE
   };
 
   useEffect(() => {
-    // TODO FIXME workaround to make sure that parent container is initialized before the chart
     setTimeout(() => {
       setLoading(false);
     }, 1000 / 2);

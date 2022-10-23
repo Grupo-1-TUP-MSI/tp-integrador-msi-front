@@ -64,9 +64,15 @@ export const UsuariosPage: React.FC = () => {
       width: '5%',
     },
     {
+      title: t('common.nombre'),
+      dataIndex: 'nombrecompleto',
+      key: 'nombrecompleto',
+    },
+    {
       title: t('common.email'),
       dataIndex: 'usuario',
       key: 'email',
+      width: '25%',
     },
     {
       title: t('common.rol'),
@@ -106,7 +112,10 @@ export const UsuariosPage: React.FC = () => {
   const usuariosFiltrados = () => {
     const arr = usuariosData
       ?.filter((usuario: Usuario) => {
-        return usuario.usuario.toLowerCase().includes(searchUsuario.toLowerCase());
+        return (
+          usuario.usuario.toLowerCase().includes(searchUsuario.toLowerCase()) ||
+          usuario.nombrecompleto.toLowerCase().includes(searchUsuario.toLowerCase())
+        );
       })
       .filter((usuario: Usuario) => {
         return !!filterEstado ? usuario.estado === filterEstado : true;
@@ -288,6 +297,7 @@ export const UsuariosForm: React.FC = () => {
       form.setFieldsValue({
         id: id,
         usuario: usuarioData?.usuario,
+        nombrecompleto: usuarioData?.nombrecompleto,
         rol: usuarioData?.rol,
       });
     }
