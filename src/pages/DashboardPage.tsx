@@ -40,8 +40,38 @@ const DashboardPage: React.FC = () => {
       keepPreviousData: false,
       refetchOnWindowFocus: false,
       onSuccess: (data) => {
-        const { compra, venta, meses } = data;
-        setData({ data1: compra, data2: venta, xAxisData: meses });
+        const { compras, ventas, meses } = data;
+        const monthsTranslatedFromNumber = meses.map((month: number) => {
+          switch (month) {
+            case 1:
+              return t('charts.barras.meses.enero').substring(0, 3);
+            case 2:
+              return t('charts.barras.meses.febrero').substring(0, 3);
+            case 3:
+              return t('charts.barras.meses.marzo').substring(0, 3);
+            case 4:
+              return t('charts.barras.meses.abril').substring(0, 3);
+            case 5:
+              return t('charts.barras.meses.mayo').substring(0, 3);
+            case 6:
+              return t('charts.barras.meses.junio').substring(0, 3);
+            case 7:
+              return t('charts.barras.meses.julio').substring(0, 3);
+            case 8:
+              return t('charts.barras.meses.agosto').substring(0, 3);
+            case 9:
+              return t('charts.barras.meses.septiembre').substring(0, 3);
+            case 10:
+              return t('charts.barras.meses.octubre').substring(0, 3);
+            case 11:
+              return t('charts.barras.meses.noviembre').substring(0, 3);
+            case 12:
+              return t('charts.barras.meses.diciembre').substring(0, 3);
+            default:
+              return '';
+          }
+        });
+        setData({ data1: compras, data2: ventas, xAxisData: monthsTranslatedFromNumber });
       },
     },
   );
@@ -85,7 +115,7 @@ const DashboardPage: React.FC = () => {
         emphasis: {
           focus: 'series',
         },
-        animationDelay: (idx: number) => idx * 10,
+        animationDelay: (idx: number) => idx * 70,
       },
       {
         name: t('charts.barras.ventas'),
@@ -95,10 +125,9 @@ const DashboardPage: React.FC = () => {
         emphasis: {
           focus: 'series',
         },
-        animationDelay: (idx: number) => idx * 10 + 100,
+        animationDelay: (idx: number) => idx * 70 + 100,
       },
     ],
-    animationEasing: 'elasticOut',
   };
 
   const calcularDemora = (demora: number) => {
@@ -135,11 +164,18 @@ const DashboardPage: React.FC = () => {
                   />
                 </List.Item>
               ))}
+              {pendientesDeEntregaData?.length === 0 && (
+                <List.Item>
+                  <List.Item.Meta description={t('notifications.noHayDatos')} />
+                </List.Item>
+              )}
             </List>
           </Card>
         </Col>
         <Col xs={24} md={24} lg={16}>
-          <BaseChart style={{ margin: 20 }} option={option} />
+          <Card style={{ margin: 20 }} title={t('titles.comprasVentas')}>
+            <BaseChart option={option} />
+          </Card>
         </Col>
       </Row>
       <Row

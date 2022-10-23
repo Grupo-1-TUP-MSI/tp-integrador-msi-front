@@ -170,7 +170,8 @@
     "noNotifications": "No hay notificaciones",
     "readAll": "Marcar todas como leídas",
     "cambioEstadoNP": "Nota de Pedido cambió de estado",
-    "noCambioEstadoNP": "No se pudo cambiar el estado de la nota de pedido"
+    "noCambioEstadoNP": "No se pudo cambiar el estado de la nota de pedido",
+    "noHayDatos": "No hay datos para mostrar"
   },
   "table": {
     "buscarCliente": "Buscar cliente",
@@ -202,6 +203,7 @@
     "cancelSort": "Click para cancelar el ordenamiento"
   },
   "titles": {
+    "comprasVentas": "Compras y Ventas de últimos 12 meses",
     "creandoCliente": "Creando cliente",
     "editandoCliente": "Editando cliente",
     "eliminandoCliente": "Eliminando cliente",

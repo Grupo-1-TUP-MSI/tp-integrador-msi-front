@@ -13,7 +13,7 @@ export const DesktopHeader: React.FC<DesktopHeaderProps> = ({ isTwoColumnsLayout
   const leftSide = isTwoColumnsLayout ? (
     <S.SearchColumn xl={16} xxl={17} style={{ backgroundColor: 'var(--sider-background-color)' }}>
       <Row justify="space-between">
-        <Col xl={2} xxl={12} color="error">
+        <Col xl={2} color="error">
           <HeaderFullscreen />
         </Col>
       </Row>

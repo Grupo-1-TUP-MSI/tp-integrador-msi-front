@@ -25,8 +25,6 @@ import FormItem from 'antd/es/form/FormItem';
 import { SubmitButton } from '@app/components/layouts/AuthLayout/AuthLayout.styles';
 import { Table } from '@app/components/common/Table/Table';
 import { getProveedores } from '../../../api/proveedores.api';
-import { useResponsive } from '@app/hooks/useResponsive';
-
 import {
   getNotasPedidos,
   getNotaPedido,
@@ -37,7 +35,7 @@ import {
 } from '@app/api/notasPedido.api';
 import { getUsuarios } from '@app/api/usuarios.api';
 import locale from 'antd/es/date-picker/locale/es_ES';
-import { getProductos, getProductosDeProveedor } from '@app/api/productos.api';
+import { getProductosDeProveedor } from '@app/api/productos.api';
 import jsPDFInvoiceTemplate, { OutputType, jsPDF } from 'jspdf-invoice-template';
 
 export const NotasDePedidoPage: React.FC = () => {
@@ -76,17 +74,13 @@ export const NotasDePedidoPage: React.FC = () => {
     () => putEstado(notaPedido?.id, estado),
     {
       onSuccess: (res) => {
-        if (res !== 400) {
-          notificationController.success({
-            message: t('common.successMessage'),
-            description: t('notifications.cambioEstadoNP'),
-            duration: 3,
-          });
-          setModalEstado(false);
-          refetchNotasDePedido();
-        } else {
-          throw new Error('Error al cambiar estado');
-        }
+        notificationController.success({
+          message: t('common.successMessage'),
+          description: t('notifications.cambioEstadoNP'),
+          duration: 3,
+        });
+        setModalEstado(false);
+        refetchNotasDePedido();
       },
       onError: (error: Error) => {
         notificationController.error({
@@ -462,7 +456,7 @@ export const NotasDePedidoPage: React.FC = () => {
         >
           {usuariosData?.map((usuario: Usuario, i: number) => (
             <Select.Option key={i} value={usuario?.id}>
-              {usuario?.usuario}
+              {usuario?.nombrecompleto}
             </Select.Option>
           ))}
         </Select>
@@ -566,7 +560,9 @@ export const NotasDePedidoForm: React.FC = () => {
     enabled: !!enabledField,
     onSuccess: (data) => {
       setProductos(data);
-      setDetalles([]);
+      if (!isEdit) {
+        setDetalles([]);
+      }
     },
   });
 
@@ -594,154 +590,147 @@ export const NotasDePedidoForm: React.FC = () => {
             cantidad: detalle.cantidadpedida,
           })),
         );
+        setProveedor(data?.idproveedor);
       },
     },
   );
 
-  const { data: npDataPDF, isLoading: isLoadingNPPDF } = useQuery(
-    ['getNotaPedidoPDF'],
-    () => getNotaPedidoPDF(parseInt(id as string)),
-    {
-      keepPreviousData: false,
-      refetchOnWindowFocus: false,
-      enabled: isImprimirPDF,
-      onSuccess: (data) => {
-        const props = {
-          outputType: OutputType.Save,
-          returnJsPDFDocObject: true,
-          fileName: 'Invoice 2022',
-          orientationLandscape: false,
-          compress: true,
-          logo: {
-            src: 'https://i.postimg.cc/3w2KmPdm/logo.png',
-            width: 25, //aspect ratio = width/height
-            height: 25,
-            margin: {
-              top: 0, //negative or positive num, from the current position
-              left: 0, //negative or positive num, from the current position
-            },
+  const { data } = useQuery(['getNotaPedidoPDF'], () => getNotaPedidoPDF(parseInt(id as string)), {
+    keepPreviousData: false,
+    refetchOnWindowFocus: false,
+    enabled: isImprimirPDF,
+    onSuccess: (data) => {
+      const props = {
+        outputType: OutputType.Save,
+        returnJsPDFDocObject: true,
+        fileName: 'Invoice 2022',
+        orientationLandscape: false,
+        compress: true,
+        logo: {
+          src: 'https://i.postimg.cc/3w2KmPdm/logo.png',
+          width: 25, //aspect ratio = width/height
+          height: 25,
+          margin: {
+            top: 0, //negative or positive num, from the current position
+            left: 0, //negative or positive num, from the current position
           },
-          stamp: {
-            inAllPages: true,
-            src: 'https://raw.githubusercontent.com/edisonneza/jspdf-invoice-template/demo/images/qr_code.jpg',
-            width: 20, //aspect ratio = width/height
-            height: 20,
-            margin: {
-              top: 0, //negative or positive num, from the current position
-              left: 0, //negative or positive num, from the current position
-            },
+        },
+        stamp: {
+          inAllPages: true,
+          src: 'https://raw.githubusercontent.com/edisonneza/jspdf-invoice-template/demo/images/qr_code.jpg',
+          width: 20, //aspect ratio = width/height
+          height: 20,
+          margin: {
+            top: 0, //negative or positive num, from the current position
+            left: 0, //negative or positive num, from the current position
           },
-          business: {
-            name: 'ColorCor S.A.',
-            address: 'Zapiola 77',
-            phone: '(0351) 155622138',
-            email: 'compras@colorcor.com.ar',
+        },
+        business: {
+          name: 'ColorCor S.A.',
+          address: 'Zapiola 77',
+          phone: '(0351) 155622138',
+          email: 'compras@colorcor.com.ar',
 
-            website: 'https://colorcor.netlify.app/',
-          },
-          contact: {
-            label: 'Nota de Pedido para:',
-            name: 'Pintureria ALBA',
-            address: 'Dean Funes 1522',
-            phone: '(+011) 155 422 222',
-            email: 'ventas@alba.com.ar',
-            otherInfo: 'www.alba.com.ar',
-          },
-          invoice: {
-            label: 'Nota de Pedido#: ',
-            num: 320,
-            invDate: 'Fecha de elaboracion: 01/01/2022 18:12',
-            invGenDate: 'Fecha de vencimiento: 02/02/2022 10:17',
-            headerBorder: false,
-            tableBodyBorder: false,
-            header: [
-              {
-                title: '#',
-                style: {
-                  width: 10,
-                },
+          website: 'https://colorcor.netlify.app/',
+        },
+        contact: {
+          label: 'Nota de Pedido para:',
+          name: 'Pintureria ALBA',
+          address: 'Dean Funes 1522',
+          phone: '(+011) 155 422 222',
+          email: 'ventas@alba.com.ar',
+          otherInfo: 'www.alba.com.ar',
+        },
+        invoice: {
+          label: 'Nota de Pedido#: ',
+          num: 320,
+          invDate: 'Fecha de elaboracion: 01/01/2022 18:12',
+          invGenDate: 'Fecha de vencimiento: 02/02/2022 10:17',
+          headerBorder: false,
+          tableBodyBorder: false,
+          header: [
+            {
+              title: '#',
+              style: {
+                width: 10,
               },
-              {
-                title: 'Producto',
-                style: {
-                  width: 30,
-                },
+            },
+            {
+              title: 'Producto',
+              style: {
+                width: 30,
               },
-              {
-                title: 'Descripcion',
-                style: {
-                  width: 70,
-                },
+            },
+            {
+              title: 'Descripcion',
+              style: {
+                width: 70,
               },
-              { title: 'Precio Unitario' },
-              { title: 'Cantidad' },
-              { title: 'Total' },
-            ],
-            table: Array.from(Array(2), (item, index) => [
-              index + 1,
-              'Pintura Exterior ',
-              'Interior / Exterior 20lt Gama Alta ',
-              200.5,
-              2,
-              401,
-            ]),
-            additionalRows: [
-              {
-                col1: 'Total:',
-                col2: '6015',
-                col3: 'ALL',
-                style: {
-                  fontSize: 14, //optional, default 12
-                },
+            },
+            { title: 'Precio Unitario' },
+            { title: 'Cantidad' },
+            { title: 'Total' },
+          ],
+          table: Array.from(Array(2), (item, index) => [
+            index + 1,
+            'Pintura Exterior ',
+            'Interior / Exterior 20lt Gama Alta ',
+            200.5,
+            2,
+            401,
+          ]),
+          additionalRows: [
+            {
+              col1: 'Total:',
+              col2: '6015',
+              col3: 'ALL',
+              style: {
+                fontSize: 14, //optional, default 12
               },
-              {
-                col1: 'IVA:',
-                col2: '21',
-                col3: '%',
-                style: {
-                  fontSize: 10, //optional, default 12
-                },
+            },
+            {
+              col1: 'IVA:',
+              col2: '21',
+              col3: '%',
+              style: {
+                fontSize: 10, //optional, default 12
               },
-              {
-                col1: 'SubTotal:',
-                col2: '4.751,85',
-                col3: 'ALL',
-                style: {
-                  fontSize: 10, //optional, default 12
-                },
+            },
+            {
+              col1: 'SubTotal:',
+              col2: '4.751,85',
+              col3: 'ALL',
+              style: {
+                fontSize: 10, //optional, default 12
               },
-            ],
+            },
+          ],
 
-            invDescLabel: 'Invoice Note',
-            invDesc:
-              "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary.",
-          },
-          footer: {
-            text: 'Esta nota de pedido se ha creado via web y es un documento valido.',
-          },
-          pageEnable: true,
-          pageLabel: 'Page ',
-        };
-        const pdfObject = new jsPDF(props);
-        return pdfObject;
-      },
+          invDescLabel: 'Invoice Note',
+          invDesc:
+            "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary.",
+        },
+        footer: {
+          text: 'Esta nota de pedido se ha creado via web y es un documento valido.',
+        },
+        pageEnable: true,
+        pageLabel: 'Page ',
+      };
+      const pdfObject = new jsPDF(props);
+      return pdfObject;
     },
-  );
+  });
 
   const { mutate: handleCreate, isLoading } = useMutation(postNotaPedido, {
     onSuccess: (res: any) => {
-      if (res !== 400) {
-        notificationController.success({
-          message: t('common.successMessage'),
-          description: t('notifications.npCreada'),
-          duration: 3,
-        });
-        imprimirPDF(res.id);
-        setImprimirPDF(true);
-        navigate('/compras/notapedido');
-      } else {
-        throw new Error('Error al crear nota de pedido');
-      }
+      notificationController.success({
+        message: t('common.successMessage'),
+        description: t('notifications.npCreada'),
+        duration: 3,
+      });
+      imprimirPDF(res.id);
+      setImprimirPDF(true);
+      navigate('/compras/notapedido');
     },
     onError: (error: Error) => {
       notificationController.error({
@@ -754,19 +743,14 @@ export const NotasDePedidoForm: React.FC = () => {
 
   const { mutate: handleEdit, isLoading: isLoadingEdit } = useMutation(putNotaPedido, {
     onSuccess: (res: any) => {
-      if (res !== 400) {
-        notificationController.success({
-          message: t('common.successMessage'),
-          description: t('notifications.npActualizada'),
-          duration: 3,
-        });
-        imprimirPDF(res.id);
-        setImprimirPDF(true);
-
-        navigate('/compras/notapedido');
-      } else {
-        throw new Error('Error al editar nota de pedido');
-      }
+      notificationController.success({
+        message: t('common.successMessage'),
+        description: t('notifications.npActualizada'),
+        duration: 3,
+      });
+      imprimirPDF(res.id);
+      setImprimirPDF(true);
+      navigate('/compras/notapedido');
     },
     onError: (error: Error) => {
       notificationController.error({
@@ -781,10 +765,9 @@ export const NotasDePedidoForm: React.FC = () => {
     if (isEdit) {
       const np = {
         id: parseInt(id as string),
-        fecha: values?.fecha,
+        plazoentrega: values?.plazoentrega,
         idproveedor: values?.idProveedor,
         idtipocompra: values?.idTipoCompra,
-        plazoentrega: values?.plazoentrega,
         detalles: detalles.map((d: any) => {
           return {
             idProducto: d.idproducto,
@@ -796,11 +779,10 @@ export const NotasDePedidoForm: React.FC = () => {
       handleEdit(np);
     } else {
       const np = {
-        fecha: values?.fecha,
-        idProveedor: values?.idProveedor,
-        idTipoCompra: values?.idTipoCompra,
-        idUsuario: 5,
+        idusuario: 6, // TODO: Remover hardcode
         plazoentrega: values?.plazoentrega,
+        idproveedor: values?.idProveedor,
+        idtipocompra: values?.idTipoCompra,
         detalles: detalles.map((d: any) => {
           return {
             idproducto: d.idproducto,
@@ -935,12 +917,6 @@ export const NotasDePedidoForm: React.FC = () => {
   // #region Productos
 
   const columns = [
-    {
-      title: t('common.id'),
-      dataIndex: 'idproducto',
-      key: 'idproducto',
-      width: '5%',
-    },
     {
       title: t('common.nombre'),
       dataIndex: 'productoNombre',
@@ -1088,7 +1064,11 @@ export const NotasDePedidoForm: React.FC = () => {
             </Row>
             <p>
               {t('common.fecha') +
-                `: ${new Date(form.getFieldValue('fecha')).toLocaleDateString() || new Date().toLocaleDateString()}`}
+                `: ${
+                  form.getFieldValue('fecha')
+                    ? new Date(form.getFieldValue('fecha')).toLocaleDateString()
+                    : new Date().toLocaleDateString()
+                }`}
             </p>
 
             <Row
