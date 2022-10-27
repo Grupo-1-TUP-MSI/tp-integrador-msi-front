@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
   Button,
   Col,
@@ -10,49 +10,37 @@ import {
   Row,
   Select,
   Space,
-  Spin,
   Tooltip,
   Typography,
 } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { DeleteOutlined, DownloadOutlined, EditOutlined, PlusOutlined, SubnodeOutlined } from '@ant-design/icons';
+import { DeleteOutlined, DownloadOutlined, PlusOutlined } from '@ant-design/icons';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { Proveedor, TiposIVA, TiposDocumento, EstadoNP, TipoCompra, Usuario } from '@app/models/models';
+import { Proveedor, TipoVenta, Usuario } from '@app/models/models';
 import { useNavigate, useParams } from 'react-router';
 import { notificationController } from '@app/controllers/notificationController';
 import { BaseForm } from '@app/components/common/forms/BaseForm/BaseForm';
 import FormItem from 'antd/es/form/FormItem';
-import { FormInput, SubmitButton } from '@app/components/layouts/AuthLayout/AuthLayout.styles';
+import { SubmitButton } from '@app/components/layouts/AuthLayout/AuthLayout.styles';
 import { Table } from '@app/components/common/Table/Table';
-import { getProveedores } from '../../../api/proveedores.api';
-import { useResponsive } from '@app/hooks/useResponsive';
-import { getNotasPedidos, getNotaPedido, postNotaPedido, putNotaPedido, putEstado } from '@app/api/notasPedido.api';
+import { getFacturas, getFacturaPDF, postFactura } from '@app/api/facturas.api';
 import { getUsuarios } from '@app/api/usuarios.api';
 import locale from 'antd/es/date-picker/locale/es_ES';
-import { getProductos } from '@app/api/productos.api';
-import NotaDePedido from '@app/components/shared/NotaDePedido';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
+import { getProductosDeProveedor } from '@app/api/productos.api';
+import jsPDFInvoiceTemplate, { OutputType, jsPDF } from 'jspdf-invoice-template';
+import { getClientes } from '@app/api/clientes.api';
 
 export const FacturacionPage: React.FC = () => {
   const { t } = useTranslation();
+
   const navigate = useNavigate();
   const { RangePicker } = DatePicker;
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
-  const [notaPedido, setNotaPedido] = React.useState<any>(null);
   const [filterUsuario, setFilterUsuario] = React.useState(null);
-  const [filterProveedor, setFilterProveedor] = React.useState(null);
-  const [filterEstadoNP, setFilterEstadoNP] = React.useState<number | null>(null);
+  const [filterCliente, setFilterCliente] = React.useState(null);
+  const [filterTipoVenta, setFilterTipoVenta] = React.useState<number | null>(null);
   const [filterDates, setFilterDates] = React.useState<any>([]);
-  const [filterExpiration, setFilterExpiration] = React.useState<any>([]);
-  const [modalEstado, setModalEstado] = React.useState(false);
-  const [estado, setEstado] = React.useState<any>(null);
-  const {
-    data: notasDePedidoData,
-    isLoading: isLoadingNotasDePedido,
-    refetch: refetchNotasDePedido,
-    isRefetching: isRefetchingNotasDePedido,
-  } = useQuery(['np'], getNotasPedidos, {
+
+  const { data: facturasData, isLoading: isLoadingFacturas } = useQuery(['facturas'], getFacturas, {
     keepPreviousData: false,
     refetchOnWindowFocus: false,
   });
@@ -60,57 +48,26 @@ export const FacturacionPage: React.FC = () => {
     keepPreviousData: false,
     refetchOnWindowFocus: false,
   });
-  const { data: proveedoresData, isLoading: isLoadingProveedores } = useQuery(['proveedores'], getProveedores, {
+  const { data: clientesData, isLoading: isLoadingClientes } = useQuery(['clientes'], getClientes, {
     keepPreviousData: false,
     refetchOnWindowFocus: false,
   });
 
-  const { mutate: cambiarEstado, isLoading: isLoadingCambiarEstado } = useMutation(
-    () => putEstado(notaPedido?.id, estado),
-    {
-      onSuccess: (res) => {
-        if (res !== 400) {
-          notificationController.success({
-            message: t('common.successMessage'),
-            description: t('notifications.cambioEstadoNP'),
-            duration: 3,
-          });
-          setIsModalOpen(false);
-          refetchNotasDePedido();
-        } else {
-          throw new Error('Error al cambiar estado');
-        }
-      },
-      onError: (error: Error) => {
-        notificationController.error({
-          message: t('common.errorMessage'),
-          description: t('notifications.noCambioEstadoNP'),
-          duration: 3,
-        });
-      },
-    },
-  );
-
   const columns = [
     {
       title: t('common.numero'),
-      dataIndex: 'numero',
-      key: 'numero',
+      dataIndex: 'id',
+      key: 'id',
+      render: (text: any, record: any) => {
+        return <span>{record.id}</span>;
+      },
     },
     {
       title: t('common.fecha'),
       dataIndex: 'fecha',
       key: 'fecha',
       render: (text: any, record: any) => {
-        return <span>{new Date(record.fecha).toLocaleString('es')}</span>;
-      },
-    },
-    {
-      title: t('common.plazoentrega'),
-      dataIndex: 'plazoentrega',
-      key: 'plazoentrega',
-      render: (text: any, record: any) => {
-        return <span>{record.plazoentrega + ' dias.'}</span>;
+        return <span>{new Date(record.fecha).toLocaleDateString('es')}</span>;
       },
     },
     {
@@ -119,21 +76,15 @@ export const FacturacionPage: React.FC = () => {
       key: 'usuario',
     },
     {
-      title: t('common.proveedor'),
-      dataIndex: 'proveedor',
-      key: 'proveedor',
+      title: t('common.cliente'),
+      dataIndex: 'cliente',
+      key: 'cliente',
     },
     {
-      title: t('common.estadonp'),
-      dataIndex: 'estadonp',
-      key: 'estadonp',
-      render: (text: any, record: any) => textoPorEstado(record.estadonp),
-    },
-    {
-      title: t('common.tipocompra'),
-      dataIndex: 'tipocompra',
-      key: 'tipocompra',
-      render: (text: any, record: any) => TipoCompra[record.tipocompra - 1],
+      title: t('common.tipoventa'),
+      dataIndex: 'idTipoVenta',
+      key: 'idTipoVenta',
+      render: (text: any, record: any) => TipoVenta[record.idTipoVenta - 1],
     },
     {
       title: t('common.acciones'),
@@ -141,76 +92,162 @@ export const FacturacionPage: React.FC = () => {
       key: 'acciones',
       render: (text: any, record: any) => (
         <Space>
-          <Tooltip placement="top" title={t('common.actualizarEstado')} trigger="hover" destroyTooltipOnHide>
-            <Button
-              icon={<SubnodeOutlined />}
-              disabled={!record.estado}
-              type="text"
-              onClick={() => {
-                setModalEstado(true);
-                setNotaPedido(record);
-              }}
-            ></Button>
-          </Tooltip>
           <Tooltip placement="top" title={t('common.exportarPDF')} trigger="hover" destroyTooltipOnHide>
             <Button
               icon={<DownloadOutlined />}
-              disabled={!record.estado}
               type="text"
               onClick={() => {
-                console.log('exportarPDF');
+                imprimirPDF(record.id);
               }}
             ></Button>
           </Tooltip>
-          <Button
-            icon={<EditOutlined />}
-            disabled={record.estadonp > 1}
-            type="text"
-            onClick={() => {
-              navigate(`/compras/np/${record.id}`);
-            }}
-          ></Button>
-          <Button
-            icon={<DeleteOutlined />}
-            disabled={!record.estado}
-            type="text"
-            danger
-            onClick={() => {
-              setIsModalOpen(true);
-              setNotaPedido(record);
-            }}
-          ></Button>
         </Space>
       ),
     },
   ];
 
-  const npFiltradas = () => {
-    const arr = notasDePedidoData
-      ?.filter((np: any) => {
-        if (filterDates.length > 0) {
-          const fecha = new Date(np.fecha);
-          const fechaDesde = new Date(filterDates[0]);
-          const fechaHasta = new Date(filterDates[1]);
+  const imprimirPDF = async (id: number) => {
+    const data = await getFacturaPDF(id);
+    const props: any = {
+      outputType: OutputType.Save,
+      returnJsPDFDocObject: true,
+      fileName: `ColorCor F00${data.id}-V00${data.version}`,
+      orientationLandscape: false,
+      compress: true,
+      logo: {
+        src: 'https://i.postimg.cc/3w2KmPdm/logo.png',
+        width: 25, //aspect ratio = width/height
+        height: 25,
+        margin: {
+          top: 0, //negative or positive num, from the current position
+          left: 0, //negative or positive num, from the current position
+        },
+      },
+      stamp: {
+        inAllPages: true,
+        src: 'https://i.postimg.cc/YCCvCcKC/qr-code.jpg',
+        width: 20, //aspect ratio = width/height
+        height: 20,
+        margin: {
+          top: 0, //negative or positive num, from the current position
+          left: 0, //negative or positive num, from the current position
+        },
+      },
+      business: {
+        name: 'ColorCor S.A.',
+        address: 'Zapiola 77',
+        phone: '(0351) 155622138',
+        email: 'compras@colorcor.com.ar',
+
+        website: 'https://colorcor.netlify.app/',
+      },
+      contact: {
+        label: 'Nota de Pedido para:',
+        name: data.proveedor.nombre,
+        address: data.proveedor.direccion,
+        phone: data.proveedor.telefono,
+        email: data.proveedor.email,
+      },
+      invoice: {
+        label: 'Nota de Pedido#: ',
+        num: `${data.id} Version: ${data.version}`,
+        invDate: `Fecha de elaboracion: ${data.fechaLocale}`,
+        invGenDate: `Fecha de entrega: ${data.vencimientoLocale}`,
+        headerBorder: false,
+        tableBodyBorder: false,
+        header: [
+          {
+            title: '#',
+            style: {
+              width: 10,
+            },
+          },
+          {
+            title: 'Producto',
+            style: {
+              width: 30,
+            },
+          },
+          {
+            title: 'Descripcion',
+            style: {
+              width: 70,
+            },
+          },
+          { title: 'Precio Unitario' },
+          { title: 'Cantidad' },
+          { title: 'Total' },
+        ],
+        table: Array.from(data.detalles, (item: any, index) => [
+          index + 1,
+          item.producto,
+          item.descripcion,
+          item.precio.toLocaleString(),
+          item.cantidadpedida,
+          (parseFloat(item.precio) * parseFloat(item.cantidadpedida)).toLocaleString(),
+        ]),
+        additionalRows: [
+          {
+            col1: 'Gravado:',
+            col2: data.acumGravado.toLocaleString(),
+            col3: 'ALL',
+            style: {
+              fontSize: 10, //optional, default 12
+            },
+          },
+          {
+            col1: 'IVA:',
+            col2: data.acumIVA.toLocaleString(),
+            col3: '%',
+            style: {
+              fontSize: 10, //optional, default 12
+            },
+          },
+          {
+            col1: 'Total:',
+            col2: data.acumTotal.toLocaleString(),
+            col3: 'ALL',
+            style: {
+              fontSize: 14, //optional, default 12
+            },
+          },
+        ],
+      },
+      footer: {
+        text: 'Esta nota de pedido se ha creado via web y es un documento valido.',
+      },
+      pageEnable: true,
+      pageLabel: 'Page ',
+    };
+    const pdfObj = jsPDFInvoiceTemplate(props);
+  };
+
+  const facturasFiltradas = () => {
+    const arr = facturasData
+      ?.filter((factura: any) => {
+        if (filterDates?.length > 0) {
+          const fecha = new Date(factura.fecha);
+          const fechaDesde = new Date(filterDates[0]?.format());
+          const fechaHasta = new Date(filterDates[1]?.format());
           return fecha >= fechaDesde && fecha <= fechaHasta;
         }
         return true;
       })
-      .filter((np: any) => {
+      .filter((factura: any) => {
         if (filterUsuario) {
-          return np?.idUsuario === filterUsuario;
+          return factura?.idUsuario === filterUsuario;
         }
         return true;
       })
-      .filter((np: any) => {
-        if (filterProveedor) {
-          return np?.idproveedor === filterProveedor;
+      .filter((factura: any) => {
+        if (filterCliente) {
+          return factura?.idcliente === filterCliente;
         }
         return true;
       })
-      .filter((np: any) => {
-        if (filterEstadoNP) {
-          return np.idestadonp === filterEstadoNP;
+      .filter((factura: any) => {
+        if (filterTipoVenta) {
+          return factura?.idTipoVenta === filterTipoVenta;
         }
         return true;
       })
@@ -221,59 +258,8 @@ export const FacturacionPage: React.FC = () => {
     return arr;
   };
 
-  const textoPorEstado = (estado: any) => {
-    switch (estado) {
-      case EstadoNP[0]:
-        return t('common.pendienteAceptacion');
-      case EstadoNP[1]:
-        return t('common.pendienteEntrega');
-      case EstadoNP[2]:
-        return t('common.cerrada');
-      case EstadoNP[3]:
-        return t('common.rechazada');
-      default:
-        return '';
-    }
-  };
-
   return (
     <>
-      <Modal
-        title={t('notifications.cambiandoEstado')}
-        visible={modalEstado}
-        onOk={() => {
-          cambiarEstado();
-        }}
-        onCancel={() => setModalEstado(false)}
-        okButtonProps={{ disabled: estado == null }}
-        confirmLoading={isLoadingCambiarEstado}
-        okText={t('common.confirmar')}
-        cancelText={t('common.cancelar')}
-      >
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'start',
-            marginBottom: '10px',
-          }}
-        >
-          <div style={{ marginLeft: '3rem', marginRight: '1.2rem', width: '20%' }}>{t('common.nuevoEstado')}:</div>
-          <Select
-            placeholder={t('common.estado')}
-            value={estado}
-            onChange={(value) => setEstado(value)}
-            allowClear
-            style={{ width: '60%' }}
-          >
-            {EstadoNP?.filter((e) => e > estado).map((estado, i: number) => (
-              <Select.Option key={i} value={estado}>
-                {textoPorEstado(estado)}
-              </Select.Option>
-            ))}
-          </Select>
-        </div>
-      </Modal>
       <div
         style={{
           display: 'flex',
@@ -282,7 +268,7 @@ export const FacturacionPage: React.FC = () => {
           marginBottom: '1rem',
         }}
       >
-        <h1 style={{ color: 'var(--timeline-background)' }}>{t('common.notapedido')}</h1>
+        <h1 style={{ color: 'var(--timeline-background)' }}>{t('common.facturacion')}</h1>
 
         <Button
           style={{
@@ -292,7 +278,7 @@ export const FacturacionPage: React.FC = () => {
           className="success-button"
           icon={<PlusOutlined />}
           type="text"
-          onClick={() => navigate('/compras/notapedido/alta')}
+          onClick={() => navigate('/ventas/facturacion/alta')}
         ></Button>
       </div>
       <div
@@ -303,26 +289,40 @@ export const FacturacionPage: React.FC = () => {
           marginBottom: '1rem',
         }}
       >
-        <Typography.Text style={{ width: '30%', textAlign: 'right' }}>{t('table.filtrarFecha')}:</Typography.Text>
-        <RangePicker
-          showTime
-          style={{ width: '100%', marginLeft: '1rem', marginRight: '1rem' }}
-          locale={locale}
-          value={filterDates}
-          onChange={(value, dateString) => {
-            setFilterDates(dateString);
+        <div
+          style={{
+            width: '100%',
+            marginLeft: '1rem',
+            display: 'flex',
+            justifyContent: 'flex-end',
+            alignItems: 'center',
           }}
-        />
-        <Typography.Text style={{ width: '30%', textAlign: 'right' }}>{t('table.filtrarVencimiento')}:</Typography.Text>
-        <RangePicker
-          showTime
+        >
+          <Typography.Text style={{ width: '20%', textAlign: 'right' }}>{t('table.filtrarFecha')}:</Typography.Text>
+          <RangePicker
+            allowClear
+            style={{ width: '75%', marginLeft: '1rem' }}
+            format="DD/MM/YYYY"
+            locale={locale}
+            value={filterDates}
+            onChange={(value) => {
+              setFilterDates(value);
+            }}
+          />
+        </div>
+        <Select
+          value={filterTipoVenta}
+          onChange={(value) => setFilterTipoVenta(value)}
           style={{ width: '100%', marginLeft: '1rem' }}
-          locale={locale}
-          value={filterExpiration}
-          onChange={(value, dateString) => {
-            setFilterExpiration(dateString);
-          }}
-        />
+          placeholder={t('table.filtrarTiposVenta')}
+          allowClear
+        >
+          {TipoVenta.map((estado, i: number) => (
+            <Select.Option key={i} value={i + 1}>
+              {t(`common.${TipoVenta[i]}`)}
+            </Select.Option>
+          ))}
+        </Select>
       </div>
       <div
         style={{
@@ -341,43 +341,30 @@ export const FacturacionPage: React.FC = () => {
         >
           {usuariosData?.map((usuario: Usuario, i: number) => (
             <Select.Option key={i} value={usuario?.id}>
-              {usuario?.usuario}
+              {usuario?.nombrecompleto}
             </Select.Option>
           ))}
         </Select>
         <Select
-          value={filterProveedor}
-          onChange={(value) => setFilterProveedor(value)}
+          value={filterCliente}
+          onChange={(value) => setFilterCliente(value)}
           style={{ width: '100%', marginLeft: '1rem' }}
-          placeholder={t('table.filtrarProveedores')}
+          placeholder={t('table.filtrarClientes')}
           allowClear
         >
-          {proveedoresData?.map((proveedor: Proveedor, i: number) => (
+          {clientesData?.map((proveedor: Proveedor, i: number) => (
             <Select.Option key={i} value={proveedor?.id}>
               {proveedor?.nombre}
-            </Select.Option>
-          ))}
-        </Select>
-        <Select
-          value={filterEstadoNP}
-          onChange={(value) => setFilterEstadoNP(value)}
-          style={{ width: '100%', marginLeft: '1rem' }}
-          placeholder={t('table.filtrarEstado')}
-          allowClear
-        >
-          {EstadoNP.map((estado, i: number) => (
-            <Select.Option key={i} value={estado}>
-              {textoPorEstado(estado)}
             </Select.Option>
           ))}
         </Select>
       </div>
       <Table
         rowKey={(record) => record.id}
-        rowClassName={(record) => (!record.estado ? 'deleted-row' : '')}
+        rowClassName={(record) => (record.idestadonp === 4 ? 'deleted-row' : '')}
         columns={columns}
-        dataSource={npFiltradas()}
-        loading={isLoadingNotasDePedido || isLoadingProveedores || isLoadingUsuarios || isRefetchingNotasDePedido}
+        dataSource={facturasFiltradas()}
+        loading={isLoadingFacturas || isLoadingClientes || isLoadingUsuarios}
         scroll={{ x: 800 }}
         locale={{
           filterTitle: t('table.filterTitle'),
@@ -411,156 +398,324 @@ export const FacturacionForm: React.FC = () => {
   const [detalles, setDetalles] = React.useState([]);
   const [productos, setProductos] = React.useState([]);
   const [form] = Form.useForm();
-  const { isDesktop } = useResponsive();
   const [modalVisible, setModalVisible] = React.useState(false);
   const [searchProducto, setSearchProducto] = React.useState('');
   const [proveedor, setProveedor] = React.useState(null);
-  const [pdf, setPdf] = React.useState(null);
   const enabledField = Form.useWatch('idProveedor', form);
+  const [isImprimirPDF, setImprimirPDF] = React.useState(false);
 
-  const { data: proveedoresData, isLoading: isLoadingProveedores } = useQuery(['proveedores'], getProveedores, {
+  const { data: clientesData, isLoading: isLoadingClientes } = useQuery(['proveedores'], getClientes, {
     keepPreviousData: false,
     refetchOnWindowFocus: false,
   });
 
   const {
-    data: productosData,
-    isLoading: isLoadingProductos,
-    refetch: productosRefetch,
-  } = useQuery(['productoDeProveedor'], getProductos, {
+    data: productosDeProveedorData,
+    isLoading: isLoadingProductosDeProveedor,
+    refetch: productosDeProveedorRefetch,
+  } = useQuery(['productoDeProveedor'], () => getProductosDeProveedor(form.getFieldValue('idProveedor')), {
     keepPreviousData: false,
     refetchOnWindowFocus: false,
+    enabled: !!enabledField,
     onSuccess: (data) => {
       setProductos(data);
+      if (!isEdit) {
+        setDetalles([]);
+      }
     },
   });
 
-  const { data: npData, isLoading: isLoadingNP } = useQuery(
-    ['getNotaPedido'],
-    () => getNotaPedido(parseInt(id as string)),
-    {
-      keepPreviousData: false,
-      refetchOnWindowFocus: false,
-      enabled: !!id,
-      onSuccess: (data) => {
-        setIsEdit(true);
-        form.setFieldsValue({
-          id: id,
-          nombre: data?.nombre,
-          tipoiva: data?.tipoiva,
-          tipoDocumento: data?.idtipodocumento,
-          documento: data?.documento,
-          direccion: data?.direccion,
-          cp: data?.cp,
-          telefono: data?.telefono,
-          email: data?.email,
-        });
-      },
-    },
-  );
+  const { data } = useQuery(['getFacturaPDF'], () => getFacturaPDF(parseInt(id as string)), {
+    keepPreviousData: false,
+    refetchOnWindowFocus: false,
+    enabled: isImprimirPDF,
+    onSuccess: (data) => {
+      const props = {
+        outputType: OutputType.Save,
+        returnJsPDFDocObject: true,
+        fileName: 'Invoice 2022',
+        orientationLandscape: false,
+        compress: true,
+        logo: {
+          src: 'https://i.postimg.cc/3w2KmPdm/logo.png',
+          width: 25, //aspect ratio = width/height
+          height: 25,
+          margin: {
+            top: 0, //negative or positive num, from the current position
+            left: 0, //negative or positive num, from the current position
+          },
+        },
+        stamp: {
+          inAllPages: true,
+          src: 'https://raw.githubusercontent.com/edisonneza/jspdf-invoice-template/demo/images/qr_code.jpg',
+          width: 20, //aspect ratio = width/height
+          height: 20,
+          margin: {
+            top: 0, //negative or positive num, from the current position
+            left: 0, //negative or positive num, from the current position
+          },
+        },
+        business: {
+          name: 'ColorCor S.A.',
+          address: 'Zapiola 77',
+          phone: '(0351) 155622138',
+          email: 'compras@colorcor.com.ar',
 
-  const { mutate: handleCreate, isLoading } = useMutation(postNotaPedido, {
+          website: 'https://colorcor.netlify.app/',
+        },
+        contact: {
+          label: 'Nota de Pedido para:',
+          name: 'Pintureria ALBA',
+          address: 'Dean Funes 1522',
+          phone: '(+011) 155 422 222',
+          email: 'ventas@alba.com.ar',
+          otherInfo: 'www.alba.com.ar',
+        },
+        invoice: {
+          label: 'Nota de Pedido#: ',
+          num: 320,
+          invDate: 'Fecha de elaboracion: 01/01/2022 18:12',
+          invGenDate: 'Fecha de vencimiento: 02/02/2022 10:17',
+          headerBorder: false,
+          tableBodyBorder: false,
+          header: [
+            {
+              title: '#',
+              style: {
+                width: 10,
+              },
+            },
+            {
+              title: 'Producto',
+              style: {
+                width: 30,
+              },
+            },
+            {
+              title: 'Descripcion',
+              style: {
+                width: 70,
+              },
+            },
+            { title: 'Precio Unitario' },
+            { title: 'Cantidad' },
+            { title: 'Total' },
+          ],
+          table: Array.from(Array(2), (item, index) => [
+            index + 1,
+            'Pintura Exterior ',
+            'Interior / Exterior 20lt Gama Alta ',
+            200.5,
+            2,
+            401,
+          ]),
+          additionalRows: [
+            {
+              col1: 'Total:',
+              col2: '6015',
+              col3: 'ALL',
+              style: {
+                fontSize: 14, //optional, default 12
+              },
+            },
+            {
+              col1: 'IVA:',
+              col2: '21',
+              col3: '%',
+              style: {
+                fontSize: 10, //optional, default 12
+              },
+            },
+            {
+              col1: 'SubTotal:',
+              col2: '4.751,85',
+              col3: 'ALL',
+              style: {
+                fontSize: 10, //optional, default 12
+              },
+            },
+          ],
+
+          invDescLabel: 'Invoice Note',
+          invDesc:
+            "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary.",
+        },
+        footer: {
+          text: 'Esta nota de pedido se ha creado via web y es un documento valido.',
+        },
+        pageEnable: true,
+        pageLabel: 'Page ',
+      };
+      const pdfObject = new jsPDF(props);
+      return pdfObject;
+    },
+  });
+
+  const { mutate: handleCreate, isLoading } = useMutation(postFactura, {
     onSuccess: (res: any) => {
-      if (res !== 400) {
-        notificationController.success({
-          message: t('common.successMessage'),
-          description: t('notifications.npCreada'),
-          duration: 3,
-        });
-
-        imprimirPDF(res.id);
-        navigate('/compras/notapedido');
-      } else {
-        throw new Error('Error al crear nota de pedido');
-      }
-    },
-    onError: (error: Error) => {
-      notificationController.error({
-        message: t('common.errorMessage'),
-        description: t('notifications.npNoCreada'),
+      notificationController.success({
+        message: t('common.successMessage'),
+        description: t('notifications.facturaCreada'),
         duration: 3,
       });
-    },
-  });
-
-  const { mutate: handleEdit, isLoading: isLoadingEdit } = useMutation(putNotaPedido, {
-    onSuccess: (res: any) => {
-      if (res !== 400) {
-        notificationController.success({
-          message: t('common.successMessage'),
-          description: t('notifications.npActualizada'),
-          duration: 3,
-        });
-
-        imprimirPDF(res.id);
-        navigate('/compras/notapedido');
-      } else {
-        throw new Error('Error al editar nota de pedido');
-      }
+      imprimirPDF(res.id);
+      setImprimirPDF(true);
+      navigate('/ventas/facturacion');
     },
     onError: (error: Error) => {
       notificationController.error({
         message: t('common.errorMessage'),
-        description: t('notifications.npNoActualizada'),
+        description: t('notifications.facturaNoCreada'),
         duration: 3,
       });
     },
   });
 
   const handleSubmit = (values: any) => {
-    setPdf(values);
-    if (isEdit) {
-      const np = {
-        id: parseInt(id as string),
-        fecha: values?.fecha,
-        idproveedor: values?.idProveedor,
-        idtipocompra: values?.idTipoCompra,
-        plazoentrega: values?.plazoentrega,
-        detalles: detalles.map((d: any) => {
-          return {
-            idProducto: d.id,
-            cantidadPedida: d.cantidad,
-            precio: parseInt(d.preciolista),
-          };
-        }),
-      };
-      handleEdit(np);
-    } else {
-      const np = {
-        fecha: values?.fecha,
-        idproveedor: values?.idProveedor,
-        idtipocompra: values?.idTipoCompra,
-        plazoentrega: values?.plazoentrega,
-        detalles: detalles.map((d: any) => {
-          return {
-            idProducto: d.id,
-            cantidadPedida: d.cantidad,
-            precio: parseInt(d.preciolista),
-          };
-        }),
-      };
-      handleCreate(np);
-    }
+    const np = {
+      idusuario: 6, // TODO: Remover hardcode
+      plazoentrega: values?.plazoentrega,
+      idcliente: values?.idProveedor,
+      idtipoventa: values?.idTipoVenta,
+      detalles: detalles.map((d: any) => {
+        return {
+          idproducto: d.idproducto,
+          cantidadpedida: d.cantidad,
+          precio: parseInt(d.precio),
+        };
+      }),
+    };
+    handleCreate(np);
+  };
+
+  const imprimirPDF = async (id: number) => {
+    const data = await getFacturaPDF(id);
+    const props: any = {
+      outputType: OutputType.Save,
+      returnJsPDFDocObject: true,
+      fileName: `ColorCor F00${data.id}-V00${data.version}`,
+      orientationLandscape: false,
+      compress: true,
+      logo: {
+        src: 'https://i.postimg.cc/3w2KmPdm/logo.png',
+        width: 25, //aspect ratio = width/height
+        height: 25,
+        margin: {
+          top: 0, //negative or positive num, from the current position
+          left: 0, //negative or positive num, from the current position
+        },
+      },
+      stamp: {
+        inAllPages: true,
+        src: 'https://i.postimg.cc/YCCvCcKC/qr-code.jpg',
+        width: 20, //aspect ratio = width/height
+        height: 20,
+        margin: {
+          top: 0, //negative or positive num, from the current position
+          left: 0, //negative or positive num, from the current position
+        },
+      },
+      business: {
+        name: 'ColorCor S.A.',
+        address: 'Zapiola 77',
+        phone: '(0351) 155622138',
+        email: 'compras@colorcor.com.ar',
+
+        website: 'https://colorcor.netlify.app/',
+      },
+      contact: {
+        label: 'Nota de Pedido para:',
+        name: data.proveedor.nombre,
+        address: data.proveedor.direccion,
+        phone: data.proveedor.telefono,
+        email: data.proveedor.email,
+      },
+      invoice: {
+        label: 'Nota de Pedido#: ',
+        num: `${data.id} Version: ${data.version}`,
+        invDate: `Fecha de elaboracion: ${data.fechaLocale}`,
+        invGenDate: `Fecha de entrega: ${data.vencimientoLocale}`,
+        headerBorder: false,
+        tableBodyBorder: false,
+        header: [
+          {
+            title: '#',
+            style: {
+              width: 10,
+            },
+          },
+          {
+            title: 'Producto',
+            style: {
+              width: 30,
+            },
+          },
+          {
+            title: 'Descripcion',
+            style: {
+              width: 70,
+            },
+          },
+          { title: 'Precio Unitario' },
+          { title: 'Cantidad' },
+          { title: 'Total' },
+        ],
+        table: Array.from(data.detalles, (item: any, index) => [
+          index + 1,
+          item.producto,
+          item.descripcion,
+          item.precio.toLocaleString(),
+          item.cantidadpedida,
+          (parseFloat(item.precio) * parseFloat(item.cantidadpedida)).toLocaleString(),
+        ]),
+        additionalRows: [
+          {
+            col1: 'Gravado:',
+            col2: data.acumGravado.toLocaleString(),
+            col3: 'ALL',
+            style: {
+              fontSize: 10, //optional, default 12
+            },
+          },
+          {
+            col1: 'IVA:',
+            col2: data.acumIVA.toLocaleString(),
+            col3: '%',
+            style: {
+              fontSize: 10, //optional, default 12
+            },
+          },
+          {
+            col1: 'Total:',
+            col2: data.acumTotal.toLocaleString(),
+            col3: 'ALL',
+            style: {
+              fontSize: 14, //optional, default 12
+            },
+          },
+        ],
+      },
+      footer: {
+        text: 'Esta nota de pedido se ha creado via web y es un documento valido.',
+      },
+      pageEnable: true,
+      pageLabel: 'Page ',
+    };
+    const pdfObj = jsPDFInvoiceTemplate(props);
   };
 
   // #region Productos
 
   const columns = [
     {
-      title: t('common.id'),
-      dataIndex: 'id',
-      key: 'id',
-      width: '5%',
-    },
-    {
       title: t('common.nombre'),
-      dataIndex: 'nombre',
-      key: 'nombre',
+      dataIndex: 'productoNombre',
+      key: 'productoNombre',
     },
     {
       title: t('common.importeunitario'),
-      dataIndex: 'preciolista',
-      key: 'preciolista',
+      dataIndex: 'precio',
+      key: 'precio',
       width: '5%',
     },
     {
@@ -568,7 +723,7 @@ export const FacturacionForm: React.FC = () => {
       key: 'iva',
       width: '5%',
       render: (text: any, record: any) => {
-        return <span>{record.preciolista * 0.21}</span>;
+        return <span>{record.precio * 0.21}</span>;
       },
     },
     {
@@ -582,7 +737,7 @@ export const FacturacionForm: React.FC = () => {
       key: 'importetotal',
       width: '5%',
       render: (text: any, record: any) => {
-        return <span>{record.preciolista * record.cantidad * 1.21}</span>;
+        return <span>{record.precio * record.cantidad * 1.21}</span>;
       },
     },
     {
@@ -607,19 +762,19 @@ export const FacturacionForm: React.FC = () => {
   const agregarProductosColumnas = [
     {
       title: t('common.id'),
-      dataIndex: 'id',
-      key: 'id',
+      dataIndex: 'idproducto',
+      key: 'idproducto',
       width: '5%',
     },
     {
       title: t('common.nombre'),
-      dataIndex: 'nombre',
-      key: 'nombre',
+      dataIndex: 'productoNombre',
+      key: 'productoNombre',
     },
     {
       title: t('common.importeunitario'),
-      dataIndex: 'preciolista',
-      key: 'preciolista',
+      dataIndex: 'precio',
+      key: 'precio',
       width: '5%',
     },
     {
@@ -633,10 +788,10 @@ export const FacturacionForm: React.FC = () => {
             min={0}
             max={record.stock}
             defaultValue={0}
-            value={(productos as any).find((p: any) => p.id === record.id)?.cantidad}
+            value={(productos as any).find((p: any) => p.idproducto === record.idproducto)?.cantidad}
             onChange={(value) => {
               const newProductos = productos.map((p: any) => {
-                if (p.id === record.id) {
+                if (p.idproducto === record.idproducto) {
                   return {
                     ...p,
                     cantidad: value,
@@ -660,44 +815,22 @@ export const FacturacionForm: React.FC = () => {
   };
 
   const removeProducto = (record: any) => {
-    const newDetalles = detalles.filter((d: any) => d.id !== record.id);
+    const newDetalles = detalles.filter((d: any) => d.idproducto !== record.idproducto);
     setDetalles(newDetalles);
   };
 
   const filteredProductos = () => {
-    const arr = productosData?.filter(
+    const arr = productosDeProveedorData?.filter(
       (p: any) =>
-        p.nombre.toLowerCase().includes(searchProducto.toLowerCase()) ||
-        p.id.toString().toLowerCase().includes(searchProducto.toLowerCase()),
+        p.productoNombre.toLowerCase().includes(searchProducto.toLowerCase()) ||
+        p.idproducto.toString().toLowerCase().includes(searchProducto.toLowerCase()),
     );
 
     return arr;
   };
 
-  if (isLoadingNP && isEdit) {
-    return <Spin />;
-  }
-  const imprimirPDF = (codigo: any) => {
-    const clonedDoc: any = document.getElementById('#nota-de-pedido-form')?.cloneNode(true);
-    html2canvas(clonedDoc, {
-      onclone: function (clonedDoc) {
-        (clonedDoc as any).getElementById('nota-de-pedido').style.display = 'block';
-      },
-    }).then((canvas) => {
-      const img = canvas.toDataURL('image/jpeg');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const width = pdf.internal.pageSize.getWidth();
-      const height = pdf.internal.pageSize.getHeight();
-      pdf.addImage(img, 'JPEG', 0, 0, width, height);
-      pdf.save(`nota-de-pedido-${codigo}.pdf`);
-    });
-  };
-
   return (
     <div id="nota-de-pedido-form">
-      <div style={{ display: 'none' }}>
-        <NotaDePedido nota={pdf} />
-      </div>
       {/* #region Formulario  */}
       <Row>
         <Col span={24}>
@@ -708,35 +841,22 @@ export const FacturacionForm: React.FC = () => {
                 <SubmitButton
                   type="primary"
                   htmlType="submit"
-                  loading={isLoading || isLoadingEdit}
+                  loading={isLoading}
                   disabled={!detalles || detalles.length === 0}
                 >
                   {isEdit ? t('common.editar') : t('common.confirmar')}
                 </SubmitButton>
               </BaseForm.Item>
             </Row>
-            <Row>
-              <Col span={6}>
-                <FormItem
-                  requiredMark
-                  name="fecha"
-                  label={t('common.fecha')}
-                  rules={[{ required: true, message: t('common.requiredField') }]}
-                >
-                  <DatePicker showToday style={{ width: '100%' }} locale={locale} />
-                </FormItem>
-              </Col>
-              <Col span={6} offset={1}>
-                <FormItem
-                  requiredMark
-                  name="plazoentrega"
-                  label={t('common.plazoentrega')}
-                  rules={[{ required: true, message: t('common.requiredField') }]}
-                >
-                  <InputNumber addonAfter="días." style={{ width: '100%' }} />
-                </FormItem>
-              </Col>
-            </Row>
+            <p>
+              {t('common.fecha') +
+                `: ${
+                  form.getFieldValue('fecha')
+                    ? new Date(form.getFieldValue('fecha')).toLocaleDateString()
+                    : new Date().toLocaleDateString()
+                }`}
+            </p>
+
             <Row
               style={{
                 display: 'flex',
@@ -755,10 +875,10 @@ export const FacturacionForm: React.FC = () => {
                     disabled={isEdit}
                     onChange={(value) => {
                       setProveedor(value);
-                      productosRefetch();
+                      productosDeProveedorRefetch();
                     }}
                   >
-                    {proveedoresData?.map((proveedor: Proveedor, i: number) => (
+                    {clientesData?.map((proveedor: Proveedor, i: number) => (
                       <Select.Option key={i} value={proveedor?.id}>
                         {proveedor?.nombre}
                       </Select.Option>
@@ -769,12 +889,12 @@ export const FacturacionForm: React.FC = () => {
               <Col span={6} offset={1}>
                 <FormItem
                   requiredMark
-                  name="idTipoCompra"
+                  name="idTipoVenta"
                   label={t('common.tipocompra')}
                   rules={[{ required: true, message: t('common.requiredField') }]}
                 >
                   <Select allowClear>
-                    {TipoCompra.map((tc, i) => (
+                    {TipoVenta.map((tc, i) => (
                       <Select.Option key={i} value={i + 1}>
                         {tc}
                       </Select.Option>
@@ -782,8 +902,17 @@ export const FacturacionForm: React.FC = () => {
                   </Select>
                 </FormItem>
               </Col>
-
-              <Col offset={9} span={1}>
+              <Col span={6} offset={1}>
+                <FormItem
+                  requiredMark
+                  name="plazoentrega"
+                  label={t('common.plazoentrega')}
+                  rules={[{ required: true, message: t('common.requiredField') }]}
+                >
+                  <InputNumber addonAfter="días." style={{ width: '100%' }} />
+                </FormItem>
+              </Col>
+              <Col offset={3} span={1}>
                 <Button
                   style={{
                     color: 'var(--success-color)',
@@ -805,7 +934,6 @@ export const FacturacionForm: React.FC = () => {
                   rowKey={(record) => record.id}
                   columns={columns}
                   dataSource={detalles}
-                  loading={isEdit && isLoadingNP}
                   scroll={{ x: 800 }}
                   locale={{
                     filterTitle: t('table.filterTitle'),
@@ -858,7 +986,7 @@ export const FacturacionForm: React.FC = () => {
           rowKey={(record) => record.id}
           columns={agregarProductosColumnas}
           dataSource={filteredProductos()}
-          loading={isLoadingProductos}
+          loading={isLoadingProductosDeProveedor}
           scroll={{ x: 800 }}
           locale={{
             filterTitle: t('table.filterTitle'),

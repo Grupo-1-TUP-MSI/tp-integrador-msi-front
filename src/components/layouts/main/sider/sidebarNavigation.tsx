@@ -34,6 +34,11 @@ export const adminSidebarNavigation: SidebarNavigationItem[] = [
         url: '/compras/proveedores',
       },
       {
+        title: 'common.comparativaProveedores',
+        key: 'proveedores/comparativa',
+        url: '/compras/proveedores/comparativa',
+      },
+      {
         title: 'common.notapedido',
         key: 'notapedido',
         url: '/compras/notapedido',
@@ -55,6 +60,11 @@ export const adminSidebarNavigation: SidebarNavigationItem[] = [
         key: 'facturacion',
         url: '/ventas/facturacion',
       },
+      {
+        title: 'common.ganancias',
+        key: 'ganancias',
+        url: '/ventas/ganancias',
+      },
     ],
   },
   {
@@ -69,12 +79,6 @@ export const adminSidebarNavigation: SidebarNavigationItem[] = [
     icon: <UserOutlined />,
     url: '/usuarios',
   },
-  {
-    title: 'common.ganancias',
-    key: 'ganancias',
-    icon: <SettingOutlined />,
-    url: '/ganancias',
-  },
 ];
 
 export const compradorSidebarNavigation: SidebarNavigationItem[] = [
@@ -87,6 +91,11 @@ export const compradorSidebarNavigation: SidebarNavigationItem[] = [
         title: 'common.proveedores',
         key: 'proveedores',
         url: '/compras/proveedores',
+      },
+      {
+        title: 'common.comparativaProveedores',
+        key: 'proveedores/comparativa',
+        url: '/compras/proveedores/comparativa',
       },
       {
         title: 'common.notapedido',
