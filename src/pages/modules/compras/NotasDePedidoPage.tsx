@@ -187,7 +187,6 @@ export const NotasDePedidoPage: React.FC = () => {
 
   const imprimirPDF = async (id: number) => {
     const data = await getNotaPedidoPDF(id);
-    console.log(data);
     const props: any = {
       outputType: OutputType.Save,
       returnJsPDFDocObject: true,
@@ -300,8 +299,6 @@ export const NotasDePedidoPage: React.FC = () => {
       pageLabel: 'Page ',
     };
     const pdfObj = jsPDFInvoiceTemplate(props);
-
-    //console.log(pdfObj);
   };
 
   const npFiltradas = () => {
@@ -797,7 +794,6 @@ export const NotasDePedidoForm: React.FC = () => {
 
   const imprimirPDF = async (id: number) => {
     const data = await getNotaPedidoPDF(id);
-    console.log(data);
     const props: any = {
       outputType: OutputType.Save,
       returnJsPDFDocObject: true,
@@ -910,8 +906,6 @@ export const NotasDePedidoForm: React.FC = () => {
       pageLabel: 'Page ',
     };
     const pdfObj = jsPDFInvoiceTemplate(props);
-
-    //console.log(pdfObj);
   };
 
   // #region Productos

@@ -14,6 +14,7 @@ import { NotasDePedidoForm } from '@app/pages/modules/compras/NotasDePedidoPage'
 import { NotasDePedidoPage } from '@app/pages/modules/compras/NotasDePedidoPage';
 import { ProveedoresForm } from '@app/pages/modules/compras/ProveedoresPage';
 import { ProveedoresPage } from '@app/pages/modules/compras/ProveedoresPage';
+import { ProveedoresComparativaPage } from '@app/pages/modules/compras/ProveedoresComparativaPage';
 import { ProductosForm } from '@app/pages/modules/ProductosPage';
 import { ProductosPage } from '@app/pages/modules/ProductosPage';
 import { ClientesForm } from '@app/pages/modules/ventas/ClientesPage';
@@ -22,7 +23,7 @@ import { FacturacionForm } from '@app/pages/modules/ventas/FacturacionPage';
 import { FacturacionPage } from '@app/pages/modules/ventas/FacturacionPage';
 import { UsuariosForm } from '@app/pages/modules/UsuariosPage';
 import { UsuariosPage } from '@app/pages/modules/UsuariosPage';
-import { GananciasPage } from '@app/pages/modules/GananciasPage';
+import { GananciasPage } from '@app/pages/modules/ventas/GananciasPage';
 
 const ServerErrorPage = React.lazy(() => import('@app/pages/ServerErrorPage'));
 const Error404Page = React.lazy(() => import('@app/pages/Error404Page'));
@@ -31,6 +32,7 @@ const NotasDePedidoF = withLoading(NotasDePedidoForm);
 const NotasDePedidoP = withLoading(NotasDePedidoPage);
 const ProveedoresF = withLoading(ProveedoresForm);
 const ProveedoresP = withLoading(ProveedoresPage);
+const ProveedoresC = withLoading(ProveedoresComparativaPage);
 const ProductosF = withLoading(ProductosForm);
 const ProductosP = withLoading(ProductosPage);
 const ClientesF = withLoading(ClientesForm);
@@ -65,6 +67,7 @@ export const AppRouter: React.FC = () => {
               <Route path="proveedores" element={<ProveedoresP />} />
               <Route path="proveedores/alta" element={<ProveedoresF />} />
               <Route path="proveedores/:id" element={<ProveedoresF />} />
+              <Route path="proveedores/comparativa" element={<ProveedoresC />} />
               <Route path="notapedido" element={<NotasDePedidoP />} />
               <Route path="notapedido/alta" element={<NotasDePedidoF />} />
               <Route path="notapedido/:id" element={<NotasDePedidoF />} />
@@ -135,11 +138,13 @@ export const AppRouter: React.FC = () => {
             <Route path="facturacion" element={<FacturacionP />} />
             <Route path="facturacion/alta" element={<FacturacionF />} />
             <Route path="facturacion/:id" element={<FacturacionF />} />
+            <Route path="ganancias" element={<Ganancias />} />
           </Route>
           <Route path="compras">
             <Route path="proveedores" element={<ProveedoresP />} />
             <Route path="proveedores/alta" element={<ProveedoresF />} />
             <Route path="proveedores/:id" element={<ProveedoresF />} />
+            <Route path="proveedores/comparativa" element={<ProveedoresC />} />
             <Route path="notapedido" element={<NotasDePedidoP />} />
             <Route path="notapedido/alta" element={<NotasDePedidoF />} />
             <Route path="notapedido/:id" element={<NotasDePedidoF />} />
@@ -150,7 +155,6 @@ export const AppRouter: React.FC = () => {
           <Route path="usuarios" element={<UsuariosP />} />
           <Route path="usuarios/alta" element={<UsuariosF />} />
           <Route path="usuarios/:id" element={<UsuariosF />} />
-          <Route path="ganancias" element={<Ganancias />} />
           <Route path="500" element={<ServerError />} />
         </Route>
         <Route path="*" element={<Error404 />} />
