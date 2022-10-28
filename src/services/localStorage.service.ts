@@ -16,5 +16,14 @@ export const readRole = (): string => {
   return localStorage.getItem('role') || '';
 };
 
+export const persistExpiration = (expiration: string): void => {
+  localStorage.setItem('expiration', expiration);
+};
+
+export const readExpiration = (): string => {
+  return localStorage.getItem('expiration') || '';
+};
+
+export const deleteExpiration = (): void => localStorage.removeItem('expiration');
 export const deleteToken = (): void => localStorage.removeItem('token');
 export const deleteUser = (): void => localStorage.removeItem('user');

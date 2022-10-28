@@ -5,8 +5,13 @@ import { WithChildrenProps } from '@app/types/generalTypes';
 
 const RequireAuth: React.FC<WithChildrenProps> = ({ children }) => {
   const token = useAppSelector((state) => state.auth.token);
-
-  return token ? <>{children}</> : <Navigate to="/auth/login" replace />;
+  const expiration = useAppSelector((state) => state.auth.expiration);
+  console.log('Expiración de token: ' + expiration);
+  return token && new Date(expiration as string).getTime() > new Date().getTime() ? (
+    <>{children}</>
+  ) : (
+    <Navigate to="/auth/login" replace />
+  );
 };
 
 export default RequireAuth;
