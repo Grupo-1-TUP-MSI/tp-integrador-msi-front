@@ -21,6 +21,9 @@
     }
   },
   "common": {
+    "aplicarDescuento": "Aplicar descuento",
+    "descuento": "Descuento",
+    "tipopago": "Tipo de pago",
     "detalles": "Detalles",
     "porcentajeSobre": "% sobre el precio de lista.",
     "nuevoPorcentaje": "Nuevo porcentaje",
@@ -235,6 +238,7 @@
     "eliminandoProducto": "Eliminando producto",
     "editandoNP": "Editando nota de pedido",
     "creandoNP": "Creando nota de pedido",
+    "creandoFactura": "Creando factura",
     "ultimosPendientesEntrega": "Últimos pendientes de entrega"
   },
   "serverError": {

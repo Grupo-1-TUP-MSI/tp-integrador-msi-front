@@ -842,9 +842,9 @@ export const NotasDePedidoForm: React.FC = () => {
         idtipocompra: values?.idTipoCompra,
         detalles: detalles.map((d: any) => {
           return {
-            idProducto: d.idproducto,
+            idproducto: d.idproducto,
             cantidadPedida: d.cantidad,
-            precio: parseInt(d.precio),
+            precio: parseFloat(d.precio),
           };
         }),
       };
