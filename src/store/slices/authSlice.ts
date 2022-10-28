@@ -1,18 +1,30 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { login, LoginRequest, LoginResponse } from '@app/api/auth.api';
-import { deleteToken, deleteUser, persistRole, persistToken, readToken } from '@app/services/localStorage.service';
+import {
+  deleteToken,
+  deleteUser,
+  persistRole,
+  persistToken,
+  readToken,
+  readExpiration,
+  persistExpiration,
+  deleteExpiration,
+} from '@app/services/localStorage.service';
 
 export interface AuthSlice {
   token: string | null;
+  expiration: string | null;
 }
 
 const initialState: AuthSlice = {
   token: readToken(),
+  expiration: readExpiration(),
 };
 
 export const doLogin = createAsyncThunk('auth/doLogin', async (loginPayload: LoginRequest) =>
   login(loginPayload).then((res: LoginResponse) => {
     persistToken(res.token);
+    persistExpiration(res.fechaExpiracion);
     persistRole(res.role);
 
     return res.token;
@@ -21,6 +33,7 @@ export const doLogin = createAsyncThunk('auth/doLogin', async (loginPayload: Log
 
 export const doLogout = createAsyncThunk('auth/doLogout', (payload) => {
   deleteToken();
+  deleteExpiration();
   deleteUser();
 });
 

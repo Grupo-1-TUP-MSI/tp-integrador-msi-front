@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 // no lazy loading for auth pages to avoid flickering
 const AuthLayout = React.lazy(() => import('@app/components/layouts/AuthLayout/AuthLayout'));
@@ -8,7 +8,7 @@ import LoginPage from '@app/pages/LoginPage';
 import MainLayout from '@app/components/layouts/main/MainLayout/MainLayout';
 import RequireAuth from '@app/components/router/RequireAuth';
 import { withLoading } from '@app/hocs/withLoading.hoc';
-import { readRole, readToken } from '@app/services/localStorage.service';
+import { readRole } from '@app/services/localStorage.service';
 import DashboardPage from '@app/pages/DashboardPage';
 import { NotasDePedidoForm } from '@app/pages/modules/compras/NotasDePedidoPage';
 import { NotasDePedidoPage } from '@app/pages/modules/compras/NotasDePedidoPage';
@@ -62,7 +62,7 @@ export const AppRouter: React.FC = () => {
             <Route path="login" element={<LoginPage />} />
           </Route>
           <Route path="/logout" element={<LogoutFallback />} />
-          <Route path="/" element={readToken() == '' ? <Navigate to="/auth/login" /> : protectedLayout}>
+          <Route path="/" element={protectedLayout}>
             <Route path="compras">
               <Route path="proveedores" element={<ProveedoresP />} />
               <Route path="proveedores/alta" element={<ProveedoresF />} />
@@ -91,7 +91,7 @@ export const AppRouter: React.FC = () => {
             <Route path="login" element={<LoginPage />} />
           </Route>
           <Route path="/logout" element={<LogoutFallback />} />
-          <Route path="/" element={readToken() == '' ? <Navigate to="/auth/login" /> : protectedLayout}>
+          <Route path="/" element={protectedLayout}>
             <Route path="ventas">
               <Route path="clientes" element={<ClientesP />} />
               <Route path="clientes/alta" element={<ClientesF />} />
@@ -108,20 +108,6 @@ export const AppRouter: React.FC = () => {
     );
   }
 
-  if (readToken() == '') {
-    return (
-      <BrowserRouter>
-        <Routes>
-          <Route path="/auth" element={<AuthLayoutFallback />}>
-            <Route path="login" element={<LoginPage />} />
-          </Route>
-          <Route path="/" element={<Navigate to="/auth/login" />} />
-          <Route path="/logout" element={<LogoutFallback />} />
-          <Route path="*" element={<Error404 />} />
-        </Routes>
-      </BrowserRouter>
-    );
-  }
   return (
     <BrowserRouter>
       <Routes>
@@ -129,7 +115,7 @@ export const AppRouter: React.FC = () => {
           <Route path="login" element={<LoginPage />} />
         </Route>
         <Route path="/logout" element={<LogoutFallback />} />
-        <Route path="/" element={readToken() == '' ? <Navigate to="/auth/login" /> : <MainLayout />}>
+        <Route path="/" element={protectedLayout}>
           <Route index element={<DashboardPage />} />
           <Route path="ventas">
             <Route path="clientes" element={<ClientesP />} />

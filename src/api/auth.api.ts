@@ -15,6 +15,7 @@ export interface LoginResponse {
   token: string;
   user: User;
   role: string;
+  fechaExpiracion: string;
 }
 
 export const login = (loginPayload: LoginRequest): Promise<LoginResponse> => {
