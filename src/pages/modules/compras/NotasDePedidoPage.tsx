@@ -264,7 +264,7 @@ export const NotasDePedidoPage: React.FC = () => {
     const props: any = {
       outputType: OutputType.Save,
       returnJsPDFDocObject: true,
-      fileName: `ColorCor F00${data.id}-V00${data.version}`,
+      fileName: `ColorCor NP00${data.id}-V00${data.version}`,
       orientationLandscape: false,
       compress: true,
       logo: {
@@ -872,7 +872,7 @@ export const NotasDePedidoForm: React.FC = () => {
     const props: any = {
       outputType: OutputType.Save,
       returnJsPDFDocObject: true,
-      fileName: `ColorCor F00${data.id}-V00${data.version}`,
+      fileName: `ColorCor NP00${data.id}-V00${data.version}`,
       orientationLandscape: false,
       compress: true,
       logo: {

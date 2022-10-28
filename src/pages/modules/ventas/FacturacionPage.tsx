@@ -183,7 +183,7 @@ export const FacturacionPage: React.FC = () => {
     const props: any = {
       outputType: OutputType.Save,
       returnJsPDFDocObject: true,
-      fileName: `ColorCor F00${data.id}-V00${data.version}`,
+      fileName: `ColorCor F00${data.id}-V00${data.numero}`,
       orientationLandscape: false,
       compress: true,
       logo: {
@@ -214,17 +214,17 @@ export const FacturacionPage: React.FC = () => {
         website: 'https://colorcor.netlify.app/',
       },
       contact: {
-        label: 'Nota de Pedido para:',
-        name: data.proveedor.nombre,
-        address: data.proveedor.direccion,
-        phone: data.proveedor.telefono,
-        email: data.proveedor.email,
+        label: 'Factura para:',
+        name: data.cliente.nombre,
+        address: data.cliente.direccion,
+        phone: data.cliente.telefono,
+        email: data.cliente.email,
       },
       invoice: {
-        label: 'Nota de Pedido#: ',
-        num: `${data.id} Version: ${data.version}`,
+        label: 'Factura #: ',
+        num: `${data.id} Numero: ${data.numero}`, //aca deberia ir numero
         invDate: `Fecha de elaboracion: ${data.fechaLocale}`,
-        invGenDate: `Fecha de entrega: ${data.vencimientoLocale}`,
+        //invGenDate: `Fecha de entrega: ${data.vencimientoLocale}`,
         headerBorder: false,
         tableBodyBorder: false,
         header: [
@@ -255,8 +255,8 @@ export const FacturacionPage: React.FC = () => {
           item.producto,
           item.descripcion,
           item.precio.toLocaleString(),
-          item.cantidadpedida,
-          (parseFloat(item.precio) * parseFloat(item.cantidadpedida)).toLocaleString(),
+          item.cantidad,
+          (parseFloat(item.precio) * parseFloat(item.cantidad)).toLocaleString(),
         ]),
         additionalRows: [
           {
@@ -286,7 +286,7 @@ export const FacturacionPage: React.FC = () => {
         ],
       },
       footer: {
-        text: 'Esta nota de pedido se ha creado via web y es un documento valido.',
+        text: 'Esta factura se ha creado via web y es un documento valido.',
       },
       pageEnable: true,
       pageLabel: 'Page ',
@@ -665,7 +665,7 @@ export const FacturacionForm: React.FC = () => {
     const props: any = {
       outputType: OutputType.Save,
       returnJsPDFDocObject: true,
-      fileName: `ColorCor F00${data.id}-V00${data.version}`,
+      fileName: `ColorCor F00${data.id}-V00${data.numero}`,
       orientationLandscape: false,
       compress: true,
       logo: {
@@ -696,17 +696,17 @@ export const FacturacionForm: React.FC = () => {
         website: 'https://colorcor.netlify.app/',
       },
       contact: {
-        label: 'Nota de Pedido para:',
-        name: data.proveedor.nombre,
-        address: data.proveedor.direccion,
-        phone: data.proveedor.telefono,
-        email: data.proveedor.email,
+        label: 'Factura para:',
+        name: data.cliente.nombre,
+        address: data.cliente.direccion,
+        phone: data.cliente.telefono,
+        email: data.cliente.email,
       },
       invoice: {
-        label: 'Nota de Pedido#: ',
-        num: `${data.id} Version: ${data.version}`,
+        label: 'Factura #: ',
+        num: `${data.id} Numero: ${data.numero}`,
         invDate: `Fecha de elaboracion: ${data.fechaLocale}`,
-        invGenDate: `Fecha de entrega: ${data.vencimientoLocale}`,
+        //invGenDate: `Fecha de entrega: ${data.vencimientoLocale}`,
         headerBorder: false,
         tableBodyBorder: false,
         header: [
@@ -768,7 +768,7 @@ export const FacturacionForm: React.FC = () => {
         ],
       },
       footer: {
-        text: 'Esta nota de pedido se ha creado via web y es un documento valido.',
+        text: 'Esta factura se ha creado via web y es un documento valido.',
       },
       pageEnable: true,
       pageLabel: 'Page ',
