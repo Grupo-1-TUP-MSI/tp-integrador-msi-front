@@ -17,7 +17,8 @@ export const postNotaPedido = (np: any) => {
 };
 
 export const putNotaPedido = (np: any) => {
-  return httpApi.put(`np/${np.id}`, np).then((res) => res.data.data);
+  const { id, ...rest } = np;
+  return httpApi.put(`np/${id}`, rest).then((res) => res.data.data);
 };
 
 export const putEstado = (id: number, estado: any) => {

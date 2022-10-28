@@ -10,13 +10,15 @@ import {
   Row,
   Select,
   Space,
+  Spin,
+  Switch,
   Tooltip,
   Typography,
 } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { DeleteOutlined, DownloadOutlined, PlusOutlined } from '@ant-design/icons';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { Proveedor, TipoVenta, Usuario } from '@app/models/models';
+import { Cliente, Proveedor, TiposPago, TipoVenta, Usuario } from '@app/models/models';
 import { useNavigate, useParams } from 'react-router';
 import { notificationController } from '@app/controllers/notificationController';
 import { BaseForm } from '@app/components/common/forms/BaseForm/BaseForm';
@@ -26,7 +28,7 @@ import { Table } from '@app/components/common/Table/Table';
 import { getFacturas, getFacturaPDF, postFactura } from '@app/api/facturas.api';
 import { getUsuarios } from '@app/api/usuarios.api';
 import locale from 'antd/es/date-picker/locale/es_ES';
-import { getProductosDeProveedor } from '@app/api/productos.api';
+import { getProductos, getProductosDeProveedor } from '@app/api/productos.api';
 import jsPDFInvoiceTemplate, { OutputType, jsPDF } from 'jspdf-invoice-template';
 import { getClientes } from '@app/api/clientes.api';
 
@@ -466,34 +468,25 @@ export const FacturacionForm: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { id } = useParams();
-  const [isEdit, setIsEdit] = React.useState(false);
   const [detalles, setDetalles] = React.useState([]);
   const [productos, setProductos] = React.useState([]);
   const [form] = Form.useForm();
   const [modalVisible, setModalVisible] = React.useState(false);
   const [searchProducto, setSearchProducto] = React.useState('');
-  const [proveedor, setProveedor] = React.useState(null);
-  const enabledField = Form.useWatch('idProveedor', form);
+  const [tipoPago, setTipoPago] = React.useState(null);
+  const [aplicaDescuento, setAplicaDescuento] = React.useState(false);
   const [isImprimirPDF, setImprimirPDF] = React.useState(false);
 
-  const { data: clientesData, isLoading: isLoadingClientes } = useQuery(['proveedores'], getClientes, {
+  const { data: clientesData, isLoading: isLoadingClientes } = useQuery(['clientes'], getClientes, {
     keepPreviousData: false,
     refetchOnWindowFocus: false,
   });
 
-  const {
-    data: productosDeProveedorData,
-    isLoading: isLoadingProductosDeProveedor,
-    refetch: productosDeProveedorRefetch,
-  } = useQuery(['productoDeProveedor'], () => getProductosDeProveedor(form.getFieldValue('idProveedor')), {
+  const { data: productosData, isLoading: isLoadingProductos } = useQuery(['productos'], getProductos, {
     keepPreviousData: false,
     refetchOnWindowFocus: false,
-    enabled: !!enabledField,
     onSuccess: (data) => {
       setProductos(data);
-      if (!isEdit) {
-        setDetalles([]);
-      }
     },
   });
 
@@ -645,15 +638,14 @@ export const FacturacionForm: React.FC = () => {
 
   const handleSubmit = (values: any) => {
     const np = {
-      idusuario: 6, // TODO: Remover hardcode
-      plazoentrega: values?.plazoentrega,
-      idcliente: values?.idProveedor,
-      idtipoventa: values?.idTipoVenta,
+      idCliente: values?.idCliente,
+      idTipoVenta: values?.idTipoVenta,
+      idTipoPago: values?.idTipoPago,
+      descuento: values?.descuento,
       detalles: detalles.map((d: any) => {
         return {
-          idproducto: d.idproducto,
-          cantidadpedida: d.cantidad,
-          precio: parseInt(d.precio),
+          idProducto: d.idproducto,
+          cantidad: d.cantidad,
         };
       }),
     };
@@ -737,8 +729,8 @@ export const FacturacionForm: React.FC = () => {
           item.producto,
           item.descripcion,
           item.precio.toLocaleString(),
-          item.cantidadpedida,
-          (parseFloat(item.precio) * parseFloat(item.cantidadpedida)).toLocaleString(),
+          item.cantidad,
+          (parseFloat(item.precio) * parseFloat(item.cantidad)).toLocaleString(),
         ]),
         additionalRows: [
           {
@@ -780,36 +772,40 @@ export const FacturacionForm: React.FC = () => {
 
   const columns = [
     {
-      title: t('common.nombre'),
-      dataIndex: 'productoNombre',
-      key: 'productoNombre',
+      title: t('common.detalles'),
+      dataIndex: 'nombre',
+      key: 'nombre',
     },
     {
       title: t('common.importeunitario'),
-      dataIndex: 'precio',
-      key: 'precio',
-      width: '5%',
+      dataIndex: 'precioVenta',
+      key: 'precioVenta',
+      width: '10%',
+      render: (text: any, record: any) => {
+        return <span>ARS ${record.precioVenta}</span>;
+      },
     },
     {
       title: t('common.iva'),
       key: 'iva',
-      width: '5%',
+      width: '10%',
       render: (text: any, record: any) => {
-        return <span>{record.precio * 0.21}</span>;
+        return <span>ARS ${Math.round(record.precioVenta * 0.21)}</span>;
       },
     },
     {
       title: t('common.cantidad'),
       dataIndex: 'cantidad',
       key: 'cantidad',
-      width: '5%',
+      width: '10%',
     },
     {
       title: t('common.importetotal'),
       key: 'importetotal',
-      width: '5%',
+      width: '10%',
+
       render: (text: any, record: any) => {
-        return <span>{record.precio * record.cantidad * 1.21}</span>;
+        return <span>ARS ${Math.round(record.precioVenta * record.cantidad * 1.21)}</span>;
       },
     },
     {
@@ -834,20 +830,23 @@ export const FacturacionForm: React.FC = () => {
   const agregarProductosColumnas = [
     {
       title: t('common.id'),
-      dataIndex: 'idproducto',
-      key: 'idproducto',
+      dataIndex: 'id',
+      key: 'id',
       width: '5%',
     },
     {
       title: t('common.nombre'),
-      dataIndex: 'productoNombre',
-      key: 'productoNombre',
+      dataIndex: 'nombre',
+      key: 'nombre',
     },
     {
       title: t('common.importeunitario'),
-      dataIndex: 'precio',
-      key: 'precio',
+      dataIndex: 'precioVenta',
+      key: 'precioVenta',
       width: '5%',
+      render: (text: any, record: any) => {
+        return <span>ARS ${record.precioVenta}</span>;
+      },
     },
     {
       title: t('common.cantidad'),
@@ -860,10 +859,10 @@ export const FacturacionForm: React.FC = () => {
             min={0}
             max={record.stock}
             defaultValue={0}
-            value={(productos as any).find((p: any) => p.idproducto === record.idproducto)?.cantidad}
+            value={(productos as any).find((p: any) => p.id === record.id)?.cantidad}
             onChange={(value) => {
               const newProductos = productos.map((p: any) => {
-                if (p.idproducto === record.idproducto) {
+                if (p.id === record.id) {
                   return {
                     ...p,
                     cantidad: value,
@@ -887,19 +886,25 @@ export const FacturacionForm: React.FC = () => {
   };
 
   const removeProducto = (record: any) => {
-    const newDetalles = detalles.filter((d: any) => d.idproducto !== record.idproducto);
+    const newDetalles = detalles.filter((d: any) => d.id !== record.id);
     setDetalles(newDetalles);
   };
 
   const filteredProductos = () => {
-    const arr = productosDeProveedorData?.filter(
-      (p: any) =>
-        p.productoNombre.toLowerCase().includes(searchProducto.toLowerCase()) ||
-        p.idproducto.toString().toLowerCase().includes(searchProducto.toLowerCase()),
-    );
+    const arr = productosData
+      ?.filter(
+        (p: any) =>
+          p.nombre.toLowerCase().includes(searchProducto.toLowerCase()) ||
+          p.id.toString().toLowerCase().includes(searchProducto.toLowerCase()),
+      )
+      .sort((a: any, b: any) => a.id - b.id);
 
     return arr;
   };
+
+  if (isLoadingClientes || isLoadingProductos) {
+    return <Spin />;
+  }
 
   return (
     <div id="nota-de-pedido-form">
@@ -908,7 +913,7 @@ export const FacturacionForm: React.FC = () => {
         <Col span={24}>
           <BaseForm layout="vertical" onFinish={handleSubmit} requiredMark="optional" form={form}>
             <Row justify="space-between">
-              <h1>{isEdit ? t('titles.editandoNP') : t('titles.creandoNP')}</h1>
+              <h1>{t('titles.creandoFactura')}</h1>
               <BaseForm.Item>
                 <SubmitButton
                   type="primary"
@@ -916,19 +921,10 @@ export const FacturacionForm: React.FC = () => {
                   loading={isLoading}
                   disabled={!detalles || detalles.length === 0}
                 >
-                  {isEdit ? t('common.editar') : t('common.confirmar')}
+                  {t('common.confirmar')}
                 </SubmitButton>
               </BaseForm.Item>
             </Row>
-            <p>
-              {t('common.fecha') +
-                `: ${
-                  form.getFieldValue('fecha')
-                    ? new Date(form.getFieldValue('fecha')).toLocaleDateString()
-                    : new Date().toLocaleDateString()
-                }`}
-            </p>
-
             <Row
               style={{
                 display: 'flex',
@@ -936,33 +932,20 @@ export const FacturacionForm: React.FC = () => {
               }}
             >
               <Col span={6}>
-                <FormItem
-                  requiredMark
-                  name="idProveedor"
-                  label={t('common.proveedores')}
-                  rules={[{ required: true, message: t('common.requiredField') }]}
-                >
-                  <Select
-                    allowClear
-                    disabled={isEdit}
-                    onChange={(value) => {
-                      setProveedor(value);
-                      productosDeProveedorRefetch();
-                    }}
-                  >
-                    {clientesData?.map((proveedor: Proveedor, i: number) => (
-                      <Select.Option key={i} value={proveedor?.id}>
-                        {proveedor?.nombre}
-                      </Select.Option>
-                    ))}
-                  </Select>
-                </FormItem>
+                <p>
+                  {t('common.fecha') +
+                    `: ${
+                      form.getFieldValue('fecha')
+                        ? new Date(form.getFieldValue('fecha')).toLocaleDateString()
+                        : new Date().toLocaleDateString()
+                    }`}
+                </p>
               </Col>
               <Col span={6} offset={1}>
                 <FormItem
                   requiredMark
                   name="idTipoVenta"
-                  label={t('common.tipocompra')}
+                  label={t('common.tipoventa')}
                   rules={[{ required: true, message: t('common.requiredField') }]}
                 >
                   <Select allowClear>
@@ -975,13 +958,58 @@ export const FacturacionForm: React.FC = () => {
                 </FormItem>
               </Col>
               <Col span={6} offset={1}>
+                <FormItem requiredMark label={t('common.aplicarDescuento')}>
+                  <Switch
+                    checked={aplicaDescuento}
+                    onChange={setAplicaDescuento}
+                    title={t('common.aplicarDescuento')}
+                  />
+                </FormItem>
+              </Col>
+            </Row>
+
+            <Row
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+              }}
+            >
+              <Col span={6}>
                 <FormItem
                   requiredMark
-                  name="plazoentrega"
-                  label={t('common.plazoentrega')}
+                  name="idCliente"
+                  label={t('common.clientes')}
                   rules={[{ required: true, message: t('common.requiredField') }]}
                 >
-                  <InputNumber addonAfter="días." style={{ width: '100%' }} />
+                  <Select allowClear>
+                    {clientesData?.map((cliente: Cliente, i: number) => (
+                      <Select.Option key={i} value={cliente?.id}>
+                        {cliente?.nombre}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </FormItem>
+              </Col>
+
+              <Col span={6} offset={1}>
+                <FormItem
+                  requiredMark
+                  name="idTipoPago"
+                  label={t('common.tipopago')}
+                  rules={[{ required: true, message: t('common.requiredField') }]}
+                >
+                  <Select allowClear value={tipoPago} onChange={(value) => setTipoPago(value)}>
+                    {TiposPago.map((tp, i) => (
+                      <Select.Option key={i} value={i + 1}>
+                        {tp}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </FormItem>
+              </Col>
+              <Col span={6} offset={1}>
+                <FormItem requiredMark name="descuento" label={t('common.descuento')}>
+                  <InputNumber min={0} max={100} addonAfter="%" style={{ width: '100%' }} disabled={!aplicaDescuento} />
                 </FormItem>
               </Col>
               <Col offset={3} span={1}>
@@ -993,7 +1021,6 @@ export const FacturacionForm: React.FC = () => {
                   className="success-button"
                   icon={<PlusOutlined />}
                   type="text"
-                  disabled={!proveedor}
                   onClick={() => {
                     setModalVisible(true);
                   }}
@@ -1058,7 +1085,7 @@ export const FacturacionForm: React.FC = () => {
           rowKey={(record) => record.id}
           columns={agregarProductosColumnas}
           dataSource={filteredProductos()}
-          loading={isLoadingProductosDeProveedor}
+          loading={isLoadingProductos}
           scroll={{ x: 800 }}
           locale={{
             filterTitle: t('table.filterTitle'),
