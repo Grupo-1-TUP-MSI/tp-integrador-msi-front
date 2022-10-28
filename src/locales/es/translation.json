@@ -21,6 +21,7 @@
     }
   },
   "common": {
+    "detalles": "Detalles",
     "porcentajeSobre": "% sobre el precio de lista.",
     "nuevoPorcentaje": "Nuevo porcentaje",
     "desdeGanancia": "Entrará en vigencia desde: ",
