@@ -105,6 +105,78 @@ export const FacturacionPage: React.FC = () => {
       ),
     },
   ];
+  const expandedRowRender = (notaPedido: any) => {
+    const columns = [
+      {
+        title: t('common.detalles'),
+        dataIndex: 'producto',
+        key: 'producto',
+      },
+      {
+        title: t('common.importeunitario'),
+        dataIndex: 'precio',
+        key: 'precio',
+        width: '10%',
+        render: (text: any, record: any) => {
+          return <span>ARS ${record.precio}</span>;
+        },
+      },
+      {
+        title: t('common.iva'),
+        key: 'iva',
+        width: '10%',
+        render: (text: any, record: any) => {
+          return <span>ARS ${Math.round(record.precio * 0.21)}</span>;
+        },
+      },
+      {
+        title: t('common.cantidad'),
+        dataIndex: 'cantidad',
+        key: 'cantidad',
+        width: '10%',
+      },
+      {
+        title: t('common.importetotal'),
+        key: 'importetotal',
+        width: '10%',
+
+        render: (text: any, record: any) => {
+          return <span>ARS ${Math.round(record.precio * record.cantidad * 1.21)}</span>;
+        },
+      },
+    ];
+
+    const data = notaPedido?.detalles;
+
+    return (
+      <Table
+        rowKey={(record) => record.id}
+        columns={columns}
+        dataSource={data}
+        pagination={false}
+        scroll={{ x: 800 }}
+        locale={{
+          filterTitle: t('table.filterTitle'),
+          filterConfirm: t('table.filterConfirm'),
+          filterReset: t('table.filterReset'),
+          filterEmptyText: t('table.filterEmptyText'),
+          filterCheckall: t('table.filterCheckall'),
+          filterSearchPlaceholder: t('table.filterSearchPlaceholder'),
+          emptyText: t('table.emptyText'),
+          selectAll: t('table.selectAll'),
+          selectInvert: t('table.selectInvert'),
+          selectNone: t('table.selectNone'),
+          selectionAll: t('table.selectionAll'),
+          sortTitle: t('table.sortTitle'),
+          expand: t('table.expand'),
+          collapse: t('table.collapse'),
+          triggerDesc: t('table.triggerDesc'),
+          triggerAsc: t('table.triggerAsc'),
+          cancelSort: t('table.cancelSort'),
+        }}
+      />
+    );
+  };
 
   const imprimirPDF = async (id: number) => {
     const data = await getFacturaPDF(id);
@@ -361,7 +433,7 @@ export const FacturacionPage: React.FC = () => {
       </div>
       <Table
         rowKey={(record) => record.id}
-        rowClassName={(record) => (record.idestadonp === 4 ? 'deleted-row' : '')}
+        expandable={{ expandedRowRender }}
         columns={columns}
         dataSource={facturasFiltradas()}
         loading={isLoadingFacturas || isLoadingClientes || isLoadingUsuarios}
