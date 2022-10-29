@@ -13,9 +13,9 @@ import { RollbackOutlined } from '@ant-design/icons';
 import { readRole } from '@app/services/localStorage.service';
 
 const sidebarNavigation =
-  readRole() === 'Comprador'
+  readRole() === 'COMPRADOR'
     ? compradorSidebarNavigation
-    : readRole() === 'Vendedor'
+    : readRole() === 'VENDEDOR'
     ? vendedorSidebarNavigation
     : adminSidebarNavigation;
 interface SiderContentProps {

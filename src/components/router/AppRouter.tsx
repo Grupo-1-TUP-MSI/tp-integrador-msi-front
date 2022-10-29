@@ -54,7 +54,7 @@ export const AppRouter: React.FC = () => {
       <MainLayout />
     </RequireAuth>
   );
-  if (readRole() === 'Comprador') {
+  if (readRole() === 'COMPRADOR') {
     return (
       <BrowserRouter>
         <Routes>
@@ -83,7 +83,7 @@ export const AppRouter: React.FC = () => {
     );
   }
 
-  if (readRole() === 'Vendedor') {
+  if (readRole() === 'VENDEDOR') {
     return (
       <BrowserRouter>
         <Routes>
