@@ -638,14 +638,16 @@ export const FacturacionForm: React.FC = () => {
 
   const handleSubmit = (values: any) => {
     const np = {
+      fecha: new Date(values?.fecha).toLocaleDateString(),
       idCliente: values?.idCliente,
       idTipoVenta: values?.idTipoVenta,
       idTipoPago: values?.idTipoPago,
-      descuento: values?.descuento,
+      descuento: values?.descuento || 0,
       detalles: detalles.map((d: any) => {
         return {
-          idProducto: d.idproducto,
+          idProducto: d.id,
           cantidad: d.cantidad,
+          precio: d.precioVenta,
         };
       }),
     };
@@ -932,14 +934,21 @@ export const FacturacionForm: React.FC = () => {
               }}
             >
               <Col span={6}>
-                <p>
-                  {t('common.fecha') +
-                    `: ${
-                      form.getFieldValue('fecha')
-                        ? new Date(form.getFieldValue('fecha')).toLocaleDateString()
-                        : new Date().toLocaleDateString()
-                    }`}
-                </p>
+                <FormItem
+                  requiredMark
+                  name="fecha"
+                  label={t('common.fecha')}
+                  rules={[{ required: true, message: t('common.required') }]}
+                >
+                  <DatePicker
+                    style={{
+                      width: '100%',
+                    }}
+                    format="DD/MM/YYYY"
+                    showToday
+                    locale={locale}
+                  />
+                </FormItem>
               </Col>
               <Col span={6} offset={1}>
                 <FormItem

@@ -239,6 +239,10 @@
     "editandoNP": "Editando nota de pedido",
     "creandoNP": "Creando nota de pedido",
     "creandoFactura": "Creando factura",
+    "tiposCompraMonto": "Tipos de compra por monto",
+    "tiposVentaMonto": "Tipos de venta por monto",
+    "tiposVentaCantidad": "Tipos de venta por cantidad",
+    "tiposCompraCantidad": "Tipos de compra por cantidad",
     "ultimosPendientesEntrega": "Últimos pendientes de entrega"
   },
   "serverError": {
