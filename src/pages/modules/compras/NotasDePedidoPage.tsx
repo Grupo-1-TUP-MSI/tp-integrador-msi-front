@@ -37,6 +37,7 @@ import { getUsuarios } from '@app/api/usuarios.api';
 import locale from 'antd/es/date-picker/locale/es_ES';
 import { getProductosDeProveedor } from '@app/api/productos.api';
 import jsPDFInvoiceTemplate, { OutputType, jsPDF } from 'jspdf-invoice-template';
+import { BotonCSV } from '@app/components/shared/BotonCSV';
 
 export const NotasDePedidoPage: React.FC = () => {
   const { t } = useTranslation();
@@ -468,16 +469,19 @@ export const NotasDePedidoPage: React.FC = () => {
       >
         <h1 style={{ color: 'var(--timeline-background)' }}>{t('common.notapedido')}</h1>
 
-        <Button
-          style={{
-            color: 'var(--success-color)',
-            borderRadius: '2rem',
-          }}
-          className="success-button"
-          icon={<PlusOutlined />}
-          type="text"
-          onClick={() => navigate('/compras/notapedido/alta')}
-        ></Button>
+        <div>
+          <Button
+            style={{
+              color: 'var(--success-color)',
+              borderRadius: '2rem',
+            }}
+            className="success-button"
+            icon={<PlusOutlined />}
+            type="text"
+            onClick={() => navigate('/compras/notapedido/alta')}
+          ></Button>
+          <BotonCSV list={npFiltradas()} fileName={'notasDePedido'} />
+        </div>
       </div>
       <div
         style={{
@@ -657,7 +661,7 @@ export const NotasDePedidoForm: React.FC = () => {
         setDetalles(
           data?.detalles.map((detalle: any) => ({
             ...detalle,
-            idproducto: detalle.id,
+            idproducto: detalle.idproducto,
             productoNombre: detalle.producto,
             cantidad: detalle.cantidadpedida,
           })),

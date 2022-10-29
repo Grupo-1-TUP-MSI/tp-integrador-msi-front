@@ -31,6 +31,7 @@ import locale from 'antd/es/date-picker/locale/es_ES';
 import { getProductos, getProductosDeProveedor } from '@app/api/productos.api';
 import jsPDFInvoiceTemplate, { OutputType, jsPDF } from 'jspdf-invoice-template';
 import { getClientes } from '@app/api/clientes.api';
+import { BotonCSV } from '@app/components/shared/BotonCSV';
 
 export const FacturacionPage: React.FC = () => {
   const { t } = useTranslation();
@@ -344,16 +345,19 @@ export const FacturacionPage: React.FC = () => {
       >
         <h1 style={{ color: 'var(--timeline-background)' }}>{t('common.facturacion')}</h1>
 
-        <Button
-          style={{
-            color: 'var(--success-color)',
-            borderRadius: '2rem',
-          }}
-          className="success-button"
-          icon={<PlusOutlined />}
-          type="text"
-          onClick={() => navigate('/ventas/facturacion/alta')}
-        ></Button>
+        <div>
+          <Button
+            style={{
+              color: 'var(--success-color)',
+              borderRadius: '2rem',
+            }}
+            className="success-button"
+            icon={<PlusOutlined />}
+            type="text"
+            onClick={() => navigate('/ventas/facturacion/alta')}
+          ></Button>
+          <BotonCSV list={facturasFiltradas()} fileName={'facturas'} />
+        </div>
       </div>
       <div
         style={{

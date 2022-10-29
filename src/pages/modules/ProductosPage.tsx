@@ -41,6 +41,7 @@ import { FormInput, SubmitButton } from '@app/components/layouts/AuthLayout/Auth
 import { Table } from '@app/components/common/Table/Table';
 import { useResponsive } from '@app/hooks/useResponsive';
 import { getProveedores } from '@app/api/proveedores.api';
+import { BotonCSV } from '@app/components/shared/BotonCSV';
 
 export const ProductosPage: React.FC = () => {
   const { t } = useTranslation();
@@ -387,16 +388,19 @@ export const ProductosPage: React.FC = () => {
       >
         <h1 style={{ color: 'var(--timeline-background)' }}>{t('common.productos')}</h1>
 
-        <Button
-          style={{
-            color: 'var(--success-color)',
-            borderRadius: '2rem',
-          }}
-          className="success-button"
-          icon={<PlusOutlined />}
-          type="text"
-          onClick={() => navigate('/productos/alta')}
-        ></Button>
+        <div>
+          <Button
+            style={{
+              color: 'var(--success-color)',
+              borderRadius: '2rem',
+            }}
+            className="success-button"
+            icon={<PlusOutlined />}
+            type="text"
+            onClick={() => navigate('/productos/alta')}
+          ></Button>
+          <BotonCSV list={productosFiltrados()} fileName={'productos'} />
+        </div>
       </div>
       {!isDesktop ? (
         <>
