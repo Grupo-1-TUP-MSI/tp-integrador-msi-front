@@ -183,8 +183,17 @@ const DashboardPage: React.FC = () => {
           marginTop: '3rem',
         }}
       >
-        <Col span={24}>
-          <BaseChart style={{ margin: 20 }} option={option} />
+        <Col xs={24} md={12} lg={6}>
+          <Card style={{ margin: 20 }} title={t('titles.tiposCompraMonto')}></Card>
+        </Col>
+        <Col xs={24} md={12} lg={6}>
+          <Card style={{ margin: 20 }} title={t('titles.tiposVentaMonto')}></Card>
+        </Col>
+        <Col xs={24} md={12} lg={6}>
+          <Card style={{ margin: 20 }} title={t('titles.tiposVentaCantidad')}></Card>
+        </Col>
+        <Col xs={24} md={12} lg={6}>
+          <Card style={{ margin: 20 }} title={t('titles.tiposCompraCantidad')}></Card>
         </Col>
       </Row>
     </>

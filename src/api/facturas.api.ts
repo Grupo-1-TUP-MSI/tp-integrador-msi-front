@@ -9,5 +9,5 @@ export const getFacturaPDF = (id: number) => {
 };
 
 export const postFactura = (factura: any) => {
-  return httpApi.post('factura', factura).then((res) => res.data.data);
+  return httpApi.post('facturas', factura).then((res) => res.data);
 };
