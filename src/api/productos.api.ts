@@ -34,3 +34,7 @@ export const agregarProveedores = (idProducto: number, idProveedor: number, nuev
 export const getProductosDeProveedor = (idProveedor: number) => {
   return httpApi.get(`productos/proveedor/${idProveedor}`).then((res) => res.data.data);
 };
+
+export const getProductosFiltrados = () => {
+  return httpApi.get('proveedores/comparativa').then((res) => res.data);
+};
