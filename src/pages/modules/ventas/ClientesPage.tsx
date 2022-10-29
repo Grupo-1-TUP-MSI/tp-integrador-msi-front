@@ -12,6 +12,7 @@ import { FormInput, FormInputPassword, SubmitButton } from '@app/components/layo
 import { Table } from '@app/components/common/Table/Table';
 import { getClientes, getCliente, postCliente, putCliente, deleteCliente } from '../../../api/clientes.api';
 import { useResponsive } from '@app/hooks/useResponsive';
+import { BotonCSV } from '@app/components/shared/BotonCSV';
 
 export const ClientesPage: React.FC = () => {
   const { t } = useTranslation();
@@ -170,16 +171,19 @@ export const ClientesPage: React.FC = () => {
       >
         <h1 style={{ color: 'var(--timeline-background)' }}>{t('common.clientes')}</h1>
 
-        <Button
-          style={{
-            color: 'var(--success-color)',
-            borderRadius: '2rem',
-          }}
-          className="success-button"
-          icon={<PlusOutlined />}
-          type="text"
-          onClick={() => navigate('/ventas/clientes/alta')}
-        ></Button>
+        <div>
+          <Button
+            style={{
+              color: 'var(--success-color)',
+              borderRadius: '2rem',
+            }}
+            className="success-button"
+            icon={<PlusOutlined />}
+            type="text"
+            onClick={() => navigate('/ventas/clientes/alta')}
+          ></Button>
+          <BotonCSV list={clientesFiltrados()} fileName={'clientes'} />
+        </div>
       </div>
       <div
         style={{

@@ -7,6 +7,7 @@ import { notificationController } from '@app/controllers/notificationController'
 import { Table } from '@app/components/common/Table/Table';
 import { getGanancias, postGanancia } from '@app/api/ganancias.api';
 import locale from 'antd/es/date-picker/locale/es_ES';
+import { BotonCSV } from '@app/components/shared/BotonCSV';
 
 export const GananciasPage: React.FC = () => {
   const { t } = useTranslation();
@@ -151,16 +152,19 @@ export const GananciasPage: React.FC = () => {
       >
         <h1 style={{ color: 'var(--timeline-background)' }}>{t('common.margenGanancias')}</h1>
 
-        <Button
-          style={{
-            color: 'var(--success-color)',
-            borderRadius: '2rem',
-          }}
-          className="success-button"
-          icon={<PlusOutlined />}
-          type="text"
-          onClick={() => setModal(true)}
-        ></Button>
+        <div>
+          <Button
+            style={{
+              color: 'var(--success-color)',
+              borderRadius: '2rem',
+            }}
+            className="success-button"
+            icon={<PlusOutlined />}
+            type="text"
+            onClick={() => setModal(true)}
+          ></Button>
+          <BotonCSV list={gananciasData} fileName={'ganancias'} />
+        </div>
       </div>
       <Table
         rowKey={(record) => record.id}

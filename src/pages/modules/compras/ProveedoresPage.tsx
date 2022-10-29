@@ -18,6 +18,7 @@ import {
   deleteProveedor,
 } from '../../../api/proveedores.api';
 import { useResponsive } from '@app/hooks/useResponsive';
+import { BotonCSV } from '@app/components/shared/BotonCSV';
 
 export const ProveedoresPage: React.FC = () => {
   const { t } = useTranslation();
@@ -176,16 +177,19 @@ export const ProveedoresPage: React.FC = () => {
       >
         <h1 style={{ color: 'var(--timeline-background)' }}>{t('common.proveedores')}</h1>
 
-        <Button
-          style={{
-            color: 'var(--success-color)',
-            borderRadius: '2rem',
-          }}
-          className="success-button"
-          icon={<PlusOutlined />}
-          type="text"
-          onClick={() => navigate('/compras/proveedores/alta')}
-        ></Button>
+        <div>
+          <Button
+            style={{
+              color: 'var(--success-color)',
+              borderRadius: '2rem',
+            }}
+            className="success-button"
+            icon={<PlusOutlined />}
+            type="text"
+            onClick={() => navigate('/compras/proveedores/alta')}
+          ></Button>
+          <BotonCSV list={proveedoresFiltrados()} fileName={'proveedores'} />
+        </div>
       </div>
       <div
         style={{

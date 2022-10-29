@@ -11,6 +11,7 @@ import { BaseForm } from '@app/components/common/forms/BaseForm/BaseForm';
 import FormItem from 'antd/es/form/FormItem';
 import { FormInput, FormInputPassword, SubmitButton } from '@app/components/layouts/AuthLayout/AuthLayout.styles';
 import { Table } from '@app/components/common/Table/Table';
+import { BotonCSV } from '@app/components/shared/BotonCSV';
 
 export const UsuariosPage: React.FC = () => {
   const { t } = useTranslation();
@@ -155,16 +156,19 @@ export const UsuariosPage: React.FC = () => {
       >
         <h1 style={{ color: 'var(--timeline-background)' }}>{t('common.usuarios')}</h1>
 
-        <Button
-          style={{
-            color: 'var(--success-color)',
-            borderRadius: '2rem',
-          }}
-          className="success-button"
-          icon={<PlusOutlined />}
-          type="text"
-          onClick={() => navigate('/usuarios/alta')}
-        ></Button>
+        <div>
+          <Button
+            style={{
+              color: 'var(--success-color)',
+              borderRadius: '2rem',
+            }}
+            className="success-button"
+            icon={<PlusOutlined />}
+            type="text"
+            onClick={() => navigate('/usuarios/alta')}
+          ></Button>
+          <BotonCSV list={usuariosFiltrados()} fileName={'usuarios'} />
+        </div>
       </div>
       <div
         style={{
