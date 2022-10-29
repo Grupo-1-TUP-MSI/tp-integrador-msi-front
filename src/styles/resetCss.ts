@@ -36,6 +36,11 @@ export const resetCss = css`
     opacity: 0.8;
   }
 
+  .disabled-row {
+    opacity: 0.8;
+    pointer-events: none;
+  }
+
   .no-stock-row {
     background-color: #f8d11133;
     opacity: 0.8;

@@ -21,6 +21,7 @@
     }
   },
   "common": {
+    "comprar": "Comprar",
     "aplicarDescuento": "Aplicar descuento",
     "descuento": "Descuento",
     "tipopago": "Tipo de pago",
