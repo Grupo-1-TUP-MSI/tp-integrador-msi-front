@@ -37,7 +37,7 @@ export const resetCss = css`
   }
 
   .disabled-row {
-    opacity: 0.8;
+    opacity: 0.3;
     pointer-events: none;
   }
 

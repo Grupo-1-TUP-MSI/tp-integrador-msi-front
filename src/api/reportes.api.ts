@@ -11,5 +11,5 @@ export const getReportePendientesDeEntrega = () => {
 };
 
 export const getPieCharts = () => {
-  return httpApi.get('reportes/pie-charts').then((res) => res.data.data);
+  return httpApi.get('reportes/pie-charts').then((res) => res.data);
 };

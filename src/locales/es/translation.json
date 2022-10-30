@@ -104,6 +104,7 @@
     "ventas": "Ventas",
     "verBorrados": "Ocultar borrados",
     "verSinStock": "Ocultar sin stock",
+    "verConStock": "Ocultar con stock",
     "verStockMinimo": "Filtrar productos que no superen el stock mínimo",
     "pendienteAceptacion": "Pendiente de aceptación",
     "pendienteEntrega": "Pendiente de entrega",

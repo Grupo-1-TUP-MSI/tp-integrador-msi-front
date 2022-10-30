@@ -18,6 +18,7 @@ import { useTranslation } from 'react-i18next';
 import {
   DeleteOutlined,
   EditOutlined,
+  InfoCircleOutlined,
   PlusCircleOutlined,
   PlusOutlined,
   UsergroupAddOutlined,
@@ -185,9 +186,14 @@ export const ProductosPage: React.FC = () => {
       key: 'nombre',
       width: '40%',
       render: (text: any, record: any) => (
-        <Tooltip placement="top" title={record.descripcion} trigger="hover" destroyTooltipOnHide>
-          <span>{record.nombre}</span>
-        </Tooltip>
+        <>
+          {record.descripcion && (
+            <Tooltip placement="top" title={record.descripcion} trigger="hover" destroyTooltipOnHide>
+              <InfoCircleOutlined style={{ opacity: '0.4' }} />
+            </Tooltip>
+          )}
+          <span style={{ marginLeft: '1rem' }}>{record.nombre}</span>
+        </>
       ),
     },
     {
