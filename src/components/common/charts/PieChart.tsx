@@ -32,31 +32,32 @@ export const PieChart: React.FC<PieChartProps> = ({ option, data, name, showLege
       {
         name,
         type: 'pie',
-        top: showLegend ? '25%' : '10%',
-        bottom: '5%',
-        radius: ['55%', '100%'],
-        avoidLabelOverlap: false,
+        center: ['50%', '50%'],
+        radius: '55%',
+        label: {
+          color: 'rgba(255, 255, 255, 0.3)',
+        },
+        labelLine: {
+          lineStyle: {
+            color: 'rgba(255, 255, 255, 0.3)',
+          },
+          smooth: 0.2,
+          length: 10,
+          length2: 20,
+        },
+        data,
         itemStyle: {
           borderRadius: 5,
           borderColor: BASE_COLORS.white,
           borderWidth: 2,
+          shadowBlur: 200,
+          shadowColor: 'rgba(0, 0, 0, 0.5)',
         },
-        label: {
-          show: false,
-          position: 'center',
+        animationType: 'scale',
+        animationEasing: 'elasticOut',
+        animationDelay: (idx: any) => {
+          return Math.random() * 200;
         },
-        emphasis: {
-          label: {
-            show: true,
-            fontSize: '40',
-            fontWeight: 'bold',
-            color: themeObject[theme].textMain,
-          },
-        },
-        labelLine: {
-          show: false,
-        },
-        data,
       },
     ],
   };
