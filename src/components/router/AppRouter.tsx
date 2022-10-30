@@ -24,6 +24,7 @@ import { FacturacionPage } from '@app/pages/modules/ventas/FacturacionPage';
 import { UsuariosForm } from '@app/pages/modules/UsuariosPage';
 import { UsuariosPage } from '@app/pages/modules/UsuariosPage';
 import { GananciasPage } from '@app/pages/modules/ventas/GananciasPage';
+import { FacturaSuccess } from '@app/pages/modules/ventas/FacturaSuccess';
 
 const ServerErrorPage = React.lazy(() => import('@app/pages/ServerErrorPage'));
 const Error404Page = React.lazy(() => import('@app/pages/Error404Page'));
@@ -39,6 +40,7 @@ const ClientesF = withLoading(ClientesForm);
 const ClientesP = withLoading(ClientesPage);
 const FacturacionF = withLoading(FacturacionForm);
 const FacturacionP = withLoading(FacturacionPage);
+const FacturasSuccess = withLoading(FacturaSuccess);
 const UsuariosF = withLoading(UsuariosForm);
 const UsuariosP = withLoading(UsuariosPage);
 const Ganancias = withLoading(GananciasPage);
@@ -99,6 +101,7 @@ export const AppRouter: React.FC = () => {
               <Route path="facturacion" element={<FacturacionP />} />
               <Route path="facturacion/alta" element={<FacturacionF />} />
               <Route path="facturacion/:id" element={<FacturacionF />} />
+              <Route path="facturacion/pago-exitoso/:id" element={<FacturasSuccess />} />
             </Route>
             <Route path="500" element={<ServerError />} />
           </Route>
@@ -124,6 +127,7 @@ export const AppRouter: React.FC = () => {
             <Route path="facturacion" element={<FacturacionP />} />
             <Route path="facturacion/alta" element={<FacturacionF />} />
             <Route path="facturacion/:id" element={<FacturacionF />} />
+            <Route path="facturacion/pago-exitoso/:id" element={<FacturasSuccess />} />
             <Route path="ganancias" element={<Ganancias />} />
           </Route>
           <Route path="compras">

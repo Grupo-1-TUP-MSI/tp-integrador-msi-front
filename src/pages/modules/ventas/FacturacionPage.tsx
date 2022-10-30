@@ -480,7 +480,6 @@ export const FacturacionForm: React.FC = () => {
   const [searchProducto, setSearchProducto] = React.useState('');
   const [tipoPago, setTipoPago] = React.useState(null);
   const [aplicaDescuento, setAplicaDescuento] = React.useState(false);
-  const [isImprimirPDF, setImprimirPDF] = React.useState(false);
 
   const { data: clientesData, isLoading: isLoadingClientes } = useQuery(['clientes'], getClientes, {
     keepPreviousData: false,
@@ -495,132 +494,6 @@ export const FacturacionForm: React.FC = () => {
     },
   });
 
-  const { data } = useQuery(['getFacturaPDF'], () => getFacturaPDF(parseInt(id as string)), {
-    keepPreviousData: false,
-    refetchOnWindowFocus: false,
-    enabled: isImprimirPDF,
-    onSuccess: (data) => {
-      const props = {
-        outputType: OutputType.Save,
-        returnJsPDFDocObject: true,
-        fileName: 'Invoice 2022',
-        orientationLandscape: false,
-        compress: true,
-        logo: {
-          src: 'https://i.postimg.cc/3w2KmPdm/logo.png',
-          width: 25, //aspect ratio = width/height
-          height: 25,
-          margin: {
-            top: 0, //negative or positive num, from the current position
-            left: 0, //negative or positive num, from the current position
-          },
-        },
-        stamp: {
-          inAllPages: true,
-          src: 'https://raw.githubusercontent.com/edisonneza/jspdf-invoice-template/demo/images/qr_code.jpg',
-          width: 20, //aspect ratio = width/height
-          height: 20,
-          margin: {
-            top: 0, //negative or positive num, from the current position
-            left: 0, //negative or positive num, from the current position
-          },
-        },
-        business: {
-          name: 'ColorCor S.A.',
-          address: 'Zapiola 77',
-          phone: '(0351) 155622138',
-          email: 'compras@colorcor.com.ar',
-
-          website: 'https://colorcor.netlify.app/',
-        },
-        contact: {
-          label: 'Nota de Pedido para:',
-          name: 'Pintureria ALBA',
-          address: 'Dean Funes 1522',
-          phone: '(+011) 155 422 222',
-          email: 'ventas@alba.com.ar',
-          otherInfo: 'www.alba.com.ar',
-        },
-        invoice: {
-          label: 'Nota de Pedido#: ',
-          num: 320,
-          invDate: 'Fecha de elaboracion: 01/01/2022 18:12',
-          invGenDate: 'Fecha de vencimiento: 02/02/2022 10:17',
-          headerBorder: false,
-          tableBodyBorder: false,
-          header: [
-            {
-              title: '#',
-              style: {
-                width: 10,
-              },
-            },
-            {
-              title: 'Producto',
-              style: {
-                width: 30,
-              },
-            },
-            {
-              title: 'Descripcion',
-              style: {
-                width: 70,
-              },
-            },
-            { title: 'Precio Unitario' },
-            { title: 'Cantidad' },
-            { title: 'Total' },
-          ],
-          table: Array.from(Array(2), (item, index) => [
-            index + 1,
-            'Pintura Exterior ',
-            'Interior / Exterior 20lt Gama Alta ',
-            200.5,
-            2,
-            401,
-          ]),
-          additionalRows: [
-            {
-              col1: 'Total:',
-              col2: '6015',
-              col3: 'ALL',
-              style: {
-                fontSize: 14, //optional, default 12
-              },
-            },
-            {
-              col1: 'IVA:',
-              col2: '21',
-              col3: '%',
-              style: {
-                fontSize: 10, //optional, default 12
-              },
-            },
-            {
-              col1: 'SubTotal:',
-              col2: '4.751,85',
-              col3: 'ALL',
-              style: {
-                fontSize: 10, //optional, default 12
-              },
-            },
-          ],
-
-          invDescLabel: 'Invoice Note',
-          invDesc:
-            "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary.",
-        },
-        footer: {
-          text: 'Esta nota de pedido se ha creado via web y es un documento valido.',
-        },
-        pageEnable: true,
-        pageLabel: 'Page ',
-      };
-      const pdfObject = new jsPDF(props);
-      return pdfObject;
-    },
-  });
-
   const { mutate: handleCreate, isLoading } = useMutation(postFactura, {
     onSuccess: (res: any) => {
       notificationController.success({
@@ -628,8 +501,6 @@ export const FacturacionForm: React.FC = () => {
         description: t('notifications.facturaCreada'),
         duration: 3,
       });
-      imprimirPDF(res.id);
-      setImprimirPDF(true);
       navigate('/ventas/facturacion');
     },
     onError: (error: Error) => {
@@ -657,122 +528,6 @@ export const FacturacionForm: React.FC = () => {
       }),
     };
     handleCreate(factura);
-  };
-
-  const imprimirPDF = async (id: number) => {
-    const data = await getFacturaPDF(id);
-    const props: any = {
-      outputType: OutputType.Save,
-      returnJsPDFDocObject: true,
-      fileName: `ColorCor F00${data.id}-V00${data.numero}`,
-      orientationLandscape: false,
-      compress: true,
-      logo: {
-        src: 'https://i.postimg.cc/3w2KmPdm/logo.png',
-        width: 25, //aspect ratio = width/height
-        height: 25,
-        margin: {
-          top: 0, //negative or positive num, from the current position
-          left: 0, //negative or positive num, from the current position
-        },
-      },
-      stamp: {
-        inAllPages: true,
-        src: 'https://i.postimg.cc/YCCvCcKC/qr-code.jpg',
-        width: 20, //aspect ratio = width/height
-        height: 20,
-        margin: {
-          top: 0, //negative or positive num, from the current position
-          left: 0, //negative or positive num, from the current position
-        },
-      },
-      business: {
-        name: 'ColorCor S.A.',
-        address: 'Zapiola 77',
-        phone: '(0351) 155622138',
-        email: 'compras@colorcor.com.ar',
-
-        website: 'https://colorcor.netlify.app/',
-      },
-      contact: {
-        label: 'Factura para:',
-        name: data.cliente.nombre,
-        address: data.cliente.direccion,
-        phone: data.cliente.telefono,
-        email: data.cliente.email,
-      },
-      invoice: {
-        label: 'Factura #: ',
-        num: `${data.id} Numero: ${data.numero}`,
-        invDate: `Fecha de elaboracion: ${data.fechaLocale}`,
-        //invGenDate: `Fecha de entrega: ${data.vencimientoLocale}`,
-        headerBorder: false,
-        tableBodyBorder: false,
-        header: [
-          {
-            title: '#',
-            style: {
-              width: 10,
-            },
-          },
-          {
-            title: 'Producto',
-            style: {
-              width: 30,
-            },
-          },
-          {
-            title: 'Descripcion',
-            style: {
-              width: 70,
-            },
-          },
-          { title: 'Precio Unitario' },
-          { title: 'Cantidad' },
-          { title: 'Total' },
-        ],
-        table: Array.from(data.detalles, (item: any, index) => [
-          index + 1,
-          item.producto,
-          item.descripcion,
-          item.precio.toLocaleString(),
-          item.cantidad,
-          (parseFloat(item.precio) * parseFloat(item.cantidad)).toLocaleString(),
-        ]),
-        additionalRows: [
-          {
-            col1: 'Gravado:',
-            col2: data.acumGravado.toLocaleString(),
-            col3: 'ALL',
-            style: {
-              fontSize: 10, //optional, default 12
-            },
-          },
-          {
-            col1: 'IVA:',
-            col2: data.acumIVA.toLocaleString(),
-            col3: '%',
-            style: {
-              fontSize: 10, //optional, default 12
-            },
-          },
-          {
-            col1: 'Total:',
-            col2: data.acumTotal.toLocaleString(),
-            col3: 'ALL',
-            style: {
-              fontSize: 14, //optional, default 12
-            },
-          },
-        ],
-      },
-      footer: {
-        text: 'Esta factura se ha creado via web y es un documento valido.',
-      },
-      pageEnable: true,
-      pageLabel: 'Page ',
-    };
-    const pdfObj = jsPDFInvoiceTemplate(props);
   };
 
   // #region Productos

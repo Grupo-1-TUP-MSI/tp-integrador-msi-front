@@ -27,3 +27,4 @@ export const readExpiration = (): string => {
 export const deleteExpiration = (): void => localStorage.removeItem('expiration');
 export const deleteToken = (): void => localStorage.removeItem('token');
 export const deleteUser = (): void => localStorage.removeItem('user');
+export const deleteRole = (): void => localStorage.removeItem('role');
