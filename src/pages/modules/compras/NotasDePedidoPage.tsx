@@ -18,7 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { DeleteOutlined, DownloadOutlined, EditOutlined, PlusOutlined, SubnodeOutlined } from '@ant-design/icons';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { Proveedor, EstadoNP, TipoCompra, Usuario } from '@app/models/models';
-import { useNavigate, useParams } from 'react-router';
+import { useLocation, useNavigate, useParams } from 'react-router';
 import { notificationController } from '@app/controllers/notificationController';
 import { BaseForm } from '@app/components/common/forms/BaseForm/BaseForm';
 import FormItem from 'antd/es/form/FormItem';
@@ -611,8 +611,10 @@ export const NotasDePedidoForm: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { id } = useParams();
+  const { state }: any = useLocation();
+  const productosComparativa = state?.productos;
   const [isEdit, setIsEdit] = React.useState(false);
-  const [detalles, setDetalles] = React.useState([]);
+  const [detalles, setDetalles] = React.useState<any>([]);
   const [productos, setProductos] = React.useState([]);
   const [form] = Form.useForm();
   const [modalVisible, setModalVisible] = React.useState(false);
@@ -620,6 +622,23 @@ export const NotasDePedidoForm: React.FC = () => {
   const [proveedor, setProveedor] = React.useState(null);
   const enabledField = Form.useWatch('idProveedor', form);
   const [isImprimirPDF, setImprimirPDF] = React.useState(false);
+
+  React.useEffect(() => {
+    if (productosComparativa) {
+      const productosComparativaFormateados = productosComparativa?.map((producto: any) => {
+        return {
+          ...producto,
+          id: producto.idproducto,
+          cantidad: 1,
+          precio: producto.precio,
+          productoNombre: producto.nombre,
+        };
+      });
+      setDetalles(productosComparativaFormateados);
+      setProveedor(productosComparativa[0].idproveedor);
+      form.setFieldValue('idProveedor', productosComparativa[0].idproveedor);
+    }
+  }, [productosComparativa]);
 
   const { data: proveedoresData, isLoading: isLoadingProveedores } = useQuery(['proveedores'], getProveedores, {
     keepPreviousData: false,
@@ -635,10 +654,15 @@ export const NotasDePedidoForm: React.FC = () => {
     refetchOnWindowFocus: false,
     enabled: !!enabledField,
     onSuccess: (data) => {
-      setProductos(data);
-      if (!isEdit) {
-        setDetalles([]);
-      }
+      const newProductos = data?.map((producto: any) => {
+        return {
+          ...producto,
+          cantidad: detalles?.find((detalle: any) => detalle.id === producto.idproducto)?.cantidad || 0,
+        };
+      });
+      setProductos(newProductos);
+      const newDetalles = detalles?.filter((detalle: any) => proveedor === detalle.idproveedor);
+      setDetalles(newDetalles);
     },
   });
 

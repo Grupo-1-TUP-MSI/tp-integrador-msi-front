@@ -1,7 +1,7 @@
 import { getProveedores } from '@app/api/proveedores.api';
-import { getProductosFiltrados } from '@app/api/productos.api';
+import { getProductosComparativa } from '@app/api/productos.api';
 import { useResponsive } from '@app/hooks/useResponsive';
-import { Producto, Proveedor } from '@app/models/models';
+import { Proveedor } from '@app/models/models';
 import { useQuery } from '@tanstack/react-query';
 import { Button, Checkbox, Input, InputNumber, Select, Spin, Table, Tooltip } from 'antd';
 import React from 'react';
@@ -17,11 +17,10 @@ export const ProveedoresComparativaPage = () => {
   const [maxPrecio, setMaxPrecio] = React.useState(0);
   const [filterProveedor, setFilterProveedor] = React.useState(null);
   const [filterStock, setFilterStock] = React.useState(false);
-  const [filterStockMinimo, setFilterStockMinimo] = React.useState(false);
-  const [productosNota, setProductosNota] = React.useState<Producto[]>([]);
+  const [productosNota, setProductosNota] = React.useState<any>([]);
   const { isDesktop } = useResponsive();
 
-  const { data: productosData, isLoading: isLoadingProductos } = useQuery(['productos'], getProductosFiltrados, {
+  const { data: productosData, isLoading: isLoadingProductos } = useQuery(['productos'], getProductosComparativa, {
     keepPreviousData: false,
     refetchOnWindowFocus: false,
   });
@@ -30,10 +29,10 @@ export const ProveedoresComparativaPage = () => {
     refetchOnWindowFocus: false,
   });
 
-  const productoIsDisabled = (producto: Producto) => {
+  const productoIsDisabled = (producto: any) => {
     if (productosNota?.length > 0) {
-      const proveedorDeProductos = productosNota[0].proveedor;
-      return proveedorDeProductos !== producto.proveedor;
+      const proveedorDeProductos = productosNota[0].nombreproveedor;
+      return proveedorDeProductos !== producto.nombreproveedor;
     } else {
       return false;
     }
@@ -51,24 +50,26 @@ export const ProveedoresComparativaPage = () => {
       key: 'nombre',
       render: (text: string, record: any) => (
         <>
-          <Tooltip placement="top" title={record.descripcion} trigger="hover" destroyTooltipOnHide>
-            <InfoCircleOutlined style={{ opacity: '0.4' }} />
-          </Tooltip>
+          {record.descripcion && (
+            <Tooltip placement="top" title={record.descripcion} trigger="hover" destroyTooltipOnHide>
+              <InfoCircleOutlined style={{ opacity: '0.4' }} />
+            </Tooltip>
+          )}
           <span style={{ marginLeft: '1rem' }}>{record.nombre}</span>
         </>
       ),
     },
     {
       title: t('common.proveedor'),
-      dataIndex: 'proveedor',
-      key: 'proveedor',
+      dataIndex: 'nombreproveedor',
+      key: 'nombreproveedor',
     },
     {
       title: t('common.precio'),
-      dataIndex: 'preciolista',
-      key: 'preciolista',
+      dataIndex: 'precio',
+      key: 'precio',
       width: '10%',
-      render: (text: any, record: any) => <span>ARS ${record.preciolista}</span>,
+      render: (text: any, record: any) => <span>ARS ${record.precio}</span>,
     },
     {
       title: t('common.stock'),
@@ -80,22 +81,25 @@ export const ProveedoresComparativaPage = () => {
 
   const productosFiltrados = () => {
     const arr = productosData
-      ?.filter((producto: Producto) => {
-        return producto.nombre.toLowerCase().includes(searchProducto.toLowerCase());
+      ?.filter((producto: any) => {
+        return (
+          producto.nombre.toLowerCase().includes(searchProducto.toLowerCase()) ||
+          producto.id.toString().includes(searchProducto)
+        );
       })
-      .filter((producto: Producto) => {
-        return !!filterStockMinimo ? producto.stockminimo > (producto.stock || 0) : true;
+      .filter((producto: any) => {
+        return !!filterProveedor ? producto.idproveedor === filterProveedor : true;
       })
-      .filter((producto: Producto) => {
-        return !!filterStock ? producto.stock || 0 > 0 : true;
+      .filter((producto: any) => {
+        return !!filterStock ? producto.stock === 0 : true;
       })
-      .filter((producto: Producto) => {
-        return !!minPrecio ? producto.preciolista >= minPrecio : true;
+      .filter((producto: any) => {
+        return !!minPrecio ? producto.precio >= minPrecio : true;
       })
-      .filter((producto: Producto) => {
-        return !!maxPrecio ? producto.preciolista <= maxPrecio : true;
+      .filter((producto: any) => {
+        return !!maxPrecio ? producto.precio <= maxPrecio : true;
       })
-      .sort((a: Producto, b: Producto) => {
+      .sort((a: any, b: any) => {
         return (a.id as number) - (b.id as number);
       });
 
@@ -119,7 +123,7 @@ export const ProveedoresComparativaPage = () => {
         <h1 style={{ color: 'var(--timeline-background)' }}>{t('common.comparativaProveedores')}</h1>
         <Button
           type="primary"
-          onClick={() => navigate('/compras/proveedores/alta', { state: { productos: productosNota } })}
+          onClick={() => navigate('/compras/notaPedido/alta', { state: { productos: productosNota } })}
           disabled={productosNota?.length === 0}
         >
           {t('common.comprar')}
@@ -169,11 +173,8 @@ export const ProveedoresComparativaPage = () => {
               value={maxPrecio}
               onChange={setMaxPrecio}
             />{' '}
-            <Checkbox checked={filterStockMinimo} onChange={(e) => setFilterStockMinimo(e.target.checked)}>
-              {t('common.verStockMinimo')}
-            </Checkbox>
             <Checkbox checked={filterStock} onChange={(e) => setFilterStock(e.target.checked)}>
-              {t('common.verSinStock')}
+              {t('common.verConStock')}
             </Checkbox>
           </div>
         </>
@@ -225,11 +226,9 @@ export const ProveedoresComparativaPage = () => {
               value={maxPrecio}
               onChange={setMaxPrecio}
             />
-            <Checkbox checked={filterStockMinimo} onChange={(e) => setFilterStockMinimo(e.target.checked)}>
-              {t('common.verStockMinimo')}
-            </Checkbox>
+
             <Checkbox checked={filterStock} onChange={(e) => setFilterStock(e.target.checked)}>
-              {t('common.verSinStock')}
+              {t('common.verConStock')}
             </Checkbox>
           </div>
         </div>
