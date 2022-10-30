@@ -9,3 +9,7 @@ export const getReporteCompraVenta = () => {
 export const getReportePendientesDeEntrega = () => {
   return httpApi.get('reportes/np/pde').then((res) => res.data.data);
 };
+
+export const getPieCharts = () => {
+  return httpApi.get('reportes/pie-charts').then((res) => res.data.data);
+};

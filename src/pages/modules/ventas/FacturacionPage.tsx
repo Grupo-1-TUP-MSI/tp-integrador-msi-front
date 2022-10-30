@@ -32,6 +32,7 @@ import { getProductos, getProductosDeProveedor } from '@app/api/productos.api';
 import jsPDFInvoiceTemplate, { OutputType, jsPDF } from 'jspdf-invoice-template';
 import { getClientes } from '@app/api/clientes.api';
 import { BotonCSV } from '@app/components/shared/BotonCSV';
+import { httpApi } from '@app/api/http.api';
 
 export const FacturacionPage: React.FC = () => {
   const { t } = useTranslation();
@@ -641,7 +642,7 @@ export const FacturacionForm: React.FC = () => {
   });
 
   const handleSubmit = (values: any) => {
-    const np = {
+    const factura = {
       fecha: new Date(values?.fecha).toLocaleDateString(),
       idCliente: values?.idCliente,
       idTipoVenta: values?.idTipoVenta,
@@ -655,7 +656,7 @@ export const FacturacionForm: React.FC = () => {
         };
       }),
     };
-    handleCreate(np);
+    handleCreate(factura);
   };
 
   const imprimirPDF = async (id: number) => {
@@ -908,12 +909,15 @@ export const FacturacionForm: React.FC = () => {
     return arr;
   };
 
+  // #endregion
+
   if (isLoadingClientes || isLoadingProductos) {
     return <Spin />;
   }
 
   return (
     <div id="nota-de-pedido-form">
+      <div id="mercadopago"></div>
       {/* #region Formulario  */}
       <Row>
         <Col span={24}>
