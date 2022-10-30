@@ -3,6 +3,7 @@ import { login, LoginRequest, LoginResponse } from '@app/api/auth.api';
 import {
   deleteToken,
   deleteUser,
+  deleteRole,
   persistRole,
   persistToken,
   readToken,
@@ -34,6 +35,7 @@ export const doLogin = createAsyncThunk('auth/doLogin', async (loginPayload: Log
 export const doLogout = createAsyncThunk('auth/doLogout', (payload) => {
   deleteToken();
   deleteExpiration();
+  deleteRole();
   deleteUser();
 });
 

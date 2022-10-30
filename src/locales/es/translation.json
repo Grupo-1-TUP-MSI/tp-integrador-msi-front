@@ -21,6 +21,7 @@
     }
   },
   "common": {
+    "volver": "Volver",
     "comprar": "Comprar",
     "aplicarDescuento": "Aplicar descuento",
     "descuento": "Descuento",
@@ -141,6 +142,10 @@
     "logout": "Cerrar sesión"
   },
   "notifications": {
+    "facturaCreadaConExito": "Factura creada con éxito!",
+    "facturaCreadaConExitoCaption": "La factura #{{num}} se creó correctamente.",
+    "facturaCreadaConExitoSubCaption": "Puede verla en el listado de facturas o ",
+    "imprimirla": "imprimirla",
     "alertaStock": "Producto no cumple con el stock mínimo",
     "agregandoProveedor": "Agregando proveedor",
     "agregandoProductos": "Agregando productos",
