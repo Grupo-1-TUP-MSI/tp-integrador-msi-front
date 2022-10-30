@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { Avatar, Card, Col, List, Row, Table } from 'antd';
+import React, { useState } from 'react';
+import { Avatar, Card, Col, List, Row } from 'antd';
 import { PageTitle } from '@app/components/common/PageTitle/PageTitle';
 // import { useResponsive } from '@app/hooks/useResponsive';
-import * as S from './uiComponentsPages/DashboardPage.styles';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '@app/hooks/reduxHooks';
 import { themeObject } from '@app/styles/themes/themeVariables';
 import { BaseChart } from '@app/components/common/charts/BaseChart';
 import { useQuery } from '@tanstack/react-query';
-import { getReporteCompraVenta, getReportePendientesDeEntrega } from '@app/api/reportes.api';
+import { getReporteCompraVenta, getReportePendientesDeEntrega, getPieCharts } from '@app/api/reportes.api';
 import { TipoCompra } from '@app/models/models';
 import { useNavigate } from 'react-router-dom';
 import { FileOutlined } from '@ant-design/icons';
+import { PieChartCustomLegend } from '@app/components/common/charts/PieChartCustomLegend';
 
 const DashboardPage: React.FC = () => {
   const { t } = useTranslation();
@@ -75,6 +75,11 @@ const DashboardPage: React.FC = () => {
       },
     },
   );
+
+  const { data: pieChartsData, isLoading: isLoadingPieCharts } = useQuery(['getPieCharts'], getPieCharts, {
+    keepPreviousData: false,
+    refetchOnWindowFocus: false,
+  });
 
   const option = {
     legend: {
@@ -140,6 +145,10 @@ const DashboardPage: React.FC = () => {
     return t('common.aTiempo');
   };
 
+  const generateLegendData = (data: any, percent: boolean) => {
+    return data?.map((item: any) => ({ ...item, value: `${item.value}${percent ? '%' : ''}` }));
+  };
+
   return (
     <>
       <PageTitle>Dashboard</PageTitle>
@@ -184,16 +193,40 @@ const DashboardPage: React.FC = () => {
         }}
       >
         <Col xs={24} md={12} lg={6}>
-          <Card style={{ margin: 20 }} title={t('titles.tiposCompraMonto')}></Card>
+          <Card style={{ margin: 20 }} title={t('titles.tiposCompraMonto')}>
+            <PieChartCustomLegend
+              chartData={pieChartsData?.comprasMonto}
+              legendData={generateLegendData(pieChartsData?.comprasMonto, true) || []}
+              name={t('titles.tiposCompraMonto')}
+            />
+          </Card>
         </Col>
         <Col xs={24} md={12} lg={6}>
-          <Card style={{ margin: 20 }} title={t('titles.tiposVentaMonto')}></Card>
+          <Card style={{ margin: 20 }} title={t('titles.tiposVentaMonto')}>
+            <PieChartCustomLegend
+              chartData={pieChartsData?.ventasMonto}
+              legendData={generateLegendData(pieChartsData?.ventasMonto, true) || []}
+              name={t('titles.tiposCompraMonto')}
+            />
+          </Card>
         </Col>
         <Col xs={24} md={12} lg={6}>
-          <Card style={{ margin: 20 }} title={t('titles.tiposVentaCantidad')}></Card>
+          <Card style={{ margin: 20 }} title={t('titles.tiposVentaCantidad')}>
+            <PieChartCustomLegend
+              chartData={pieChartsData?.comprasCantidad}
+              legendData={generateLegendData(pieChartsData?.comprasCantidad, false) || []}
+              name={t('titles.tiposCompraMonto')}
+            />
+          </Card>
         </Col>
         <Col xs={24} md={12} lg={6}>
-          <Card style={{ margin: 20 }} title={t('titles.tiposCompraCantidad')}></Card>
+          <Card style={{ margin: 20 }} title={t('titles.tiposCompraCantidad')}>
+            <PieChartCustomLegend
+              chartData={pieChartsData?.ventasCantidad}
+              legendData={generateLegendData(pieChartsData?.ventasCantidad, false) || []}
+              name={t('titles.tiposCompraMonto')}
+            />
+          </Card>
         </Col>
       </Row>
     </>
