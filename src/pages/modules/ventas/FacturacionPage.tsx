@@ -501,7 +501,7 @@ export const FacturacionForm: React.FC = () => {
         description: t('notifications.facturaCreada'),
         duration: 3,
       });
-      navigate('/ventas/facturacion');
+      window.location.replace(res);
     },
     onError: (error: Error) => {
       notificationController.error({
