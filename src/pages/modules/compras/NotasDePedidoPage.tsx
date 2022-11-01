@@ -649,7 +649,7 @@ export const NotasDePedidoForm: React.FC = () => {
   } = useQuery(['productoDeProveedor'], () => getProductosDeProveedor(form.getFieldValue('idProveedor')), {
     keepPreviousData: false,
     refetchOnWindowFocus: false,
-    enabled: !!enabledField,
+    enabled: !!enabledField && !isEdit,
     onSuccess: (data) => {
       const newProductos = data?.map((producto: any) => {
         return {
