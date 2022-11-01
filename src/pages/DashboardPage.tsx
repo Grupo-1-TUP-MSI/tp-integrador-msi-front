@@ -20,7 +20,7 @@ const DashboardPage: React.FC = () => {
   const theme = useAppSelector((state) => state.theme.theme);
   const navigate = useNavigate();
 
-  const [data, setData] = useState<{ data1: number[]; data2: number[]; xAxisData: string[] }>({
+  const [data, setData] = useState<{ data1: string[]; data2: string[]; xAxisData: string[] }>({
     data1: [],
     data2: [],
     xAxisData: [],
@@ -43,6 +43,23 @@ const DashboardPage: React.FC = () => {
       refetchOnWindowFocus: false,
       onSuccess: (data) => {
         const { compras, ventas, meses } = data;
+        const ventasFixed: string[] = [];
+        const comprasFixed: string[] = [];
+
+        ventas.forEach((element: number) => {
+          if (!element) {
+            element = 0;
+          }
+          ventasFixed.push(element.toFixed(2));
+        });
+
+        compras.forEach((elementCompras: number) => {
+          if (!elementCompras) {
+            elementCompras = 0;
+          }
+          comprasFixed.push(elementCompras.toFixed(2));
+        });
+
         const monthsTranslatedFromNumber = meses.map((month: number) => {
           switch (month) {
             case 1:
@@ -73,7 +90,8 @@ const DashboardPage: React.FC = () => {
               return '';
           }
         });
-        setData({ data1: compras, data2: ventas, xAxisData: monthsTranslatedFromNumber });
+
+        setData({ data1: comprasFixed, data2: ventasFixed, xAxisData: monthsTranslatedFromNumber });
       },
     },
   );
