@@ -333,11 +333,15 @@ export const ProductosPage: React.FC = () => {
             loading={isLoadingProveedores || isRefetchingProveedores}
             style={{ width: '60%' }}
           >
-            {proveedoresData?.map((proveedor: Proveedor, i: number) => (
-              <Select.Option key={i} value={proveedor.id}>
-                {proveedor.id + ' - ' + proveedor.nombre}
-              </Select.Option>
-            ))}
+            {proveedoresData
+              ?.filter((p: any) => {
+                return p.estado !== false;
+              })
+              ?.map((proveedor: Proveedor, i: number) => (
+                <Select.Option key={i} value={proveedor.id}>
+                  {proveedor.id + ' - ' + proveedor.nombre}
+                </Select.Option>
+              ))}
           </Select>
         </div>
         <div
@@ -349,7 +353,7 @@ export const ProductosPage: React.FC = () => {
           }}
         >
           <div style={{ marginLeft: '3rem', marginRight: '1.2rem', width: '20%' }}>{t('common.nuevoPrecio')}:</div>
-          <InputNumber value={nuevoPrecio} onChange={setNuevoPrecio} />
+          <InputNumber min={0} value={nuevoPrecio} onChange={setNuevoPrecio} />
         </div>
         <Typography.Text
           type="secondary"
@@ -381,7 +385,7 @@ export const ProductosPage: React.FC = () => {
           }}
         >
           <div style={{ marginLeft: '3rem', marginRight: '1.2rem' }}>{t('common.newStock')}:</div>
-          <InputNumber value={newStock} onChange={setNewStock} />
+          <InputNumber min={0} value={newStock} onChange={setNewStock} />
         </div>
       </Modal>
       <div
