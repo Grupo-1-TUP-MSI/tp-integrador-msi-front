@@ -12,25 +12,26 @@ import { Divider, Menu } from 'antd';
 import { RollbackOutlined } from '@ant-design/icons';
 import { readRole } from '@app/services/localStorage.service';
 
-const sidebarNavigation =
-  readRole() === 'COMPRADOR'
-    ? compradorSidebarNavigation
-    : readRole() === 'VENDEDOR'
-    ? vendedorSidebarNavigation
-    : adminSidebarNavigation;
 interface SiderContentProps {
   setCollapsed: (isCollapsed: boolean) => void;
 }
 
-const sidebarNavFlat = sidebarNavigation.reduce(
-  (result: SidebarNavigationItem[], current) =>
-    result.concat(current.children && current.children.length > 0 ? current.children : current),
-  [],
-);
-
 const SiderMenu: React.FC<SiderContentProps> = ({ setCollapsed }) => {
   const { t } = useTranslation();
   const location = useLocation();
+
+  const sidebarNavigation =
+    readRole() === 'COMPRADOR'
+      ? compradorSidebarNavigation
+      : readRole() === 'VENDEDOR'
+      ? vendedorSidebarNavigation
+      : adminSidebarNavigation;
+
+  const sidebarNavFlat = sidebarNavigation.reduce(
+    (result: SidebarNavigationItem[], current) =>
+      result.concat(current.children && current.children.length > 0 ? current.children : current),
+    [],
+  );
 
   const currentMenuItem = sidebarNavFlat.find(({ url }) => url === location.pathname);
   const defaultSelectedKeys = currentMenuItem ? [currentMenuItem.key] : [];

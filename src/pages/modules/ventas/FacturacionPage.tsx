@@ -33,6 +33,7 @@ import jsPDFInvoiceTemplate, { OutputType, jsPDF } from 'jspdf-invoice-template'
 import { getClientes } from '@app/api/clientes.api';
 import { BotonCSV } from '@app/components/shared/BotonCSV';
 import { httpApi } from '@app/api/http.api';
+import { zeroPad } from '@app/utils/utils';
 
 export const FacturacionPage: React.FC = () => {
   const { t } = useTranslation();
@@ -225,8 +226,8 @@ export const FacturacionPage: React.FC = () => {
         email: data.cliente.email,
       },
       invoice: {
-        label: 'Factura #: ',
-        num: `${data.id} Numero: ${data.numero}`, //aca deberia ir numero
+        label: 'Factura N°: 0008-',
+        num: `${zeroPad(data.numero, 8)}`,
         invDate: `Fecha de elaboracion: ${data.fechaLocale}`,
         //invGenDate: `Fecha de entrega: ${data.vencimientoLocale}`,
         headerBorder: false,
@@ -266,7 +267,6 @@ export const FacturacionPage: React.FC = () => {
           {
             col1: 'Gravado:',
             col2: data.acumGravado.toLocaleString(),
-            col3: 'ALL',
             style: {
               fontSize: 10, //optional, default 12
             },
@@ -274,7 +274,6 @@ export const FacturacionPage: React.FC = () => {
           {
             col1: 'IVA:',
             col2: data.acumIVA.toLocaleString(),
-            col3: '%',
             style: {
               fontSize: 10, //optional, default 12
             },
@@ -282,7 +281,6 @@ export const FacturacionPage: React.FC = () => {
           {
             col1: 'Total:',
             col2: data.acumTotal.toLocaleString(),
-            col3: 'ALL',
             style: {
               fontSize: 14, //optional, default 12
             },
@@ -514,7 +512,7 @@ export const FacturacionForm: React.FC = () => {
 
   const handleSubmit = (values: any) => {
     const factura = {
-      fecha: new Date(values?.fecha).toLocaleDateString(),
+      fecha: new Date(values?.fecha),
       idCliente: values?.idCliente,
       idTipoVenta: values?.idTipoVenta,
       idTipoPago: values?.idTipoPago,

@@ -11,7 +11,7 @@ export const camelize = (string: string): string => {
 type MarkArea = {
   xAxis: number;
 };
-
+export const zeroPad = (num: number, places: number) => String(num).padStart(places, '0');
 export const getMarkAreaData = (data: string[] | number[]): MarkArea[][] =>
   data.map((el, index) => [
     {

@@ -303,8 +303,8 @@ export const NotasDePedidoPage: React.FC = () => {
         email: data.proveedor.email,
       },
       invoice: {
-        label: 'Nota de Pedido#: ',
-        num: `${data.id} Version: ${data.version}`,
+        label: 'Nota de Pedido N°: ',
+        num: `${data.id}.${data.version}`,
         invDate: `Fecha de elaboracion: ${data.fechaLocale}`,
         invGenDate: `Fecha de entrega: ${data.vencimientoLocale}`,
         headerBorder: false,
@@ -344,7 +344,6 @@ export const NotasDePedidoPage: React.FC = () => {
           {
             col1: 'Gravado:',
             col2: data.acumGravado.toLocaleString(),
-            col3: 'ALL',
             style: {
               fontSize: 10, //optional, default 12
             },
@@ -352,7 +351,6 @@ export const NotasDePedidoPage: React.FC = () => {
           {
             col1: 'IVA:',
             col2: data.acumIVA.toLocaleString(),
-            col3: '%',
             style: {
               fontSize: 10, //optional, default 12
             },
@@ -360,7 +358,6 @@ export const NotasDePedidoPage: React.FC = () => {
           {
             col1: 'Total:',
             col2: data.acumTotal.toLocaleString(),
-            col3: 'ALL',
             style: {
               fontSize: 14, //optional, default 12
             },
@@ -742,7 +739,7 @@ export const NotasDePedidoForm: React.FC = () => {
           otherInfo: 'www.alba.com.ar',
         },
         invoice: {
-          label: 'Nota de Pedido#: ',
+          label: 'Nota de Pedido N°: ',
           num: 320,
           invDate: 'Fecha de elaboracion: 01/01/2022 18:12',
           invGenDate: 'Fecha de vencimiento: 02/02/2022 10:17',
@@ -783,7 +780,6 @@ export const NotasDePedidoForm: React.FC = () => {
             {
               col1: 'Total:',
               col2: '6015',
-              col3: 'ALL',
               style: {
                 fontSize: 14, //optional, default 12
               },
@@ -791,7 +787,6 @@ export const NotasDePedidoForm: React.FC = () => {
             {
               col1: 'IVA:',
               col2: '21',
-              col3: '%',
               style: {
                 fontSize: 10, //optional, default 12
               },
@@ -799,7 +794,6 @@ export const NotasDePedidoForm: React.FC = () => {
             {
               col1: 'SubTotal:',
               col2: '4.751,85',
-              col3: 'ALL',
               style: {
                 fontSize: 10, //optional, default 12
               },
@@ -938,8 +932,8 @@ export const NotasDePedidoForm: React.FC = () => {
         email: data.proveedor.email,
       },
       invoice: {
-        label: 'Nota de Pedido#: ',
-        num: `${data.id} Version: ${data.version}`,
+        label: 'Nota de Pedido N°: ',
+        num: `${data.id}.${data.version}`,
         invDate: `Fecha de elaboracion: ${data.fechaLocale}`,
         invGenDate: `Fecha de entrega: ${data.vencimientoLocale}`,
         headerBorder: false,
@@ -979,7 +973,6 @@ export const NotasDePedidoForm: React.FC = () => {
           {
             col1: 'Gravado:',
             col2: data.acumGravado.toLocaleString(),
-            col3: 'ALL',
             style: {
               fontSize: 10, //optional, default 12
             },
@@ -987,7 +980,6 @@ export const NotasDePedidoForm: React.FC = () => {
           {
             col1: 'IVA:',
             col2: data.acumIVA.toLocaleString(),
-            col3: '%',
             style: {
               fontSize: 10, //optional, default 12
             },
@@ -995,7 +987,6 @@ export const NotasDePedidoForm: React.FC = () => {
           {
             col1: 'Total:',
             col2: data.acumTotal.toLocaleString(),
-            col3: 'ALL',
             style: {
               fontSize: 14, //optional, default 12
             },

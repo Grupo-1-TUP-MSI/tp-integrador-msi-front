@@ -25,6 +25,8 @@ import { UsuariosForm } from '@app/pages/modules/UsuariosPage';
 import { UsuariosPage } from '@app/pages/modules/UsuariosPage';
 import { GananciasPage } from '@app/pages/modules/ventas/GananciasPage';
 import { FacturaSuccess } from '@app/pages/modules/ventas/FacturaSuccess';
+import RequireVentasRole from './RequireVentasRole';
+import RequireComprasRole from './RequireComprasRole';
 
 const ServerErrorPage = React.lazy(() => import('@app/pages/ServerErrorPage'));
 const Error404Page = React.lazy(() => import('@app/pages/Error404Page'));
@@ -56,7 +58,19 @@ export const AppRouter: React.FC = () => {
       <MainLayout />
     </RequireAuth>
   );
-  if (readRole() === 'COMPRADOR') {
+
+  const protectedVentasLayout = (
+    <RequireVentasRole>
+      <MainLayout />
+    </RequireVentasRole>
+  );
+
+  const protectedComprasLayout = (
+    <RequireComprasRole>
+      <MainLayout />
+    </RequireComprasRole>
+  );
+  /* if (readRole() === 'COMPRADOR') {
     return (
       <BrowserRouter>
         <Routes>
@@ -109,7 +123,7 @@ export const AppRouter: React.FC = () => {
         </Routes>
       </BrowserRouter>
     );
-  }
+  } */
 
   return (
     <BrowserRouter>
@@ -120,25 +134,7 @@ export const AppRouter: React.FC = () => {
         <Route path="/logout" element={<LogoutFallback />} />
         <Route path="/" element={protectedLayout}>
           <Route index element={<DashboardPage />} />
-          <Route path="ventas">
-            <Route path="clientes" element={<ClientesP />} />
-            <Route path="clientes/alta" element={<ClientesF />} />
-            <Route path="clientes/:id" element={<ClientesF />} />
-            <Route path="facturacion" element={<FacturacionP />} />
-            <Route path="facturacion/alta" element={<FacturacionF />} />
-            <Route path="facturacion/:id" element={<FacturacionF />} />
-            <Route path="facturacion/pago-exitoso/:id" element={<FacturasSuccess />} />
-            <Route path="ganancias" element={<Ganancias />} />
-          </Route>
-          <Route path="compras">
-            <Route path="proveedores" element={<ProveedoresP />} />
-            <Route path="proveedores/alta" element={<ProveedoresF />} />
-            <Route path="proveedores/:id" element={<ProveedoresF />} />
-            <Route path="proveedores/comparativa" element={<ProveedoresC />} />
-            <Route path="notapedido" element={<NotasDePedidoP />} />
-            <Route path="notapedido/alta" element={<NotasDePedidoF />} />
-            <Route path="notapedido/:id" element={<NotasDePedidoF />} />
-          </Route>
+
           <Route path="productos" element={<ProductosP />} />
           <Route path="productos/alta" element={<ProductosF />} />
           <Route path="productos/:id" element={<ProductosF />} />
@@ -146,6 +142,25 @@ export const AppRouter: React.FC = () => {
           <Route path="usuarios/alta" element={<UsuariosF />} />
           <Route path="usuarios/:id" element={<UsuariosF />} />
           <Route path="500" element={<ServerError />} />
+        </Route>
+        <Route path="/ventas" element={protectedVentasLayout}>
+          <Route path="clientes" element={<ClientesP />} />
+          <Route path="clientes/alta" element={<ClientesF />} />
+          <Route path="clientes/:id" element={<ClientesF />} />
+          <Route path="facturacion" element={<FacturacionP />} />
+          <Route path="facturacion/alta" element={<FacturacionF />} />
+          <Route path="facturacion/:id" element={<FacturacionF />} />
+          <Route path="facturacion/pago-exitoso/:id" element={<FacturasSuccess />} />
+          <Route path="ganancias" element={<Ganancias />} />
+        </Route>
+        <Route path="/compras" element={protectedComprasLayout}>
+          <Route path="proveedores" element={<ProveedoresP />} />
+          <Route path="proveedores/alta" element={<ProveedoresF />} />
+          <Route path="proveedores/:id" element={<ProveedoresF />} />
+          <Route path="proveedores/comparativa" element={<ProveedoresC />} />
+          <Route path="notapedido" element={<NotasDePedidoP />} />
+          <Route path="notapedido/alta" element={<NotasDePedidoF />} />
+          <Route path="notapedido/:id" element={<NotasDePedidoF />} />
         </Route>
         <Route path="*" element={<Error404 />} />
       </Routes>

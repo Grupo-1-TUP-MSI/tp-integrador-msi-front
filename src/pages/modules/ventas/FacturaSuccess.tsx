@@ -1,5 +1,6 @@
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { getFacturaPDF } from '@app/api/facturas.api';
+import { zeroPad } from '@app/utils/utils';
 import { Button, Col, Row, Typography } from 'antd';
 import jsPDFInvoiceTemplate, { OutputType } from 'jspdf-invoice-template';
 import React from 'react';
@@ -55,8 +56,8 @@ export const FacturaSuccess = () => {
         email: data.cliente.email,
       },
       invoice: {
-        label: 'Factura #: ',
-        num: `${data.id} Numero: ${data.numero}`,
+        label: 'Factura N°: 0008-',
+        num: `${zeroPad(data.numero, 8)}`,
         invDate: `Fecha de elaboracion: ${data.fechaLocale}`,
         //invGenDate: `Fecha de entrega: ${data.vencimientoLocale}`,
         headerBorder: false,
@@ -96,7 +97,6 @@ export const FacturaSuccess = () => {
           {
             col1: 'Gravado:',
             col2: data.acumGravado.toLocaleString(),
-            col3: 'ALL',
             style: {
               fontSize: 10, //optional, default 12
             },
@@ -104,7 +104,6 @@ export const FacturaSuccess = () => {
           {
             col1: 'IVA:',
             col2: data.acumIVA.toLocaleString(),
-            col3: '%',
             style: {
               fontSize: 10, //optional, default 12
             },
@@ -112,7 +111,6 @@ export const FacturaSuccess = () => {
           {
             col1: 'Total:',
             col2: data.acumTotal.toLocaleString(),
-            col3: 'ALL',
             style: {
               fontSize: 14, //optional, default 12
             },
