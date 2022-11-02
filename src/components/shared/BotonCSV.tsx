@@ -1,10 +1,11 @@
 import { ExportOutlined } from '@ant-design/icons';
-import { Button } from 'antd';
+import { Button, Tooltip } from 'antd';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 export const BotonCSV = ({ list, fileName }: any) => {
+  const { t } = useTranslation();
   const exportToCSV = () => {
-    console.log(list);
     const replacer = (key: any, value: any) => (value === null ? '' : value);
     const header = Object.keys(list[0]);
     let csv = list.map((row: any) => header.map((fieldName) => JSON.stringify(row[fieldName], replacer)).join(','));
@@ -23,16 +24,18 @@ export const BotonCSV = ({ list, fileName }: any) => {
     document.body.removeChild(link);
   };
   return (
-    <Button
-      style={{
-        color: 'var(--warning-color)',
-        borderRadius: '2rem',
-      }}
-      icon={<ExportOutlined />}
-      onClick={() => {
-        exportToCSV();
-      }}
-      type="text"
-    ></Button>
+    <Tooltip placement="left" title={t('common.exportarPDF')} trigger="hover" destroyTooltipOnHide>
+      <Button
+        style={{
+          color: 'var(--warning-color)',
+          borderRadius: '2rem',
+        }}
+        icon={<ExportOutlined />}
+        onClick={() => {
+          exportToCSV();
+        }}
+        type="text"
+      ></Button>
+    </Tooltip>
   );
 };

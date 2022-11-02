@@ -15,7 +15,15 @@ import {
   Typography,
 } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { DeleteOutlined, DownloadOutlined, EditOutlined, PlusOutlined, SubnodeOutlined } from '@ant-design/icons';
+import {
+  DeleteOutlined,
+  DownloadOutlined,
+  DownOutlined,
+  EditOutlined,
+  PlusOutlined,
+  RightOutlined,
+  SubnodeOutlined,
+} from '@ant-design/icons';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { Proveedor, EstadoNP, TipoCompra, Usuario } from '@app/models/models';
 import { useLocation, useNavigate, useParams } from 'react-router';
@@ -38,6 +46,7 @@ import locale from 'antd/es/date-picker/locale/es_ES';
 import { getProductosDeProveedor } from '@app/api/productos.api';
 import jsPDFInvoiceTemplate, { OutputType, jsPDF } from 'jspdf-invoice-template';
 import { BotonCSV } from '@app/components/shared/BotonCSV';
+import { useResponsive } from '@app/hooks/useResponsive';
 
 export const NotasDePedidoPage: React.FC = () => {
   const { t } = useTranslation();
@@ -151,10 +160,22 @@ export const NotasDePedidoPage: React.FC = () => {
       key: 'acciones',
       render: (text: any, record: any) => (
         <Space>
+          <Tooltip placement="top" title={t('common.editar')} trigger="hover" destroyTooltipOnHide>
+            <Button
+              size="small"
+              icon={<EditOutlined />}
+              disabled={record.idestadonp > 1}
+              type="text"
+              onClick={() => {
+                navigate(`/compras/notapedido/${record.id}`);
+              }}
+            ></Button>
+          </Tooltip>
           <Tooltip placement="top" title={t('common.actualizarEstado')} trigger="hover" destroyTooltipOnHide>
             <Button
+              size="small"
               icon={<SubnodeOutlined />}
-              disabled={record.idestadonp === 4}
+              disabled={record.idestadonp === 3 || record.idestadonp === 4}
               type="text"
               onClick={() => {
                 setModalEstado(true);
@@ -162,25 +183,16 @@ export const NotasDePedidoPage: React.FC = () => {
               }}
             ></Button>
           </Tooltip>
-          {
-            <Tooltip placement="top" title={t('common.exportarPDF')} trigger="hover" destroyTooltipOnHide>
-              <Button
-                icon={<DownloadOutlined />}
-                type="text"
-                onClick={() => {
-                  imprimirPDF(record.id);
-                }}
-              ></Button>
-            </Tooltip>
-          }
-          <Button
-            icon={<EditOutlined />}
-            disabled={record.idestadonp > 1}
-            type="text"
-            onClick={() => {
-              navigate(`/compras/notapedido/${record.id}`);
-            }}
-          ></Button>
+          <Tooltip placement="top" title={t('common.exportarPDF')} trigger="hover" destroyTooltipOnHide>
+            <Button
+              size="small"
+              icon={<DownloadOutlined />}
+              type="text"
+              onClick={() => {
+                imprimirPDF(record.id);
+              }}
+            ></Button>
+          </Tooltip>
         </Space>
       ),
     },
@@ -199,7 +211,7 @@ export const NotasDePedidoPage: React.FC = () => {
         key: 'precio',
         width: '10%',
         render: (text: any, record: any) => {
-          return <span>ARS ${record.precio}</span>;
+          return <span>${record.precio}</span>;
         },
       },
       {
@@ -207,7 +219,7 @@ export const NotasDePedidoPage: React.FC = () => {
         key: 'iva',
         width: '10%',
         render: (text: any, record: any) => {
-          return <span>ARS ${Math.round(record.precio * 0.21)}</span>;
+          return <span>${Math.round(record.precio * 0.21)}</span>;
         },
       },
       {
@@ -222,7 +234,7 @@ export const NotasDePedidoPage: React.FC = () => {
         width: '10%',
 
         render: (text: any, record: any) => {
-          return <span>ARS ${Math.round(record.precio * record.cantidadpedida * 1.21)}</span>;
+          return <span>${Math.round(record.precio * record.cantidadpedida * 1.21)}</span>;
         },
       },
     ];
@@ -231,6 +243,7 @@ export const NotasDePedidoPage: React.FC = () => {
 
     return (
       <Table
+        size="small"
         rowKey={(record) => record.id}
         columns={columns}
         dataSource={data}
@@ -258,6 +271,30 @@ export const NotasDePedidoPage: React.FC = () => {
         }}
       />
     );
+  };
+
+  const expandIcon = (props: any) => {
+    if (props.expanded) {
+      return (
+        <a
+          onClick={(e) => {
+            props.onExpand(props.record, e);
+          }}
+        >
+          <DownOutlined />
+        </a>
+      );
+    } else {
+      return (
+        <a
+          onClick={(e) => {
+            props.onExpand(props.record, e);
+          }}
+        >
+          <RightOutlined />
+        </a>
+      );
+    }
   };
 
   const imprimirPDF = async (id: number) => {
@@ -467,16 +504,18 @@ export const NotasDePedidoPage: React.FC = () => {
         <h1 style={{ color: 'var(--timeline-background)' }}>{t('common.notapedido')}</h1>
 
         <div>
-          <Button
-            style={{
-              color: 'var(--success-color)',
-              borderRadius: '2rem',
-            }}
-            className="success-button"
-            icon={<PlusOutlined />}
-            type="text"
-            onClick={() => navigate('/compras/notapedido/alta')}
-          ></Button>
+          <Tooltip placement="left" title={t('common.crear')} trigger="hover" destroyTooltipOnHide>
+            <Button
+              style={{
+                color: 'var(--success-color)',
+                borderRadius: '2rem',
+              }}
+              className="success-button"
+              icon={<PlusOutlined />}
+              type="text"
+              onClick={() => navigate('/compras/notapedido/alta')}
+            ></Button>
+          </Tooltip>
           <BotonCSV list={npFiltradas()} fileName={'notasDePedido'} />
         </div>
       </div>
@@ -573,9 +612,10 @@ export const NotasDePedidoPage: React.FC = () => {
         </Select>
       </div>
       <Table
+        size="small"
         rowKey={(record) => record.id}
         rowClassName={(record) => (record.idestadonp === 4 ? 'deleted-row' : '')}
-        expandable={{ expandedRowRender }}
+        expandable={{ expandedRowRender, expandIcon }}
         columns={columns}
         dataSource={npFiltradas()}
         loading={isLoadingNotasDePedido || isLoadingProveedores || isLoadingUsuarios || isRefetchingNotasDePedido}
@@ -619,6 +659,7 @@ export const NotasDePedidoForm: React.FC = () => {
   const [proveedor, setProveedor] = React.useState(null);
   const enabledField = Form.useWatch('idProveedor', form);
   const [isImprimirPDF, setImprimirPDF] = React.useState(false);
+  const { isTablet } = useResponsive();
 
   React.useEffect(() => {
     if (productosComparativa) {
@@ -1015,13 +1056,16 @@ export const NotasDePedidoForm: React.FC = () => {
       dataIndex: 'precio',
       key: 'precio',
       width: '5%',
+      render: (text: any, record: any) => {
+        return <span>${record.precio}</span>;
+      },
     },
     {
       title: t('common.iva'),
       key: 'iva',
       width: '5%',
       render: (text: any, record: any) => {
-        return <span>{record.precio * 0.21}</span>;
+        return <span>${record.precio * 0.21}</span>;
       },
     },
     {
@@ -1035,7 +1079,7 @@ export const NotasDePedidoForm: React.FC = () => {
       key: 'importetotal',
       width: '5%',
       render: (text: any, record: any) => {
-        return <span>{record.precio * record.cantidad * 1.21}</span>;
+        return <span>${record.precio * record.cantidad * 1.21}</span>;
       },
     },
     {
@@ -1045,6 +1089,7 @@ export const NotasDePedidoForm: React.FC = () => {
       render: (text: any, record: any) => (
         <Space>
           <Button
+            size="small"
             icon={<DeleteOutlined />}
             type="text"
             danger
@@ -1068,24 +1113,28 @@ export const NotasDePedidoForm: React.FC = () => {
       title: t('common.nombre'),
       dataIndex: 'productoNombre',
       key: 'productoNombre',
+      width: '70%',
     },
     {
       title: t('common.importeunitario'),
       dataIndex: 'precio',
       key: 'precio',
-      width: '5%',
+      render: (text: any, record: any) => {
+        return <span>${record.precio}</span>;
+      },
     },
     {
       title: t('common.cantidad'),
       dataIndex: 'cantidad',
       key: 'cantidad',
-      width: '5%',
+      minWidth: '120px',
       render: (text: any, record: any) => {
         return (
           <InputNumber
             min={0}
             max={record.stock}
             defaultValue={0}
+            style={{ width: '120px' }}
             value={(productos as any).find((p: any) => p.idproducto === record.idproducto)?.cantidad}
             onChange={(value) => {
               const newProductos = productos.map((p: any) => {
@@ -1135,133 +1184,269 @@ export const NotasDePedidoForm: React.FC = () => {
     <div id="nota-de-pedido-form">
       {/* #region Formulario  */}
       <Row>
-        <Col span={24}>
-          <BaseForm layout="vertical" onFinish={handleSubmit} requiredMark="optional" form={form}>
-            <Row justify="space-between">
-              <h1>{isEdit ? t('titles.editandoNP') : t('titles.creandoNP')}</h1>
-              <BaseForm.Item>
-                <SubmitButton
-                  type="primary"
-                  htmlType="submit"
-                  loading={isLoading || isLoadingEdit}
-                  disabled={!detalles || detalles.length === 0}
-                >
-                  {isEdit ? t('common.editar') : t('common.confirmar')}
-                </SubmitButton>
-              </BaseForm.Item>
-            </Row>
-            <p>
-              {t('common.fecha') +
-                `: ${
-                  form.getFieldValue('fecha')
-                    ? new Date(form.getFieldValue('fecha')).toLocaleDateString()
-                    : new Date().toLocaleDateString()
-                }`}
-            </p>
-
-            <Row
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-              }}
-            >
-              <Col span={6}>
-                <FormItem
-                  requiredMark
-                  name="idProveedor"
-                  label={t('common.proveedores')}
-                  rules={[{ required: true, message: t('common.requiredField') }]}
-                >
-                  <Select
-                    allowClear
-                    disabled={isEdit}
-                    onChange={(value) => {
-                      setProveedor(value);
-                      productosDeProveedorRefetch();
-                    }}
+        {isTablet ? (
+          <Col span={24}>
+            <BaseForm layout="vertical" onFinish={handleSubmit} requiredMark="optional" form={form}>
+              <Row justify="space-between">
+                <h1>{isEdit ? t('titles.editandoNP') : t('titles.creandoNP')}</h1>
+                <BaseForm.Item>
+                  <SubmitButton
+                    type="primary"
+                    htmlType="submit"
+                    loading={isLoading || isLoadingEdit}
+                    disabled={!detalles || detalles.length === 0}
                   >
-                    {proveedoresData?.map((proveedor: Proveedor, i: number) => (
-                      <Select.Option key={i} value={proveedor?.id}>
-                        {proveedor?.nombre}
-                      </Select.Option>
-                    ))}
-                  </Select>
-                </FormItem>
-              </Col>
-              <Col span={6} offset={1}>
-                <FormItem
-                  requiredMark
-                  name="idTipoCompra"
-                  label={t('common.tipocompra')}
-                  rules={[{ required: true, message: t('common.requiredField') }]}
-                >
-                  <Select allowClear>
-                    {TipoCompra.map((tc, i) => (
-                      <Select.Option key={i} value={i + 1}>
-                        {tc}
-                      </Select.Option>
-                    ))}
-                  </Select>
-                </FormItem>
-              </Col>
-              <Col span={6} offset={1}>
-                <FormItem
-                  requiredMark
-                  name="plazoentrega"
-                  label={t('common.plazoentrega')}
-                  rules={[{ required: true, message: t('common.requiredField') }]}
-                >
-                  <InputNumber addonAfter="días." style={{ width: '100%' }} />
-                </FormItem>
-              </Col>
-              <Col offset={3} span={1}>
-                <Button
-                  style={{
-                    color: 'var(--success-color)',
-                    borderRadius: '2rem',
-                  }}
-                  className="success-button"
-                  icon={<PlusOutlined />}
-                  type="text"
-                  disabled={!proveedor}
-                  onClick={() => {
-                    setModalVisible(true);
-                  }}
-                ></Button>
-              </Col>
-            </Row>
-            <Row>
-              <Col span={24}>
-                <Table
-                  rowKey={(record) => record.id}
-                  columns={columns}
-                  dataSource={detalles}
-                  loading={isEdit && isLoadingNP}
-                  scroll={{ x: 800 }}
-                  locale={{
-                    filterTitle: t('table.filterTitle'),
-                    filterConfirm: t('table.filterConfirm'),
-                    filterReset: t('table.filterReset'),
-                    filterEmptyText: t('table.filterEmptyText'),
-                    filterCheckall: t('table.filterCheckall'),
-                    filterSearchPlaceholder: t('table.filterSearchPlaceholder'),
-                    emptyText: t('table.emptyText'),
-                    selectAll: t('table.selectAll'),
-                    selectInvert: t('table.selectInvert'),
-                    selectNone: t('table.selectNone'),
-                    selectionAll: t('table.selectionAll'),
-                    sortTitle: t('table.sortTitle'),
-                    expand: t('table.expand'),
-                    collapse: t('table.collapse'),
-                    triggerDesc: t('table.triggerDesc'),
-                    triggerAsc: t('table.triggerAsc'),
-                    cancelSort: t('table.cancelSort'),
-                  }}
-                />
-              </Col>
-            </Row>
-          </BaseForm>
-        </Col>
+                    {isEdit ? t('common.editar') : t('common.confirmar')}
+                  </SubmitButton>
+                </BaseForm.Item>
+              </Row>
+              <p>
+                {t('common.fecha') +
+                  `: ${
+                    form.getFieldValue('fecha')
+                      ? new Date(form.getFieldValue('fecha')).toLocaleDateString()
+                      : new Date().toLocaleDateString()
+                  }`}
+              </p>
+
+              <Row
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
+              >
+                <Col span={6}>
+                  <FormItem
+                    requiredMark
+                    name="idProveedor"
+                    label={t('common.proveedores')}
+                    rules={[{ required: true, message: t('common.requiredField') }]}
+                  >
+                    <Select
+                      allowClear
+                      disabled={isEdit}
+                      onChange={(value) => {
+                        setProveedor(value);
+                        productosDeProveedorRefetch();
+                      }}
+                    >
+                      {proveedoresData?.map((proveedor: Proveedor, i: number) => (
+                        <Select.Option key={i} value={proveedor?.id}>
+                          {proveedor?.nombre}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </FormItem>
+                </Col>
+                <Col span={6} offset={1}>
+                  <FormItem
+                    requiredMark
+                    name="idTipoCompra"
+                    label={t('common.tipocompra')}
+                    rules={[{ required: true, message: t('common.requiredField') }]}
+                  >
+                    <Select allowClear>
+                      {TipoCompra.map((tc, i) => (
+                        <Select.Option key={i} value={i + 1}>
+                          {tc}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </FormItem>
+                </Col>
+                <Col span={6} offset={1}>
+                  <FormItem
+                    requiredMark
+                    name="plazoentrega"
+                    label={t('common.plazoentrega')}
+                    rules={[{ required: true, message: t('common.requiredField') }]}
+                  >
+                    <InputNumber min={0} addonAfter="días." style={{ width: '100%' }} />
+                  </FormItem>
+                </Col>
+                <Col offset={3} span={1}>
+                  <Tooltip placement="left" title={t('common.agregarProductos')} trigger="hover" destroyTooltipOnHide>
+                    <Button
+                      style={{
+                        color: 'var(--success-color)',
+                        borderRadius: '2rem',
+                      }}
+                      className="success-button"
+                      icon={<PlusOutlined />}
+                      type="text"
+                      disabled={!proveedor}
+                      onClick={() => {
+                        setModalVisible(true);
+                      }}
+                    ></Button>
+                  </Tooltip>
+                </Col>
+              </Row>
+              <Row>
+                <Col span={24}>
+                  <Table
+                    size="small"
+                    rowKey={(record) => record.id}
+                    columns={columns}
+                    dataSource={detalles}
+                    loading={isEdit && isLoadingNP}
+                    scroll={{ x: 800 }}
+                    locale={{
+                      filterTitle: t('table.filterTitle'),
+                      filterConfirm: t('table.filterConfirm'),
+                      filterReset: t('table.filterReset'),
+                      filterEmptyText: t('table.filterEmptyText'),
+                      filterCheckall: t('table.filterCheckall'),
+                      filterSearchPlaceholder: t('table.filterSearchPlaceholder'),
+                      emptyText: t('table.emptyText'),
+                      selectAll: t('table.selectAll'),
+                      selectInvert: t('table.selectInvert'),
+                      selectNone: t('table.selectNone'),
+                      selectionAll: t('table.selectionAll'),
+                      sortTitle: t('table.sortTitle'),
+                      expand: t('table.expand'),
+                      collapse: t('table.collapse'),
+                      triggerDesc: t('table.triggerDesc'),
+                      triggerAsc: t('table.triggerAsc'),
+                      cancelSort: t('table.cancelSort'),
+                    }}
+                  />
+                </Col>
+              </Row>
+            </BaseForm>
+          </Col>
+        ) : (
+          <Col span={24}>
+            <BaseForm layout="vertical" onFinish={handleSubmit} requiredMark="optional" form={form}>
+              <Row justify="space-between">
+                <h1>{isEdit ? t('titles.editandoNP') : t('titles.creandoNP')}</h1>
+                <BaseForm.Item>
+                  <SubmitButton
+                    type="primary"
+                    htmlType="submit"
+                    loading={isLoading || isLoadingEdit}
+                    disabled={!detalles || detalles.length === 0}
+                  >
+                    {isEdit ? t('common.editar') : t('common.confirmar')}
+                  </SubmitButton>
+                </BaseForm.Item>
+              </Row>
+              <p>
+                {t('common.fecha') +
+                  `: ${
+                    form.getFieldValue('fecha')
+                      ? new Date(form.getFieldValue('fecha')).toLocaleDateString()
+                      : new Date().toLocaleDateString()
+                  }`}
+              </p>
+
+              <Row
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
+              >
+                <Col span={24}>
+                  <FormItem
+                    requiredMark
+                    name="idProveedor"
+                    label={t('common.proveedores')}
+                    rules={[{ required: true, message: t('common.requiredField') }]}
+                  >
+                    <Select
+                      allowClear
+                      disabled={isEdit}
+                      onChange={(value) => {
+                        setProveedor(value);
+                        productosDeProveedorRefetch();
+                      }}
+                    >
+                      {proveedoresData?.map((proveedor: Proveedor, i: number) => (
+                        <Select.Option key={i} value={proveedor?.id}>
+                          {proveedor?.nombre}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </FormItem>
+                </Col>
+                <Col span={24}>
+                  <FormItem
+                    requiredMark
+                    name="idTipoCompra"
+                    label={t('common.tipocompra')}
+                    rules={[{ required: true, message: t('common.requiredField') }]}
+                  >
+                    <Select allowClear>
+                      {TipoCompra.map((tc, i) => (
+                        <Select.Option key={i} value={i + 1}>
+                          {tc}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </FormItem>
+                </Col>
+                <Col span={24}>
+                  <FormItem
+                    requiredMark
+                    name="plazoentrega"
+                    label={t('common.plazoentrega')}
+                    rules={[{ required: true, message: t('common.requiredField') }]}
+                  >
+                    <InputNumber min={0} addonAfter="días." style={{ width: '100%' }} />
+                  </FormItem>
+                </Col>
+                <Col offset={21} span={3}>
+                  <Tooltip placement="left" title={t('common.agregarProductos')} trigger="hover" destroyTooltipOnHide>
+                    <Button
+                      style={{
+                        color: 'var(--success-color)',
+                        borderRadius: '2rem',
+                      }}
+                      className="success-button"
+                      icon={<PlusOutlined />}
+                      type="text"
+                      disabled={!proveedor}
+                      onClick={() => {
+                        setModalVisible(true);
+                      }}
+                    ></Button>
+                  </Tooltip>
+                </Col>
+              </Row>
+              <Row>
+                <Col span={24}>
+                  <Table
+                    size="small"
+                    rowKey={(record) => record.id}
+                    columns={columns}
+                    dataSource={detalles}
+                    loading={isEdit && isLoadingNP}
+                    scroll={{ x: 800 }}
+                    locale={{
+                      filterTitle: t('table.filterTitle'),
+                      filterConfirm: t('table.filterConfirm'),
+                      filterReset: t('table.filterReset'),
+                      filterEmptyText: t('table.filterEmptyText'),
+                      filterCheckall: t('table.filterCheckall'),
+                      filterSearchPlaceholder: t('table.filterSearchPlaceholder'),
+                      emptyText: t('table.emptyText'),
+                      selectAll: t('table.selectAll'),
+                      selectInvert: t('table.selectInvert'),
+                      selectNone: t('table.selectNone'),
+                      selectionAll: t('table.selectionAll'),
+                      sortTitle: t('table.sortTitle'),
+                      expand: t('table.expand'),
+                      collapse: t('table.collapse'),
+                      triggerDesc: t('table.triggerDesc'),
+                      triggerAsc: t('table.triggerAsc'),
+                      cancelSort: t('table.cancelSort'),
+                    }}
+                  />
+                </Col>
+              </Row>
+            </BaseForm>
+          </Col>
+        )}
       </Row>
       {/* #region Agregado de Productos  */}
       <Modal
@@ -1286,6 +1471,7 @@ export const NotasDePedidoForm: React.FC = () => {
           </Col>
         </Row>
         <Table
+          size="small"
           rowKey={(record) => record.id}
           columns={agregarProductosColumnas}
           dataSource={filteredProductos()}

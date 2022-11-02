@@ -4,7 +4,7 @@ export const TipoVenta = ['SALON', 'ONLINE'];
 export const TipoCompra = ['LOCAL', 'EXTERIOR'];
 export const TiposDocumento = ['DNI', 'CUIT', 'CUIL', 'PASAPORTE'];
 export const EstadoNP = ['PEND_ACEPTACION', 'PEND_ENTREGA', 'CERRADA', 'RECHAZADA'];
-export const TiposIVA = ['I', 'M', 'C'];
+export const TiposIVA = ['Responsable Inscripto', 'Monotributista', 'Consumidor Final'];
 
 export interface Usuario {
   id?: number;

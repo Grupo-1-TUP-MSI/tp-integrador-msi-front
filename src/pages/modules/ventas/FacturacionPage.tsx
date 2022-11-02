@@ -16,7 +16,7 @@ import {
   Typography,
 } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { DeleteOutlined, DownloadOutlined, PlusOutlined } from '@ant-design/icons';
+import { DeleteOutlined, DownloadOutlined, DownOutlined, PlusOutlined, RightOutlined } from '@ant-design/icons';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { Cliente, Proveedor, TiposPago, TipoVenta, Usuario } from '@app/models/models';
 import { useNavigate, useParams } from 'react-router';
@@ -28,12 +28,12 @@ import { Table } from '@app/components/common/Table/Table';
 import { getFacturas, getFacturaPDF, postFactura } from '@app/api/facturas.api';
 import { getUsuarios } from '@app/api/usuarios.api';
 import locale from 'antd/es/date-picker/locale/es_ES';
-import { getProductos, getProductosDeProveedor } from '@app/api/productos.api';
-import jsPDFInvoiceTemplate, { OutputType, jsPDF } from 'jspdf-invoice-template';
+import { getProductos } from '@app/api/productos.api';
+import jsPDFInvoiceTemplate, { OutputType } from 'jspdf-invoice-template';
 import { getClientes } from '@app/api/clientes.api';
 import { BotonCSV } from '@app/components/shared/BotonCSV';
-import { httpApi } from '@app/api/http.api';
 import { zeroPad } from '@app/utils/utils';
+import { useResponsive } from '@app/hooks/useResponsive';
 
 export const FacturacionPage: React.FC = () => {
   const { t } = useTranslation();
@@ -44,6 +44,7 @@ export const FacturacionPage: React.FC = () => {
   const [filterCliente, setFilterCliente] = React.useState(null);
   const [filterTipoVenta, setFilterTipoVenta] = React.useState<number | null>(null);
   const [filterDates, setFilterDates] = React.useState<any>([]);
+  const { isTablet } = useResponsive();
 
   const { data: facturasData, isLoading: isLoadingFacturas } = useQuery(['facturas'], getFacturas, {
     keepPreviousData: false,
@@ -99,6 +100,7 @@ export const FacturacionPage: React.FC = () => {
         <Space>
           <Tooltip placement="top" title={t('common.exportarPDF')} trigger="hover" destroyTooltipOnHide>
             <Button
+              size="small"
               icon={<DownloadOutlined />}
               type="text"
               onClick={() => {
@@ -110,6 +112,31 @@ export const FacturacionPage: React.FC = () => {
       ),
     },
   ];
+
+  const expandIcon = (props: any) => {
+    if (props.expanded) {
+      return (
+        <a
+          onClick={(e) => {
+            props.onExpand(props.record, e);
+          }}
+        >
+          <DownOutlined />
+        </a>
+      );
+    } else {
+      return (
+        <a
+          onClick={(e) => {
+            props.onExpand(props.record, e);
+          }}
+        >
+          <RightOutlined />
+        </a>
+      );
+    }
+  };
+
   const expandedRowRender = (notaPedido: any) => {
     const columns = [
       {
@@ -123,7 +150,7 @@ export const FacturacionPage: React.FC = () => {
         key: 'precio',
         width: '10%',
         render: (text: any, record: any) => {
-          return <span>ARS ${record.precio}</span>;
+          return <span>${record.precio}</span>;
         },
       },
       {
@@ -131,7 +158,7 @@ export const FacturacionPage: React.FC = () => {
         key: 'iva',
         width: '10%',
         render: (text: any, record: any) => {
-          return <span>ARS ${Math.round(record.precio * 0.21)}</span>;
+          return <span>${Math.round(record.precio * 0.21)}</span>;
         },
       },
       {
@@ -146,7 +173,7 @@ export const FacturacionPage: React.FC = () => {
         width: '10%',
 
         render: (text: any, record: any) => {
-          return <span>ARS ${Math.round(record.precio * record.cantidad * 1.21)}</span>;
+          return <span>${Math.round(record.precio * record.cantidad * 1.21)}</span>;
         },
       },
     ];
@@ -155,6 +182,7 @@ export const FacturacionPage: React.FC = () => {
 
     return (
       <Table
+        size="small"
         rowKey={(record) => record.id}
         columns={columns}
         dataSource={data}
@@ -345,100 +373,177 @@ export const FacturacionPage: React.FC = () => {
         <h1 style={{ color: 'var(--timeline-background)' }}>{t('common.facturacion')}</h1>
 
         <div>
-          <Button
-            style={{
-              color: 'var(--success-color)',
-              borderRadius: '2rem',
-            }}
-            className="success-button"
-            icon={<PlusOutlined />}
-            type="text"
-            onClick={() => navigate('/ventas/facturacion/alta')}
-          ></Button>
+          <Tooltip placement="left" title={t('common.crear')} trigger="hover" destroyTooltipOnHide>
+            <Button
+              style={{
+                color: 'var(--success-color)',
+                borderRadius: '2rem',
+              }}
+              className="success-button"
+              icon={<PlusOutlined />}
+              type="text"
+              onClick={() => navigate('/ventas/facturacion/alta')}
+            ></Button>
+          </Tooltip>
           <BotonCSV list={facturasFiltradas()} fileName={'facturas'} />
         </div>
       </div>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '1rem',
-        }}
-      >
-        <div
-          style={{
-            width: '100%',
-            marginLeft: '1rem',
-            display: 'flex',
-            justifyContent: 'flex-end',
-            alignItems: 'center',
-          }}
-        >
-          <Typography.Text style={{ width: '20%', textAlign: 'right' }}>{t('table.filtrarFecha')}:</Typography.Text>
-          <RangePicker
-            allowClear
-            style={{ width: '75%', marginLeft: '1rem' }}
-            format="DD/MM/YYYY"
-            locale={locale}
-            value={filterDates}
-            onChange={(value) => {
-              setFilterDates(value);
+      {isTablet ? (
+        <>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '1rem',
             }}
-          />
-        </div>
-        <Select
-          value={filterTipoVenta}
-          onChange={(value) => setFilterTipoVenta(value)}
-          style={{ width: '100%', marginLeft: '1rem' }}
-          placeholder={t('table.filtrarTiposVenta')}
-          allowClear
-        >
-          {TipoVenta.map((estado, i: number) => (
-            <Select.Option key={i} value={i + 1}>
-              {t(`common.${TipoVenta[i]}`)}
-            </Select.Option>
-          ))}
-        </Select>
-      </div>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '1rem',
-        }}
-      >
-        <Select
-          value={filterUsuario}
-          onChange={(value) => setFilterUsuario(value)}
-          style={{ width: '100%', marginLeft: '1rem' }}
-          placeholder={t('table.filtrarUsuario')}
-          allowClear
-        >
-          {usuariosData?.map((usuario: Usuario, i: number) => (
-            <Select.Option key={i} value={usuario?.id}>
-              {usuario?.nombrecompleto}
-            </Select.Option>
-          ))}
-        </Select>
-        <Select
-          value={filterCliente}
-          onChange={(value) => setFilterCliente(value)}
-          style={{ width: '100%', marginLeft: '1rem' }}
-          placeholder={t('table.filtrarClientes')}
-          allowClear
-        >
-          {clientesData?.map((proveedor: Proveedor, i: number) => (
-            <Select.Option key={i} value={proveedor?.id}>
-              {proveedor?.nombre}
-            </Select.Option>
-          ))}
-        </Select>
-      </div>
+          >
+            <div
+              style={{
+                width: '100%',
+                marginLeft: '1rem',
+                display: 'flex',
+                justifyContent: 'flex-end',
+                alignItems: 'center',
+              }}
+            >
+              <Typography.Text style={{ width: '20%', textAlign: 'right' }}>{t('table.filtrarFecha')}:</Typography.Text>
+              <RangePicker
+                allowClear
+                style={{ width: '75%', marginLeft: '1rem' }}
+                format="DD/MM/YYYY"
+                locale={locale}
+                value={filterDates}
+                onChange={(value) => {
+                  setFilterDates(value);
+                }}
+              />
+            </div>
+            <Select
+              value={filterTipoVenta}
+              onChange={(value) => setFilterTipoVenta(value)}
+              style={{ width: '100%', marginLeft: '1rem' }}
+              placeholder={t('table.filtrarTiposVenta')}
+              allowClear
+            >
+              {TipoVenta.map((estado, i: number) => (
+                <Select.Option key={i} value={i + 1}>
+                  {t(`common.${TipoVenta[i]}`)}
+                </Select.Option>
+              ))}
+            </Select>
+          </div>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '1rem',
+            }}
+          >
+            <Select
+              value={filterUsuario}
+              onChange={(value) => setFilterUsuario(value)}
+              style={{ width: '100%', marginLeft: '1rem' }}
+              placeholder={t('table.filtrarUsuario')}
+              allowClear
+            >
+              {usuariosData?.map((usuario: Usuario, i: number) => (
+                <Select.Option key={i} value={usuario?.id}>
+                  {usuario?.nombrecompleto}
+                </Select.Option>
+              ))}
+            </Select>
+            <Select
+              value={filterCliente}
+              onChange={(value) => setFilterCliente(value)}
+              style={{ width: '100%', marginLeft: '1rem' }}
+              placeholder={t('table.filtrarClientes')}
+              allowClear
+            >
+              {clientesData?.map((proveedor: Proveedor, i: number) => (
+                <Select.Option key={i} value={proveedor?.id}>
+                  {proveedor?.nombre}
+                </Select.Option>
+              ))}
+            </Select>
+          </div>
+        </>
+      ) : (
+        <Row>
+          <Col span={24} style={{ marginBottom: 10 }}>
+            <div
+              style={{
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'flex-end',
+                alignItems: 'center',
+              }}
+            >
+              <Typography.Text style={{ width: '20%', textAlign: 'right' }}>{t('table.filtrarFecha')}:</Typography.Text>
+              <RangePicker
+                allowClear
+                style={{ width: '75%', marginLeft: '1rem' }}
+                format="DD/MM/YYYY"
+                locale={locale}
+                value={filterDates}
+                onChange={(value) => {
+                  setFilterDates(value);
+                }}
+              />
+            </div>
+          </Col>
+          <Col span={24} style={{ marginBottom: 10 }}>
+            <Select
+              value={filterTipoVenta}
+              onChange={(value) => setFilterTipoVenta(value)}
+              style={{ width: '100%' }}
+              placeholder={t('table.filtrarTiposVenta')}
+              allowClear
+            >
+              {TipoVenta.map((estado, i: number) => (
+                <Select.Option key={i} value={i + 1}>
+                  {t(`common.${TipoVenta[i]}`)}
+                </Select.Option>
+              ))}
+            </Select>
+          </Col>
+          <Col span={24} style={{ marginBottom: 10 }}>
+            <Select
+              value={filterUsuario}
+              onChange={(value) => setFilterUsuario(value)}
+              style={{ width: '100%' }}
+              placeholder={t('table.filtrarUsuario')}
+              allowClear
+            >
+              {usuariosData?.map((usuario: Usuario, i: number) => (
+                <Select.Option key={i} value={usuario?.id}>
+                  {usuario?.nombrecompleto}
+                </Select.Option>
+              ))}
+            </Select>
+          </Col>
+          <Col span={24} style={{ marginBottom: 10 }}>
+            <Select
+              value={filterCliente}
+              onChange={(value) => setFilterCliente(value)}
+              style={{ width: '100%' }}
+              placeholder={t('table.filtrarClientes')}
+              allowClear
+            >
+              {clientesData?.map((proveedor: Proveedor, i: number) => (
+                <Select.Option key={i} value={proveedor?.id}>
+                  {proveedor?.nombre}
+                </Select.Option>
+              ))}
+            </Select>
+          </Col>
+        </Row>
+      )}
       <Table
+        size="small"
         rowKey={(record) => record.id}
-        expandable={{ expandedRowRender }}
+        expandable={{ expandedRowRender, expandIcon }}
         columns={columns}
         dataSource={facturasFiltradas()}
         loading={isLoadingFacturas || isLoadingClientes || isLoadingUsuarios}
@@ -478,6 +583,7 @@ export const FacturacionForm: React.FC = () => {
   const [searchProducto, setSearchProducto] = React.useState('');
   const [tipoPago, setTipoPago] = React.useState(null);
   const [aplicaDescuento, setAplicaDescuento] = React.useState(false);
+  const { isTablet } = useResponsive();
 
   const { data: clientesData, isLoading: isLoadingClientes } = useQuery(['clientes'], getClientes, {
     keepPreviousData: false,
@@ -542,7 +648,7 @@ export const FacturacionForm: React.FC = () => {
       key: 'precioVenta',
       width: '10%',
       render: (text: any, record: any) => {
-        return <span>ARS ${record.precioVenta}</span>;
+        return <span>${record.precioVenta}</span>;
       },
     },
     {
@@ -550,7 +656,7 @@ export const FacturacionForm: React.FC = () => {
       key: 'iva',
       width: '10%',
       render: (text: any, record: any) => {
-        return <span>ARS ${Math.round(record.precioVenta * 0.21)}</span>;
+        return <span>${Math.round(record.precioVenta * 0.21)}</span>;
       },
     },
     {
@@ -565,7 +671,7 @@ export const FacturacionForm: React.FC = () => {
       width: '10%',
 
       render: (text: any, record: any) => {
-        return <span>ARS ${Math.round(record.precioVenta * record.cantidad * 1.21)}</span>;
+        return <span>${Math.round(record.precioVenta * record.cantidad * 1.21)}</span>;
       },
     },
     {
@@ -575,6 +681,7 @@ export const FacturacionForm: React.FC = () => {
       render: (text: any, record: any) => (
         <Space>
           <Button
+            size="small"
             icon={<DeleteOutlined />}
             type="text"
             danger
@@ -600,12 +707,18 @@ export const FacturacionForm: React.FC = () => {
       key: 'nombre',
     },
     {
+      title: t('common.stock'),
+      dataIndex: 'stock',
+      key: 'stock',
+      width: '5%',
+    },
+    {
       title: t('common.importeunitario'),
       dataIndex: 'precioVenta',
       key: 'precioVenta',
       width: '5%',
       render: (text: any, record: any) => {
-        return <span>ARS ${record.precioVenta}</span>;
+        return <span>${record.precioVenta}</span>;
       },
     },
     {
@@ -618,6 +731,7 @@ export const FacturacionForm: React.FC = () => {
           <InputNumber
             min={0}
             max={record.stock}
+            keyboard
             defaultValue={0}
             value={(productos as any).find((p: any) => p.id === record.id)?.cantidad}
             onChange={(value) => {
@@ -688,118 +802,264 @@ export const FacturacionForm: React.FC = () => {
                 </SubmitButton>
               </BaseForm.Item>
             </Row>
-            <Row
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-              }}
-            >
-              <Col span={6}>
-                <FormItem
-                  requiredMark
-                  name="fecha"
-                  label={t('common.fecha')}
-                  rules={[{ required: true, message: t('common.required') }]}
-                >
-                  <DatePicker
-                    style={{
-                      width: '100%',
-                    }}
-                    format="DD/MM/YYYY"
-                    showToday
-                    locale={locale}
-                  />
-                </FormItem>
-              </Col>
-              <Col span={6} offset={1}>
-                <FormItem
-                  requiredMark
-                  name="idTipoVenta"
-                  label={t('common.tipoventa')}
-                  rules={[{ required: true, message: t('common.requiredField') }]}
-                >
-                  <Select allowClear>
-                    {TipoVenta.map((tc, i) => (
-                      <Select.Option key={i} value={i + 1}>
-                        {tc}
-                      </Select.Option>
-                    ))}
-                  </Select>
-                </FormItem>
-              </Col>
-              <Col span={6} offset={1}>
-                <FormItem requiredMark label={t('common.aplicarDescuento')}>
-                  <Switch
-                    checked={aplicaDescuento}
-                    onChange={setAplicaDescuento}
-                    title={t('common.aplicarDescuento')}
-                  />
-                </FormItem>
-              </Col>
-            </Row>
-
-            <Row
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-              }}
-            >
-              <Col span={6}>
-                <FormItem
-                  requiredMark
-                  name="idCliente"
-                  label={t('common.clientes')}
-                  rules={[{ required: true, message: t('common.requiredField') }]}
-                >
-                  <Select allowClear>
-                    {clientesData?.map((cliente: Cliente, i: number) => (
-                      <Select.Option key={i} value={cliente?.id}>
-                        {cliente?.nombre}
-                      </Select.Option>
-                    ))}
-                  </Select>
-                </FormItem>
-              </Col>
-
-              <Col span={6} offset={1}>
-                <FormItem
-                  requiredMark
-                  name="idTipoPago"
-                  label={t('common.tipopago')}
-                  rules={[{ required: true, message: t('common.requiredField') }]}
-                >
-                  <Select allowClear value={tipoPago} onChange={(value) => setTipoPago(value)}>
-                    {TiposPago.map((tp, i) => (
-                      <Select.Option key={i} value={i + 1}>
-                        {tp}
-                      </Select.Option>
-                    ))}
-                  </Select>
-                </FormItem>
-              </Col>
-              <Col span={6} offset={1}>
-                <FormItem requiredMark name="descuento" label={t('common.descuento')}>
-                  <InputNumber min={0} max={100} addonAfter="%" style={{ width: '100%' }} disabled={!aplicaDescuento} />
-                </FormItem>
-              </Col>
-              <Col offset={3} span={1}>
-                <Button
+            {isTablet ? (
+              <>
+                <Row
                   style={{
-                    color: 'var(--success-color)',
-                    borderRadius: '2rem',
+                    display: 'flex',
+                    alignItems: 'center',
                   }}
-                  className="success-button"
-                  icon={<PlusOutlined />}
-                  type="text"
-                  onClick={() => {
-                    setModalVisible(true);
+                >
+                  <Col span={6}>
+                    <FormItem
+                      requiredMark
+                      name="fecha"
+                      label={t('common.fecha')}
+                      rules={[{ required: true, message: t('common.required') }]}
+                    >
+                      <DatePicker
+                        style={{
+                          width: '100%',
+                        }}
+                        format="DD/MM/YYYY"
+                        showToday
+                        locale={locale}
+                        disabledDate={(current) => new Date(current.format()) > new Date()}
+                      />
+                    </FormItem>
+                  </Col>
+                  <Col span={6} offset={1}>
+                    <FormItem
+                      requiredMark
+                      name="idTipoVenta"
+                      label={t('common.tipoventa')}
+                      rules={[{ required: true, message: t('common.requiredField') }]}
+                    >
+                      <Select allowClear>
+                        {TipoVenta.map((tc, i) => (
+                          <Select.Option key={i} value={i + 1}>
+                            {tc}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    </FormItem>
+                  </Col>
+                  <Col span={6} offset={1}>
+                    <FormItem requiredMark label={t('common.aplicarDescuento')}>
+                      <Switch
+                        checked={aplicaDescuento}
+                        onChange={setAplicaDescuento}
+                        title={t('common.aplicarDescuento')}
+                      />
+                    </FormItem>
+                  </Col>
+                </Row>
+                <Row
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
                   }}
-                ></Button>
-              </Col>
-            </Row>
+                >
+                  <Col span={6}>
+                    <FormItem
+                      requiredMark
+                      name="idCliente"
+                      label={t('common.clientes')}
+                      rules={[{ required: true, message: t('common.requiredField') }]}
+                    >
+                      <Select allowClear>
+                        {clientesData?.map((cliente: Cliente, i: number) => (
+                          <Select.Option key={i} value={cliente?.id}>
+                            {cliente?.nombre}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    </FormItem>
+                  </Col>
+
+                  <Col span={6} offset={1}>
+                    <FormItem
+                      requiredMark
+                      name="idTipoPago"
+                      label={t('common.tipopago')}
+                      rules={[{ required: true, message: t('common.requiredField') }]}
+                    >
+                      <Select allowClear value={tipoPago} onChange={(value) => setTipoPago(value)}>
+                        {TiposPago.map((tp, i) => (
+                          <Select.Option key={i} value={i + 1}>
+                            {tp}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    </FormItem>
+                  </Col>
+                  <Col span={6} offset={1}>
+                    <FormItem
+                      requiredMark
+                      name="descuento"
+                      label={t('common.descuento')}
+                      rules={[
+                        {
+                          required: aplicaDescuento,
+                          message: t('common.requiredField'),
+                        },
+                      ]}
+                    >
+                      <InputNumber
+                        min={0}
+                        max={100}
+                        addonAfter="%"
+                        style={{ width: '100%' }}
+                        disabled={!aplicaDescuento}
+                      />
+                    </FormItem>
+                  </Col>
+                  <Col offset={3} span={1}>
+                    <Tooltip placement="left" title={t('common.agregarProductos')} trigger="hover" destroyTooltipOnHide>
+                      <Button
+                        style={{
+                          color: 'var(--success-color)',
+                          borderRadius: '2rem',
+                        }}
+                        className="success-button"
+                        icon={<PlusOutlined />}
+                        type="text"
+                        onClick={() => {
+                          setModalVisible(true);
+                        }}
+                      ></Button>
+                    </Tooltip>
+                  </Col>
+                </Row>
+              </>
+            ) : (
+              <>
+                <Row
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
+                >
+                  <Col span={24}>
+                    <FormItem
+                      requiredMark
+                      name="fecha"
+                      label={t('common.fecha')}
+                      rules={[{ required: true, message: t('common.required') }]}
+                    >
+                      <DatePicker
+                        style={{
+                          width: '100%',
+                        }}
+                        format="DD/MM/YYYY"
+                        showToday
+                        locale={locale}
+                        disabledDate={(current) => new Date(current.format()) > new Date()}
+                      />
+                    </FormItem>
+                  </Col>
+                  <Col span={24}>
+                    <FormItem
+                      requiredMark
+                      name="idTipoVenta"
+                      label={t('common.tipoventa')}
+                      rules={[{ required: true, message: t('common.requiredField') }]}
+                    >
+                      <Select allowClear>
+                        {TipoVenta.map((tc, i) => (
+                          <Select.Option key={i} value={i + 1}>
+                            {tc}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    </FormItem>
+                  </Col>
+                  <Col span={24}>
+                    <FormItem
+                      requiredMark
+                      name="idTipoPago"
+                      label={t('common.tipopago')}
+                      rules={[{ required: true, message: t('common.requiredField') }]}
+                    >
+                      <Select allowClear value={tipoPago} onChange={(value) => setTipoPago(value)}>
+                        {TiposPago.map((tp, i) => (
+                          <Select.Option key={i} value={i + 1}>
+                            {tp}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    </FormItem>
+                  </Col>
+
+                  <Col span={24}>
+                    <FormItem
+                      requiredMark
+                      name="idCliente"
+                      label={t('common.clientes')}
+                      rules={[{ required: true, message: t('common.requiredField') }]}
+                    >
+                      <Select allowClear>
+                        {clientesData?.map((cliente: Cliente, i: number) => (
+                          <Select.Option key={i} value={cliente?.id}>
+                            {cliente?.nombre}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    </FormItem>
+                  </Col>
+                  <Col span={6}>
+                    <FormItem requiredMark label={t('common.aplicarDescuento') + '?'}>
+                      <Switch
+                        checked={aplicaDescuento}
+                        onChange={setAplicaDescuento}
+                        title={t('common.aplicarDescuento') + '?'}
+                      />
+                    </FormItem>
+                  </Col>
+                  <Col span={18}>
+                    <FormItem
+                      requiredMark
+                      name="descuento"
+                      label={t('common.descuento')}
+                      rules={[
+                        {
+                          required: aplicaDescuento,
+                          message: t('common.requiredField'),
+                        },
+                      ]}
+                    >
+                      <InputNumber
+                        min={0}
+                        max={100}
+                        addonAfter="%"
+                        style={{ width: '100%' }}
+                        disabled={!aplicaDescuento}
+                      />
+                    </FormItem>
+                  </Col>
+                  <Col offset={21} span={3}>
+                    <Tooltip placement="left" title={t('common.agregarProductos')} trigger="hover" destroyTooltipOnHide>
+                      <Button
+                        style={{
+                          color: 'var(--success-color)',
+                          borderRadius: '2rem',
+                        }}
+                        className="success-button"
+                        icon={<PlusOutlined />}
+                        type="text"
+                        onClick={() => {
+                          setModalVisible(true);
+                        }}
+                      ></Button>
+                    </Tooltip>
+                  </Col>
+                </Row>
+              </>
+            )}
             <Row>
               <Col span={24}>
                 <Table
+                  size="small"
                   rowKey={(record) => record.id}
                   columns={columns}
                   dataSource={detalles}
@@ -852,6 +1112,7 @@ export const FacturacionForm: React.FC = () => {
           </Col>
         </Row>
         <Table
+          size="small"
           rowKey={(record) => record.id}
           columns={agregarProductosColumnas}
           dataSource={filteredProductos()}
