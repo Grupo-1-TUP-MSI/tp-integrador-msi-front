@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, DatePicker, InputNumber, Modal } from 'antd';
+import { Button, DatePicker, InputNumber, Modal, Tooltip } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { PlusOutlined } from '@ant-design/icons';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -153,20 +153,23 @@ export const GananciasPage: React.FC = () => {
         <h1 style={{ color: 'var(--timeline-background)' }}>{t('common.margenGanancias')}</h1>
 
         <div>
-          <Button
-            style={{
-              color: 'var(--success-color)',
-              borderRadius: '2rem',
-            }}
-            className="success-button"
-            icon={<PlusOutlined />}
-            type="text"
-            onClick={() => setModal(true)}
-          ></Button>
+          <Tooltip placement="left" title={t('common.crear')} trigger="hover" destroyTooltipOnHide>
+            <Button
+              style={{
+                color: 'var(--success-color)',
+                borderRadius: '2rem',
+              }}
+              className="success-button"
+              icon={<PlusOutlined />}
+              type="text"
+              onClick={() => setModal(true)}
+            ></Button>
+          </Tooltip>
           <BotonCSV list={gananciasData} fileName={'ganancias'} />
         </div>
       </div>
       <Table
+        size="small"
         rowKey={(record) => record.id}
         columns={columns}
         dataSource={gananciasData}

@@ -1,14 +1,14 @@
 import React, { useEffect } from 'react';
-import { Button, Checkbox, Col, Form, Input, Modal, Row, Select, Space, Spin } from 'antd';
+import { Button, Checkbox, Col, Form, Input, Modal, Row, Select, Space, Spin, Tooltip } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { Roles, Proveedor, TiposIVA, TiposDocumento } from '@app/models/models';
+import { Proveedor, TiposIVA, TiposDocumento } from '@app/models/models';
 import { useNavigate, useParams } from 'react-router';
 import { notificationController } from '@app/controllers/notificationController';
 import { BaseForm } from '@app/components/common/forms/BaseForm/BaseForm';
 import FormItem from 'antd/es/form/FormItem';
-import { FormInput, FormInputPassword, SubmitButton } from '@app/components/layouts/AuthLayout/AuthLayout.styles';
+import { FormInput, SubmitButton } from '@app/components/layouts/AuthLayout/AuthLayout.styles';
 import { Table } from '@app/components/common/Table/Table';
 import {
   getProveedores,
@@ -106,15 +106,19 @@ export const ProveedoresPage: React.FC = () => {
       key: 'acciones',
       render: (text: any, record: any) => (
         <Space>
+          <Tooltip placement="top" title={t('common.editar')} trigger="hover" destroyTooltipOnHide>
+            <Button
+              size="small"
+              icon={<EditOutlined />}
+              disabled={!record.estado}
+              type="text"
+              onClick={() => {
+                navigate(`/compras/proveedores/${record.id}`);
+              }}
+            ></Button>
+          </Tooltip>
           <Button
-            icon={<EditOutlined />}
-            disabled={!record.estado}
-            type="text"
-            onClick={() => {
-              navigate(`/compras/proveedores/${record.id}`);
-            }}
-          ></Button>
-          <Button
+            size="small"
             icon={<DeleteOutlined />}
             disabled={!record.estado}
             type="text"
@@ -178,16 +182,18 @@ export const ProveedoresPage: React.FC = () => {
         <h1 style={{ color: 'var(--timeline-background)' }}>{t('common.proveedores')}</h1>
 
         <div>
-          <Button
-            style={{
-              color: 'var(--success-color)',
-              borderRadius: '2rem',
-            }}
-            className="success-button"
-            icon={<PlusOutlined />}
-            type="text"
-            onClick={() => navigate('/compras/proveedores/alta')}
-          ></Button>
+          <Tooltip placement="left" title={t('common.crear')} trigger="hover" destroyTooltipOnHide>
+            <Button
+              style={{
+                color: 'var(--success-color)',
+                borderRadius: '2rem',
+              }}
+              className="success-button"
+              icon={<PlusOutlined />}
+              type="text"
+              onClick={() => navigate('/compras/proveedores/alta')}
+            ></Button>
+          </Tooltip>
           <BotonCSV list={proveedoresFiltrados()} fileName={'proveedores'} />
         </div>
       </div>
@@ -226,6 +232,7 @@ export const ProveedoresPage: React.FC = () => {
         </Checkbox>
       </div>
       <Table
+        size="small"
         rowKey={(record) => record.id}
         rowClassName={(record) => (!record.estado ? 'deleted-row' : '')}
         columns={columns}
@@ -262,7 +269,8 @@ export const ProveedoresForm: React.FC = () => {
   const { id } = useParams();
   const [isEdit, setIsEdit] = React.useState(false);
   const [form] = Form.useForm();
-  const { isDesktop } = useResponsive();
+  const { isTablet } = useResponsive();
+  const documentoLength = Form.useWatch('tipoDocumento', form);
 
   const { data: proveedorData, isLoading: isLoadingProveedor } = useQuery(
     ['getProveedor'],
@@ -362,6 +370,12 @@ export const ProveedoresForm: React.FC = () => {
       handleCreate(proveedor);
     }
   };
+  const tipoDocumentoLength = () => {
+    return (
+      TiposDocumento[parseInt(documentoLength) - 1] === 'CUIT' ||
+      TiposDocumento[parseInt(documentoLength) - 1] === 'CUIL'
+    );
+  };
 
   if (isLoadingProveedor && isEdit) {
     return <Spin />;
@@ -370,7 +384,7 @@ export const ProveedoresForm: React.FC = () => {
   return (
     <div>
       <Row>
-        {isDesktop ? (
+        {isTablet ? (
           <Col offset={6} span={12}>
             <BaseForm layout="vertical" onFinish={handleSubmit} requiredMark="optional" form={form}>
               <h1>{isEdit ? t('titles.editandoProveedor') : t('titles.creandoProveedor')}</h1>
@@ -396,7 +410,17 @@ export const ProveedoresForm: React.FC = () => {
                     requiredMark
                     name="documento"
                     label={t('common.documento')}
-                    rules={[{ required: true, message: t('common.requiredField') }]}
+                    rules={[
+                      { required: true, message: t('common.requiredField') },
+                      {
+                        pattern: new RegExp('^[0-9]*$'),
+                        message: t('common.onlyNumbers'),
+                      },
+                      {
+                        len: tipoDocumentoLength() ? 11 : 8,
+                        message: t('common.invalidLength'),
+                      },
+                    ]}
                   >
                     <FormInput disabled={isEdit} />
                   </FormItem>
@@ -463,7 +487,13 @@ export const ProveedoresForm: React.FC = () => {
                     requiredMark
                     name="email"
                     label={t('common.email')}
-                    rules={[{ required: true, message: t('common.requiredField') }]}
+                    rules={[
+                      { required: true, message: t('common.requiredField') },
+                      {
+                        type: 'email',
+                        message: t('common.notValidEmail'),
+                      },
+                    ]}
                   >
                     <FormInput />
                   </FormItem>
@@ -481,7 +511,7 @@ export const ProveedoresForm: React.FC = () => {
             <BaseForm layout="vertical" onFinish={handleSubmit} requiredMark="optional" form={form}>
               <h1>{isEdit ? t('titles.editandoProveedor') : t('titles.creandoProveedor')}</h1>
               <Row>
-                <Col span={6}>
+                <Col span={24}>
                   <FormItem
                     requiredMark
                     name="tipoDocumento"
@@ -497,19 +527,29 @@ export const ProveedoresForm: React.FC = () => {
                     </Select>
                   </FormItem>
                 </Col>
-                <Col span={17} offset={1}>
+                <Col span={24}>
                   <FormItem
                     requiredMark
                     name="documento"
                     label={t('common.documento')}
-                    rules={[{ required: true, message: t('common.requiredField') }]}
+                    rules={[
+                      { required: true, message: t('common.requiredField') },
+                      {
+                        pattern: new RegExp('^[0-9]*$'),
+                        message: t('common.onlyNumbers'),
+                      },
+                      {
+                        len: tipoDocumentoLength() ? 11 : 8,
+                        message: t('common.invalidLength'),
+                      },
+                    ]}
                   >
                     <FormInput disabled={isEdit} />
                   </FormItem>
                 </Col>
               </Row>
               <Row>
-                <Col span={6}>
+                <Col span={24}>
                   <FormItem
                     requiredMark
                     name="tipoiva"
@@ -525,7 +565,7 @@ export const ProveedoresForm: React.FC = () => {
                     </Select>
                   </FormItem>
                 </Col>
-                <Col span={17} offset={1}>
+                <Col span={24}>
                   <FormItem
                     requiredMark
                     name="nombre"
@@ -537,7 +577,7 @@ export const ProveedoresForm: React.FC = () => {
                 </Col>
               </Row>
               <Row>
-                <Col span={16}>
+                <Col span={24}>
                   <FormItem
                     requiredMark
                     name="direccion"
@@ -547,7 +587,7 @@ export const ProveedoresForm: React.FC = () => {
                     <FormInput />
                   </FormItem>
                 </Col>
-                <Col span={7} offset={1}>
+                <Col span={24}>
                   <FormItem
                     requiredMark
                     name="cp"
@@ -559,17 +599,23 @@ export const ProveedoresForm: React.FC = () => {
                 </Col>
               </Row>
               <Row>
-                <Col span={11}>
+                <Col span={24}>
                   <FormItem requiredMark name="telefono" label={t('common.telefono')}>
                     <FormInput />
                   </FormItem>
                 </Col>
-                <Col span={12} offset={1}>
+                <Col span={24}>
                   <FormItem
                     requiredMark
                     name="email"
                     label={t('common.email')}
-                    rules={[{ required: true, message: t('common.requiredField') }]}
+                    rules={[
+                      { required: true, message: t('common.requiredField') },
+                      {
+                        type: 'email',
+                        message: t('common.notValidEmail'),
+                      },
+                    ]}
                   >
                     <FormInput />
                   </FormItem>

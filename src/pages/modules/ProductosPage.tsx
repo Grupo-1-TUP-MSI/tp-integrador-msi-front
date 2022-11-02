@@ -61,7 +61,7 @@ export const ProductosPage: React.FC = () => {
   const [modalProveedor, setModalProveedor] = React.useState(false);
   const [proveedor, setProveedor] = React.useState(null);
   const [nuevoPrecio, setNuevoPrecio] = React.useState(0);
-  const { isDesktop } = useResponsive();
+  const { isTablet } = useResponsive();
 
   useEffect(() => {
     if (!!state) {
@@ -201,7 +201,7 @@ export const ProductosPage: React.FC = () => {
       dataIndex: 'preciolista',
       key: 'preciolista',
       width: '10%',
-      render: (text: any, record: any) => <span>ARS ${record.preciolista}</span>,
+      render: (text: any, record: any) => <span>${record.preciolista}</span>,
     },
     {
       title: t('common.stockminimo'),
@@ -221,6 +221,7 @@ export const ProductosPage: React.FC = () => {
         <Space>
           <Tooltip placement="top" title={t('common.actualizarStock')} trigger="hover" destroyTooltipOnHide>
             <Button
+              size="small"
               icon={<PlusCircleOutlined />}
               disabled={!record.estado}
               type="text"
@@ -232,6 +233,7 @@ export const ProductosPage: React.FC = () => {
           </Tooltip>
           <Tooltip placement="top" title={t('common.agregarProveedor')} trigger="hover" destroyTooltipOnHide>
             <Button
+              size="small"
               icon={<UsergroupAddOutlined />}
               disabled={!record.estado}
               type="text"
@@ -241,15 +243,19 @@ export const ProductosPage: React.FC = () => {
               }}
             ></Button>
           </Tooltip>
+          <Tooltip placement="top" title={t('common.editar')} trigger="hover" destroyTooltipOnHide>
+            <Button
+              size="small"
+              icon={<EditOutlined />}
+              disabled={!record.estado}
+              type="text"
+              onClick={() => {
+                navigate(`/productos/${record.id}`);
+              }}
+            ></Button>
+          </Tooltip>
           <Button
-            icon={<EditOutlined />}
-            disabled={!record.estado}
-            type="text"
-            onClick={() => {
-              navigate(`/productos/${record.id}`);
-            }}
-          ></Button>
-          <Button
+            size="small"
             icon={<DeleteOutlined />}
             disabled={!record.estado}
             type="text"
@@ -399,20 +405,22 @@ export const ProductosPage: React.FC = () => {
         <h1 style={{ color: 'var(--timeline-background)' }}>{t('common.productos')}</h1>
 
         <div>
-          <Button
-            style={{
-              color: 'var(--success-color)',
-              borderRadius: '2rem',
-            }}
-            className="success-button"
-            icon={<PlusOutlined />}
-            type="text"
-            onClick={() => navigate('/productos/alta')}
-          ></Button>
+          <Tooltip placement="left" title={t('common.crear')} trigger="hover" destroyTooltipOnHide>
+            <Button
+              style={{
+                color: 'var(--success-color)',
+                borderRadius: '2rem',
+              }}
+              className="success-button"
+              icon={<PlusOutlined />}
+              type="text"
+              onClick={() => navigate('/productos/alta')}
+            ></Button>
+          </Tooltip>
           <BotonCSV list={productosFiltrados()} fileName={'productos'} />
         </div>
       </div>
-      {!isDesktop ? (
+      {isTablet ? (
         <>
           <div
             style={{
@@ -428,9 +436,23 @@ export const ProductosPage: React.FC = () => {
               style={{ width: '100%' }}
             />
             <div style={{ marginLeft: '3rem', marginRight: '1.2rem' }}>{t('common.precio')}:</div>
-            <InputNumber placeholder="Min" style={{ width: '150px' }} value={minPrecio} onChange={setMinPrecio} />
+            <InputNumber
+              min={0}
+              placeholder="Min"
+              style={{ width: '150px' }}
+              prefix={'Min: $'}
+              value={minPrecio}
+              onChange={setMinPrecio}
+            />
             <div style={{ marginLeft: '0.8rem', marginRight: '0.8rem' }}>-</div>
-            <InputNumber placeholder="Max" style={{ width: '150px' }} value={maxPrecio} onChange={setMaxPrecio} />
+            <InputNumber
+              min={0}
+              placeholder="Max"
+              style={{ width: '150px' }}
+              prefix={'Max: $'}
+              value={maxPrecio}
+              onChange={setMaxPrecio}
+            />
           </div>
           <div
             style={{
@@ -450,48 +472,63 @@ export const ProductosPage: React.FC = () => {
           </div>
         </>
       ) : (
-        <div
-          style={{
-            display: 'grid',
-            gridGap: '1rem',
-            marginBottom: '1rem',
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-            }}
-          >
+        <Row>
+          <Col span={24} style={{ marginBottom: '15px' }}>
             <Input
+              size="small"
               placeholder={t('table.buscarProducto')}
               value={searchProducto}
               onChange={(e) => setSearchProducto(e.target.value)}
             />
-            <div style={{ marginLeft: '3rem', marginRight: '1.2rem' }}>{t('common.precio')}:</div>
-            <InputNumber placeholder="Min" style={{ width: '150px' }} value={minPrecio} onChange={setMinPrecio} />
-            <div style={{ marginLeft: '0.8rem', marginRight: '0.8rem' }}>-</div>
-            <InputNumber placeholder="Max" style={{ width: '150px' }} value={maxPrecio} onChange={setMaxPrecio} />
-          </div>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-            }}
-          >
+          </Col>
+          <Col span={24} style={{ marginBottom: '15px' }}>
+            <InputNumber
+              size="small"
+              min={0}
+              placeholder="Min"
+              prefix={'Precio Mínimo: $'}
+              value={minPrecio}
+              onChange={setMinPrecio}
+              style={{
+                width: '100%',
+              }}
+            />
+          </Col>
+          <Col span={24} style={{ marginBottom: '15px' }}>
+            <InputNumber
+              size="small"
+              min={0}
+              placeholder="Max"
+              prefix={'Precio Maximo: $'}
+              value={maxPrecio}
+              onChange={setMaxPrecio}
+              style={{
+                width: '100%',
+              }}
+            />
+          </Col>
+          <Col span={24} style={{ marginBottom: '15px' }}>
             <Checkbox checked={filterStockMinimo} onChange={(e) => setFilterStockMinimo(e.target.checked)}>
               {t('common.verStockMinimo')}
             </Checkbox>
+          </Col>
+          <Col span={24} style={{ marginBottom: '15px' }}>
             <Checkbox checked={filterStock} onChange={(e) => setFilterStock(e.target.checked)}>
               {t('common.verSinStock')}
             </Checkbox>
+          </Col>
+          <Col span={24} style={{ marginBottom: '15px' }}>
             <Checkbox checked={filterEstado} onChange={(e) => setFilterEstado(e.target.checked)}>
               {t('common.verBorrados')}
             </Checkbox>
-          </div>
-        </div>
+          </Col>
+        </Row>
       )}
       <Table
+        size="small"
+        pagination={{
+          pageSize: 5,
+        }}
         rowKey={(record) => record.id}
         rowClassName={(record) => (!record.estado ? 'deleted-row' : record.stock < 0 ? 'no-stock-row' : '')}
         columns={columns}

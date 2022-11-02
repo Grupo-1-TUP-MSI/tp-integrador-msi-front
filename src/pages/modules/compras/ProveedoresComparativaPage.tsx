@@ -7,7 +7,7 @@ import { Button, Checkbox, Input, InputNumber, Select, Spin, Table, Tooltip } fr
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { InfoCircleOutlined } from '@ant-design/icons';
+import { CheckCircleOutlined, InfoCircleOutlined } from '@ant-design/icons';
 
 export const ProveedoresComparativaPage = () => {
   const { t } = useTranslation();
@@ -69,7 +69,7 @@ export const ProveedoresComparativaPage = () => {
       dataIndex: 'precio',
       key: 'precio',
       width: '10%',
-      render: (text: any, record: any) => <span>ARS ${record.precio}</span>,
+      render: (text: any, record: any) => <span>${record.precio}</span>,
     },
     {
       title: t('common.stock'),
@@ -165,9 +165,16 @@ export const ProveedoresComparativaPage = () => {
             }}
           >
             <div style={{ marginLeft: '1rem', marginRight: '1.2rem' }}>{t('common.precio')}:</div>
-            <InputNumber placeholder="Min" style={{ width: '150px' }} value={minPrecio} onChange={setMinPrecio} />
+            <InputNumber
+              min={0}
+              placeholder="Min"
+              style={{ width: '150px' }}
+              value={minPrecio}
+              onChange={setMinPrecio}
+            />
             <div style={{ marginLeft: '0.8rem', marginRight: '0.8rem' }}>-</div>
             <InputNumber
+              min={0}
               placeholder="Max"
               style={{ width: '150px', marginRight: '2rem' }}
               value={maxPrecio}
@@ -234,6 +241,7 @@ export const ProveedoresComparativaPage = () => {
         </div>
       )}
       <Table
+        size="small"
         rowKey={(record) => record.id}
         rowClassName={(record) => (productoIsDisabled(record) ? 'disabled-row' : '')}
         rowSelection={{
@@ -241,6 +249,7 @@ export const ProveedoresComparativaPage = () => {
             setProductosNota(selectedRows);
           },
           hideSelectAll: true,
+          columnTitle: <CheckCircleOutlined />,
         }}
         columns={columns}
         dataSource={productosFiltrados()}

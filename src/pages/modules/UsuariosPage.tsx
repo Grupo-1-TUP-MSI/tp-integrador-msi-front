@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Button, Checkbox, Col, Form, Input, Modal, Row, Select, Space, Spin } from 'antd';
+import { Button, Checkbox, Col, Form, Input, Modal, Row, Select, Space, Spin, Tooltip } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -60,11 +60,6 @@ export const UsuariosPage: React.FC = () => {
 
   const columns = [
     {
-      title: t('common.id'),
-      dataIndex: 'id',
-      width: '5%',
-    },
-    {
       title: t('common.nombre'),
       dataIndex: 'nombrecompleto',
       key: 'nombrecompleto',
@@ -87,15 +82,19 @@ export const UsuariosPage: React.FC = () => {
       key: 'acciones',
       render: (text: any, record: any) => (
         <Space>
+          <Tooltip placement="top" title={t('common.editar')} trigger="hover" destroyTooltipOnHide>
+            <Button
+              size="small"
+              icon={<EditOutlined />}
+              disabled={!record.estado}
+              type="text"
+              onClick={() => {
+                navigate(`/usuarios/${record.id}`);
+              }}
+            ></Button>
+          </Tooltip>
           <Button
-            icon={<EditOutlined />}
-            disabled={!record.estado}
-            type="text"
-            onClick={() => {
-              navigate(`/usuarios/${record.id}`);
-            }}
-          ></Button>
-          <Button
+            size="small"
             icon={<DeleteOutlined />}
             disabled={!record.estado}
             type="text"
@@ -157,16 +156,18 @@ export const UsuariosPage: React.FC = () => {
         <h1 style={{ color: 'var(--timeline-background)' }}>{t('common.usuarios')}</h1>
 
         <div>
-          <Button
-            style={{
-              color: 'var(--success-color)',
-              borderRadius: '2rem',
-            }}
-            className="success-button"
-            icon={<PlusOutlined />}
-            type="text"
-            onClick={() => navigate('/usuarios/alta')}
-          ></Button>
+          <Tooltip placement="left" title={t('common.crear')} trigger="hover" destroyTooltipOnHide>
+            <Button
+              style={{
+                color: 'var(--success-color)',
+                borderRadius: '2rem',
+              }}
+              className="success-button"
+              icon={<PlusOutlined />}
+              type="text"
+              onClick={() => navigate('/usuarios/alta')}
+            ></Button>
+          </Tooltip>
           <BotonCSV list={usuariosFiltrados()} fileName={'usuarios'} />
         </div>
       </div>
@@ -205,6 +206,7 @@ export const UsuariosPage: React.FC = () => {
         </Checkbox>
       </div>
       <Table
+        size="small"
         rowKey={(record) => record.id}
         rowClassName={(record) => (!record.estado ? 'deleted-row' : '')}
         columns={columns}
