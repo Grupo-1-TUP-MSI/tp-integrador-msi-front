@@ -751,6 +751,7 @@ export const FacturacionForm: React.FC = () => {
       render: (text: any, record: any) => {
         return (
           <InputNumber
+            size="small"
             min={0}
             max={record.stock}
             keyboard
@@ -1128,6 +1129,7 @@ export const FacturacionForm: React.FC = () => {
           <Col span={24}>
             <Input
               placeholder={t('table.buscarProducto')}
+              size="small"
               value={searchProducto}
               onChange={(e) => setSearchProducto(e.target.value)}
               style={{ width: '100%' }}
@@ -1136,6 +1138,9 @@ export const FacturacionForm: React.FC = () => {
         </Row>
         <Table
           size="small"
+          pagination={{
+            pageSize: 5,
+          }}
           rowKey={(record) => record.id}
           columns={agregarProductosColumnas}
           dataSource={filteredProductos()}

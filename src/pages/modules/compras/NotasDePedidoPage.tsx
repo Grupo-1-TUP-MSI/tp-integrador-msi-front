@@ -1139,6 +1139,7 @@ export const NotasDePedidoForm: React.FC = () => {
       render: (text: any, record: any) => {
         return (
           <InputNumber
+            size="small"
             min={0}
             max={record.stock}
             defaultValue={0}
@@ -1472,6 +1473,7 @@ export const NotasDePedidoForm: React.FC = () => {
         <Row>
           <Col span={24}>
             <Input
+              size="small"
               placeholder={t('table.buscarProducto')}
               value={searchProducto}
               onChange={(e) => setSearchProducto(e.target.value)}
@@ -1481,6 +1483,9 @@ export const NotasDePedidoForm: React.FC = () => {
         </Row>
         <Table
           size="small"
+          pagination={{
+            pageSize: 5,
+          }}
           rowKey={(record) => record.id}
           columns={agregarProductosColumnas}
           dataSource={filteredProductos()}
