@@ -35,11 +35,11 @@ export const PieChart: React.FC<PieChartProps> = ({ option, data, name, showLege
         center: ['50%', '50%'],
         radius: '55%',
         label: {
-          color: 'rgba(255, 255, 255, 0.3)',
+          color: 'var(--text-main-color)',
         },
         labelLine: {
           lineStyle: {
-            color: 'rgba(255, 255, 255, 0.3)',
+            color: 'var(--text-main-color)',
           },
           smooth: 0.2,
           length: 10,
@@ -48,8 +48,8 @@ export const PieChart: React.FC<PieChartProps> = ({ option, data, name, showLege
         data,
         itemStyle: {
           borderRadius: 5,
-          borderColor: BASE_COLORS.white,
-          borderWidth: 2,
+          borderColor: theme === 'dark' ? BASE_COLORS.black : BASE_COLORS.white,
+          borderWidth: 1,
           shadowBlur: 200,
           shadowColor: 'rgba(0, 0, 0, 0.5)',
         },

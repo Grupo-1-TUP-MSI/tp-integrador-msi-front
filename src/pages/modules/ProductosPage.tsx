@@ -43,6 +43,7 @@ import { Table } from '@app/components/common/Table/Table';
 import { useResponsive } from '@app/hooks/useResponsive';
 import { getProveedores } from '@app/api/proveedores.api';
 import { BotonCSV } from '@app/components/shared/BotonCSV';
+import { PageTitle } from '@app/components/common/PageTitle/PageTitle';
 
 export const ProductosPage: React.FC = () => {
   const { t } = useTranslation();
@@ -299,6 +300,7 @@ export const ProductosPage: React.FC = () => {
 
   return (
     <>
+      <PageTitle>{t('common.productos')}</PageTitle>
       <Modal
         title={t('notifications.eliminandoElemento')}
         visible={isModalOpen}
@@ -402,7 +404,7 @@ export const ProductosPage: React.FC = () => {
           marginBottom: '1rem',
         }}
       >
-        <h1 style={{ color: 'var(--timeline-background)' }}>{t('common.productos')}</h1>
+        <h1 style={{ color: 'var(--timeline-background)', fontSize: '25px' }}>{t('common.productos')}</h1>
 
         <div>
           <Tooltip placement="left" title={t('common.crear')} trigger="hover" destroyTooltipOnHide>
@@ -660,10 +662,11 @@ export const ProductosForm: React.FC = () => {
 
   return (
     <div>
+      <PageTitle>{isEdit ? t('titles.editandoProducto') : t('titles.creandoProducto')}</PageTitle>
       <Row>
         <Col offset={6} span={12}>
           <BaseForm layout="vertical" onFinish={handleSubmit} requiredMark="optional" form={form}>
-            <h1>{isEdit ? t('titles.editandoProducto') : t('titles.creandoProducto')}</h1>
+            <h1 style={{ fontSize: '25px' }}>{isEdit ? t('titles.editandoProducto') : t('titles.creandoProducto')}</h1>
             <FormItem
               name="nombre"
               label={t('common.nombre')}

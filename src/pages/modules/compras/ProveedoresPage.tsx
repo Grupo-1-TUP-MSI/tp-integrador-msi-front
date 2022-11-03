@@ -19,6 +19,7 @@ import {
 } from '../../../api/proveedores.api';
 import { useResponsive } from '@app/hooks/useResponsive';
 import { BotonCSV } from '@app/components/shared/BotonCSV';
+import { PageTitle } from '@app/components/common/PageTitle/PageTitle';
 
 export const ProveedoresPage: React.FC = () => {
   const { t } = useTranslation();
@@ -158,6 +159,7 @@ export const ProveedoresPage: React.FC = () => {
 
   return (
     <>
+      <PageTitle>{t('common.proveedores')}</PageTitle>
       <Modal
         title={t('notifications.eliminandoElemento')}
         visible={isModalOpen}
@@ -179,7 +181,7 @@ export const ProveedoresPage: React.FC = () => {
           marginBottom: '1rem',
         }}
       >
-        <h1 style={{ color: 'var(--timeline-background)' }}>{t('common.proveedores')}</h1>
+        <h1 style={{ color: 'var(--timeline-background)', fontSize: '25px' }}>{t('common.proveedores')}</h1>
 
         <div>
           <Tooltip placement="left" title={t('common.crear')} trigger="hover" destroyTooltipOnHide>
@@ -383,11 +385,14 @@ export const ProveedoresForm: React.FC = () => {
 
   return (
     <div>
+      <PageTitle>{isEdit ? t('titles.editandoProveedor') : t('titles.creandoProveedor')}</PageTitle>
       <Row>
         {isTablet ? (
           <Col offset={6} span={12}>
             <BaseForm layout="vertical" onFinish={handleSubmit} requiredMark="optional" form={form}>
-              <h1>{isEdit ? t('titles.editandoProveedor') : t('titles.creandoProveedor')}</h1>
+              <h1 style={{ fontSize: '25px' }}>
+                {isEdit ? t('titles.editandoProveedor') : t('titles.creandoProveedor')}
+              </h1>
               <Row>
                 <Col span={6}>
                   <FormItem
@@ -478,7 +483,17 @@ export const ProveedoresForm: React.FC = () => {
               </Row>
               <Row>
                 <Col span={11}>
-                  <FormItem requiredMark name="telefono" label={t('common.telefono')}>
+                  <FormItem
+                    requiredMark
+                    name="telefono"
+                    label={t('common.telefono')}
+                    rules={[
+                      {
+                        pattern: new RegExp('^[0-9]*$'),
+                        message: t('common.invalidPhone'),
+                      },
+                    ]}
+                  >
                     <FormInput />
                   </FormItem>
                 </Col>
@@ -509,7 +524,9 @@ export const ProveedoresForm: React.FC = () => {
         ) : (
           <Col span={24}>
             <BaseForm layout="vertical" onFinish={handleSubmit} requiredMark="optional" form={form}>
-              <h1>{isEdit ? t('titles.editandoProveedor') : t('titles.creandoProveedor')}</h1>
+              <h1 style={{ fontSize: '25px' }}>
+                {isEdit ? t('titles.editandoProveedor') : t('titles.creandoProveedor')}
+              </h1>
               <Row>
                 <Col span={24}>
                   <FormItem
@@ -600,7 +617,17 @@ export const ProveedoresForm: React.FC = () => {
               </Row>
               <Row>
                 <Col span={24}>
-                  <FormItem requiredMark name="telefono" label={t('common.telefono')}>
+                  <FormItem
+                    requiredMark
+                    name="telefono"
+                    label={t('common.telefono')}
+                    rules={[
+                      {
+                        pattern: new RegExp('^[0-9]*$'),
+                        message: t('common.invalidPhone'),
+                      },
+                    ]}
+                  >
                     <FormInput />
                   </FormItem>
                 </Col>

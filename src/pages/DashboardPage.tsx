@@ -229,7 +229,7 @@ const DashboardPage: React.FC = () => {
           marginTop: '3rem',
         }}
       >
-        <Col xs={24} md={12} lg={6}>
+        <Col xs={24} md={12} lg={12}>
           <Card style={{ margin: 20 }} title={t('titles.tiposCompraMonto')}>
             <PieChart data={pieChartsData?.comprasMonto.map((d: any) => ({ ...d, name: TipoCompra[d.idTipo - 1] }))} />
             <Legend
@@ -238,7 +238,7 @@ const DashboardPage: React.FC = () => {
             />
           </Card>
         </Col>
-        <Col xs={24} md={12} lg={6}>
+        <Col xs={24} md={12} lg={12}>
           <Card style={{ margin: 20 }} title={t('titles.tiposVentaMonto')}>
             <PieChart data={pieChartsData?.ventasMonto.map((d: any) => ({ ...d, name: TipoVenta[d.idTipo - 1] }))} />
             <Legend
@@ -247,7 +247,7 @@ const DashboardPage: React.FC = () => {
             />
           </Card>
         </Col>
-        <Col xs={24} md={12} lg={6}>
+        <Col xs={24} md={12} lg={12}>
           <Card style={{ margin: 20 }} title={t('titles.tiposCompraCantidad')}>
             <PieChart
               data={pieChartsData?.comprasCantidad.map((d: any) => ({ ...d, name: TipoCompra[d.idTipo - 1] }))}
@@ -258,7 +258,7 @@ const DashboardPage: React.FC = () => {
             />
           </Card>
         </Col>
-        <Col xs={24} md={12} lg={6}>
+        <Col xs={24} md={12} lg={12}>
           <Card style={{ margin: 20 }} title={t('titles.tiposVentaCantidad')}>
             <PieChart data={pieChartsData?.ventasCantidad.map((d: any) => ({ ...d, name: TipoVenta[d.idTipo - 1] }))} />
             <Legend

@@ -12,6 +12,7 @@ import FormItem from 'antd/es/form/FormItem';
 import { FormInput, FormInputPassword, SubmitButton } from '@app/components/layouts/AuthLayout/AuthLayout.styles';
 import { Table } from '@app/components/common/Table/Table';
 import { BotonCSV } from '@app/components/shared/BotonCSV';
+import { PageTitle } from '@app/components/common/PageTitle/PageTitle';
 
 export const UsuariosPage: React.FC = () => {
   const { t } = useTranslation();
@@ -132,6 +133,7 @@ export const UsuariosPage: React.FC = () => {
 
   return (
     <>
+      <PageTitle>{t('common.usuarios')}</PageTitle>
       <Modal
         title={t('notifications.eliminandoElemento')}
         visible={isModalOpen}
@@ -153,7 +155,7 @@ export const UsuariosPage: React.FC = () => {
           marginBottom: '1rem',
         }}
       >
-        <h1 style={{ color: 'var(--timeline-background)' }}>{t('common.usuarios')}</h1>
+        <h1 style={{ color: 'var(--timeline-background)', fontSize: '25px' }}>{t('common.usuarios')}</h1>
 
         <div>
           <Tooltip placement="left" title={t('common.crear')} trigger="hover" destroyTooltipOnHide>
@@ -336,10 +338,11 @@ export const UsuariosForm: React.FC = () => {
 
   return (
     <div>
+      <PageTitle>{isEdit ? t('titles.editandoUsuario') : t('titles.creandoUsuario')}</PageTitle>
       <Row>
         <Col offset={8} span={8}>
           <BaseForm layout="vertical" onFinish={handleSubmit} requiredMark="optional" form={form}>
-            <h1>{isEdit ? t('titles.editandoUsuario') : t('titles.creandoUsuario')}</h1>
+            <h1 style={{ fontSize: '25px' }}>{isEdit ? t('titles.editandoUsuario') : t('titles.creandoUsuario')}</h1>
             <FormItem
               requiredMark
               name="usuario"

@@ -15,7 +15,7 @@ export const Wrapper = styled.div`
 export const BackgroundWrapper = styled.div`
   width: 100%;
   height: 100%;
-  background-color: var(--avatar-bg);
+  background-color: var(--background-bg);
   background-size: cover;
   position: relative;
 `;
@@ -52,6 +52,7 @@ export const FormWrapper = styled.div`
 
 export const FormTitle = styled.div`
   color: var(--primary-color);
+  margin-top: 2rem;
 
   @media only screen and ${media.xs} {
     margin-bottom: 0.625rem;

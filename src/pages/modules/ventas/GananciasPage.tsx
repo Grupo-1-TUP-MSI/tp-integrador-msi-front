@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button, DatePicker, InputNumber, Modal, Tooltip } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { PlusOutlined } from '@ant-design/icons';
@@ -6,12 +6,24 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { notificationController } from '@app/controllers/notificationController';
 import { Table } from '@app/components/common/Table/Table';
 import { getGanancias, postGanancia } from '@app/api/ganancias.api';
-import locale from 'antd/es/date-picker/locale/es_ES';
+import localeES from 'antd/es/date-picker/locale/es_ES';
+import localeEN from 'antd/es/date-picker/locale/en_US';
+import localePT from 'antd/es/date-picker/locale/pt_BR';
 import { BotonCSV } from '@app/components/shared/BotonCSV';
+import { PageTitle } from '@app/components/common/PageTitle/PageTitle';
+import { useLanguage } from '@app/hooks/useLanguage';
 
 export const GananciasPage: React.FC = () => {
   const { t } = useTranslation();
+  const { language } = useLanguage();
 
+  const [locale, setLocale] = React.useState(() =>
+    language === 'es' ? localeES : language === 'en' ? localeEN : localePT,
+  );
+
+  useEffect(() => {
+    setLocale(language === 'es' ? localeES : language === 'en' ? localeEN : localePT);
+  }, [language]);
   const [modal, setModal] = React.useState(false);
   const [porcentaje, setPorcentaje] = React.useState(0);
   const [vigencia, setVigencia] = React.useState<any>(null);
@@ -81,6 +93,7 @@ export const GananciasPage: React.FC = () => {
 
   return (
     <>
+      <PageTitle>{t('common.margenGanancias')}</PageTitle>
       <Modal
         title={t('notifications.cambiandoMargenGanancias')}
         visible={modal}
@@ -150,7 +163,7 @@ export const GananciasPage: React.FC = () => {
           marginBottom: '1rem',
         }}
       >
-        <h1 style={{ color: 'var(--timeline-background)' }}>{t('common.margenGanancias')}</h1>
+        <h1 style={{ color: 'var(--timeline-background)', fontSize: '25px' }}>{t('common.margenGanancias')}</h1>
 
         <div>
           <Tooltip placement="left" title={t('common.crear')} trigger="hover" destroyTooltipOnHide>
