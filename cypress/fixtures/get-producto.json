@@ -1,0 +1,12 @@
+{
+  "data": {
+    "id": "5",
+    "nombre": "Pintura 15L Mate Blanco Látex Interior",
+    "descripcion": "",
+    "preciolista": "1500",
+    "stock": 0,
+    "stockminimo": 20,
+    "estado": false
+  },
+  "status": 200
+}

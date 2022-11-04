@@ -1,0 +1,57 @@
+{
+  "stock": {
+    "data": [],
+    "status": 200
+  },
+  "pde": {
+    "data": [],
+    "status": 200
+  },
+  "compraventa": {
+    "compras": [0, 0, 0, 0, null, null, null, null, 0, null, 48000, 0],
+    "ventas": [163260.3, 115504.7, 0, 6975, 0, 0, 0, 0, 63168.18, 0, 84531.15000000001, 2710175],
+    "meses": [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+  },
+  "pieCharts": {
+    "comprasMonto": [
+      {
+        "idTipo": 1,
+        "value": 30000
+      },
+      {
+        "idTipo": 2,
+        "value": 18000
+      }
+    ],
+    "comprasCantidad": [
+      {
+        "idTipo": 1,
+        "value": 95
+      },
+      {
+        "idTipo": 2,
+        "value": 60
+      }
+    ],
+    "ventasMonto": [
+      {
+        "idTipo": 1,
+        "value": 330489.18
+      },
+      {
+        "idTipo": 2,
+        "value": 82102.65
+      }
+    ],
+    "ventasCantidad": [
+      {
+        "idTipo": 1,
+        "value": 540
+      },
+      {
+        "idTipo": 2,
+        "value": 83
+      }
+    ]
+  }
+}

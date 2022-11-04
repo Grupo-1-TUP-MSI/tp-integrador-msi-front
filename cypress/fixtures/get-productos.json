@@ -1,0 +1,105 @@
+{
+  "data": [
+    {
+      "id": 7,
+      "nombre": "Pintura 30L Mate Blanco Látex Interior",
+      "descripcion": "",
+      "preciolista": 1400,
+      "precioVenta": 2170,
+      "stock": 41105,
+      "stockminimo": 10,
+      "estado": true
+    },
+    {
+      "id": 8,
+      "nombre": "Pincel ",
+      "descripcion": "n° 50",
+      "preciolista": 350,
+      "precioVenta": 542.5,
+      "stock": 97,
+      "stockminimo": 50,
+      "estado": false
+    },
+    {
+      "id": 9,
+      "nombre": "Pincel n° 12",
+      "descripcion": null,
+      "preciolista": 300,
+      "precioVenta": 465,
+      "stock": 4998,
+      "stockminimo": 50,
+      "estado": false
+    },
+    {
+      "id": 6,
+      "nombre": "Pincel n° 10",
+      "descripcion": "",
+      "preciolista": 200,
+      "precioVenta": 310,
+      "stock": 2973,
+      "stockminimo": 50,
+      "estado": true
+    },
+    {
+      "id": 5,
+      "nombre": "Pintura 15L Mate Blanco Látex Interior",
+      "descripcion": "",
+      "preciolista": 1500,
+      "precioVenta": 2325,
+      "stock": 0,
+      "stockminimo": 20,
+      "estado": true
+    },
+    {
+      "id": 10,
+      "nombre": "Pincel n° 11",
+      "descripcion": "",
+      "preciolista": 250,
+      "precioVenta": 387.5,
+      "stock": 2203,
+      "stockminimo": 50,
+      "estado": true
+    },
+    {
+      "id": 11,
+      "nombre": "Lijas n° 80",
+      "descripcion": null,
+      "preciolista": 250,
+      "precioVenta": 387.5,
+      "stock": 0,
+      "stockminimo": 50,
+      "estado": true
+    },
+    {
+      "id": 12,
+      "nombre": "Pincel nº 20",
+      "descripcion": null,
+      "preciolista": 85,
+      "precioVenta": 131.75,
+      "stock": 50,
+      "stockminimo": 100,
+      "estado": true
+    },
+    {
+      "id": 13,
+      "nombre": "Pincel n° 13",
+      "descripcion": null,
+      "preciolista": 350,
+      "precioVenta": 542.5,
+      "stock": 12000,
+      "stockminimo": 50,
+      "estado": true
+    },
+    {
+      "id": 14,
+      "nombre": "Pincel n° 14",
+      "descripcion": null,
+      "preciolista": 400,
+      "precioVenta": 620,
+      "stock": 10000,
+      "stockminimo": 50,
+      "estado": true
+    }
+  ],
+  "status": 200
+}
