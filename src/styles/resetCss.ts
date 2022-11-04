@@ -110,6 +110,18 @@ export const resetCss = css`
     animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
   }
 
+  .ant-list-item-meta-description {
+    color: var(--text-main-color) !important;
+  }
+
+  .ant-card-bordered {
+    border: 1px solid var(--shadow-color);
+  }
+
+  .ant-card-head {
+    border-bottom: 1px solid var(--shadow-color);
+  }
+
   @keyframes stroke {
     100% {
       stroke-dashoffset: 0;

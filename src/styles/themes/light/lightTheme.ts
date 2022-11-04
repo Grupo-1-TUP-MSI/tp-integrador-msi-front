@@ -7,7 +7,7 @@ const chartColors = {
   chartTooltipLabel: '#6A7985',
   chartColor1: '#01509A',
   chartColor1Tint: '#2983D8',
-  chartColor2: '#35A0DC',
+  chartColor2: '#67C5FA',
   chartColor2Tint: '#67C5FA',
   chartColor3: '#FFB155',
   chartColor3Tint: '#FFA800',

@@ -21,6 +21,19 @@
     }
   },
   "common": {
+    "invalidPhone": "El número de teléfono no es válido",
+    "notaDePedidoPara": "Nota de Pedido para:",
+    "notaDePedidoN": "Nota de Pedido N°: ",
+    "facturaPara": "Factura para:",
+    "facturaN": "Factura N°: ",
+    "fechaElaboracion": "Fecha de Elaboración: ",
+    "fechaEntrega": "Fecha de Entrega: ",
+    "producto": "Producto",
+    "subtotal": "Subtotal",
+    "notaPedidoFooter": "Esta nota de pedido se ha creado via web y es un documento valido.",
+    "facturaFooter": "Esta factura se ha creado via web y es un documento valido.",
+    "auto": "Automático",
+    "pwa": "Instalar",
     "crear": "Crear",
     "volver": "Volver",
     "comprar": "Comprar",
@@ -125,21 +138,21 @@
     "notFound": "Página no encontrada"
   },
   "header": {
-    "changeLanguage": "Change language",
-    "changeTheme": "Change theme",
-    "darkTheme": "Dark",
-    "lightTheme": "Light",
+    "changeLanguage": "Cambiar lenguaje",
+    "changeTheme": "Cambiar tema",
+    "darkTheme": "Oscuro",
+    "lightTheme": "Claro",
     "logout": "Logout",
     "nightMode": {
-      "from": "From",
-      "title": "Nightmode",
-      "to": "To"
+      "from": "Desde",
+      "title": "Modo Nocturno",
+      "to": "Hasta"
     }
   },
   "login": {
-    "loginInfo": "Enter your email address and password to access admin panel",
+    "loginInfo": "Ingresá tus datos para iniciar sesión",
     "login": "Login",
-    "password": "Password",
+    "password": "Contraseña",
     "email": "Email",
     "logout": "Cerrar sesión"
   },

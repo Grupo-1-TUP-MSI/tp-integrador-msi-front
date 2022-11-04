@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Button,
   Col,
@@ -27,17 +27,29 @@ import { SubmitButton } from '@app/components/layouts/AuthLayout/AuthLayout.styl
 import { Table } from '@app/components/common/Table/Table';
 import { getFacturas, getFacturaPDF, postFactura } from '@app/api/facturas.api';
 import { getUsuarios } from '@app/api/usuarios.api';
-import locale from 'antd/es/date-picker/locale/es_ES';
+import localeES from 'antd/es/date-picker/locale/es_ES';
+import localeEN from 'antd/es/date-picker/locale/en_US';
+import localePT from 'antd/es/date-picker/locale/pt_BR';
 import { getProductos } from '@app/api/productos.api';
 import jsPDFInvoiceTemplate, { OutputType } from 'jspdf-invoice-template';
 import { getClientes } from '@app/api/clientes.api';
 import { BotonCSV } from '@app/components/shared/BotonCSV';
 import { zeroPad } from '@app/utils/utils';
 import { useResponsive } from '@app/hooks/useResponsive';
+import { PageTitle } from '@app/components/common/PageTitle/PageTitle';
+import { useLanguage } from '@app/hooks/useLanguage';
 
 export const FacturacionPage: React.FC = () => {
   const { t } = useTranslation();
+  const { language } = useLanguage();
 
+  const [locale, setLocale] = React.useState(() =>
+    language === 'es' ? localeES : language === 'en' ? localeEN : localePT,
+  );
+
+  useEffect(() => {
+    setLocale(language === 'es' ? localeES : language === 'en' ? localeEN : localePT);
+  }, [language]);
   const navigate = useNavigate();
   const { RangePicker } = DatePicker;
   const [filterUsuario, setFilterUsuario] = React.useState(null);
@@ -247,16 +259,16 @@ export const FacturacionPage: React.FC = () => {
         website: 'https://colorcor.netlify.app/',
       },
       contact: {
-        label: 'Factura para:',
+        label: t('common.facturaPara'),
         name: data.cliente.nombre,
         address: data.cliente.direccion,
         phone: data.cliente.telefono,
         email: data.cliente.email,
       },
       invoice: {
-        label: 'Factura N°: 0008-',
+        label: `${t('common.facturaN')}0008-`,
         num: `${zeroPad(data.numero, 8)}`,
-        invDate: `Fecha de elaboracion: ${data.fechaLocale}`,
+        invDate: `${t('common.fechaElaboracion')}${data.fechaLocale}`,
         //invGenDate: `Fecha de entrega: ${data.vencimientoLocale}`,
         headerBorder: false,
         tableBodyBorder: false,
@@ -268,20 +280,20 @@ export const FacturacionPage: React.FC = () => {
             },
           },
           {
-            title: 'Producto',
+            title: t('common.producto'),
             style: {
               width: 30,
             },
           },
           {
-            title: 'Descripcion',
+            title: t('common.descripcion'),
             style: {
               width: 70,
             },
           },
-          { title: 'Precio Unitario' },
-          { title: 'Cantidad' },
-          { title: 'Total' },
+          { title: t('common.importeunitario') },
+          { title: t('common.cantidad') },
+          { title: t('common.importetotal') },
         ],
         table: Array.from(data.detalles, (item: any, index) => [
           index + 1,
@@ -293,21 +305,21 @@ export const FacturacionPage: React.FC = () => {
         ]),
         additionalRows: [
           {
-            col1: 'Gravado:',
+            col1: t('common.subtotal'),
             col2: data.acumGravado.toLocaleString(),
             style: {
               fontSize: 10, //optional, default 12
             },
           },
           {
-            col1: 'IVA:',
+            col1: t('common.iva'),
             col2: data.acumIVA.toLocaleString(),
             style: {
               fontSize: 10, //optional, default 12
             },
           },
           {
-            col1: 'Total:',
+            col1: t('common.importetotal'),
             col2: data.acumTotal.toLocaleString(),
             style: {
               fontSize: 14, //optional, default 12
@@ -316,7 +328,7 @@ export const FacturacionPage: React.FC = () => {
         ],
       },
       footer: {
-        text: 'Esta factura se ha creado via web y es un documento valido.',
+        text: t('common.facturaFooter'),
       },
       pageEnable: true,
       pageLabel: 'Page ',
@@ -362,6 +374,7 @@ export const FacturacionPage: React.FC = () => {
 
   return (
     <>
+      <PageTitle>{t('common.facturacion')}</PageTitle>
       <div
         style={{
           display: 'flex',
@@ -370,7 +383,7 @@ export const FacturacionPage: React.FC = () => {
           marginBottom: '1rem',
         }}
       >
-        <h1 style={{ color: 'var(--timeline-background)' }}>{t('common.facturacion')}</h1>
+        <h1 style={{ color: 'var(--timeline-background)', fontSize: '25px' }}>{t('common.facturacion')}</h1>
 
         <div>
           <Tooltip placement="left" title={t('common.crear')} trigger="hover" destroyTooltipOnHide>
@@ -574,6 +587,15 @@ export const FacturacionPage: React.FC = () => {
 
 export const FacturacionForm: React.FC = () => {
   const { t } = useTranslation();
+  const { language } = useLanguage();
+
+  const [locale, setLocale] = React.useState(() =>
+    language === 'es' ? localeES : language === 'en' ? localeEN : localePT,
+  );
+
+  useEffect(() => {
+    setLocale(language === 'es' ? localeES : language === 'en' ? localeEN : localePT);
+  }, [language]);
   const navigate = useNavigate();
   const { id } = useParams();
   const [detalles, setDetalles] = React.useState([]);
@@ -729,6 +751,7 @@ export const FacturacionForm: React.FC = () => {
       render: (text: any, record: any) => {
         return (
           <InputNumber
+            size="small"
             min={0}
             max={record.stock}
             keyboard
@@ -784,13 +807,14 @@ export const FacturacionForm: React.FC = () => {
 
   return (
     <div id="nota-de-pedido-form">
+      <PageTitle>{t('titles.creandoFactura')}</PageTitle>
       <div id="mercadopago"></div>
       {/* #region Formulario  */}
       <Row>
         <Col span={24}>
           <BaseForm layout="vertical" onFinish={handleSubmit} requiredMark="optional" form={form}>
             <Row justify="space-between">
-              <h1>{t('titles.creandoFactura')}</h1>
+              <h1 style={{ fontSize: '25px' }}>{t('titles.creandoFactura')}</h1>
               <BaseForm.Item>
                 <SubmitButton
                   type="primary"
@@ -1105,6 +1129,7 @@ export const FacturacionForm: React.FC = () => {
           <Col span={24}>
             <Input
               placeholder={t('table.buscarProducto')}
+              size="small"
               value={searchProducto}
               onChange={(e) => setSearchProducto(e.target.value)}
               style={{ width: '100%' }}
@@ -1113,6 +1138,9 @@ export const FacturacionForm: React.FC = () => {
         </Row>
         <Table
           size="small"
+          pagination={{
+            pageSize: 5,
+          }}
           rowKey={(record) => record.id}
           columns={agregarProductosColumnas}
           dataSource={filteredProductos()}

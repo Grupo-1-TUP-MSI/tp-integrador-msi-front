@@ -8,7 +8,6 @@ import LoginPage from '@app/pages/LoginPage';
 import MainLayout from '@app/components/layouts/main/MainLayout/MainLayout';
 import RequireAuth from '@app/components/router/RequireAuth';
 import { withLoading } from '@app/hocs/withLoading.hoc';
-import { readRole } from '@app/services/localStorage.service';
 import DashboardPage from '@app/pages/DashboardPage';
 import { NotasDePedidoForm } from '@app/pages/modules/compras/NotasDePedidoPage';
 import { NotasDePedidoPage } from '@app/pages/modules/compras/NotasDePedidoPage';
@@ -70,60 +69,6 @@ export const AppRouter: React.FC = () => {
       <MainLayout />
     </RequireComprasRole>
   );
-  /* if (readRole() === 'COMPRADOR') {
-    return (
-      <BrowserRouter>
-        <Routes>
-          <Route path="/auth" element={<AuthLayoutFallback />}>
-            <Route path="login" element={<LoginPage />} />
-          </Route>
-          <Route path="/logout" element={<LogoutFallback />} />
-          <Route path="/" element={protectedLayout}>
-            <Route path="compras">
-              <Route path="proveedores" element={<ProveedoresP />} />
-              <Route path="proveedores/alta" element={<ProveedoresF />} />
-              <Route path="proveedores/:id" element={<ProveedoresF />} />
-              <Route path="proveedores/comparativa" element={<ProveedoresC />} />
-              <Route path="notapedido" element={<NotasDePedidoP />} />
-              <Route path="notapedido/alta" element={<NotasDePedidoF />} />
-              <Route path="notapedido/:id" element={<NotasDePedidoF />} />
-            </Route>
-            <Route path="productos" element={<ProductosP />} />
-            <Route path="productos/alta" element={<ProductosF />} />
-            <Route path="productos/:id" element={<ProductosF />} />
-            <Route path="500" element={<ServerError />} />
-          </Route>
-          <Route path="*" element={<Error404 />} />
-        </Routes>
-      </BrowserRouter>
-    );
-  }
-
-  if (readRole() === 'VENDEDOR') {
-    return (
-      <BrowserRouter>
-        <Routes>
-          <Route path="/auth" element={<AuthLayoutFallback />}>
-            <Route path="login" element={<LoginPage />} />
-          </Route>
-          <Route path="/logout" element={<LogoutFallback />} />
-          <Route path="/" element={protectedLayout}>
-            <Route path="ventas">
-              <Route path="clientes" element={<ClientesP />} />
-              <Route path="clientes/alta" element={<ClientesF />} />
-              <Route path="clientes/:id" element={<ClientesF />} />
-              <Route path="facturacion" element={<FacturacionP />} />
-              <Route path="facturacion/alta" element={<FacturacionF />} />
-              <Route path="facturacion/:id" element={<FacturacionF />} />
-              <Route path="facturacion/pago-exitoso/:id" element={<FacturasSuccess />} />
-            </Route>
-            <Route path="500" element={<ServerError />} />
-          </Route>
-          <Route path="*" element={<Error404 />} />
-        </Routes>
-      </BrowserRouter>
-    );
-  } */
 
   return (
     <BrowserRouter>

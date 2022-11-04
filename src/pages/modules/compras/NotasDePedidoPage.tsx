@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Button,
   Col,
@@ -42,15 +42,27 @@ import {
   getNotaPedidoPDF,
 } from '@app/api/notasPedido.api';
 import { getUsuarios } from '@app/api/usuarios.api';
-import locale from 'antd/es/date-picker/locale/es_ES';
+import localeES from 'antd/es/date-picker/locale/es_ES';
+import localeEN from 'antd/es/date-picker/locale/en_US';
+import localePT from 'antd/es/date-picker/locale/pt_BR';
 import { getProductosDeProveedor } from '@app/api/productos.api';
 import jsPDFInvoiceTemplate, { OutputType, jsPDF } from 'jspdf-invoice-template';
 import { BotonCSV } from '@app/components/shared/BotonCSV';
 import { useResponsive } from '@app/hooks/useResponsive';
+import { PageTitle } from '@app/components/common/PageTitle/PageTitle';
+import { useLanguage } from '@app/hooks/useLanguage';
 
 export const NotasDePedidoPage: React.FC = () => {
   const { t } = useTranslation();
+  const { language } = useLanguage();
 
+  const [locale, setLocale] = React.useState(() =>
+    language === 'es' ? localeES : language === 'en' ? localeEN : localePT,
+  );
+
+  useEffect(() => {
+    setLocale(language === 'es' ? localeES : language === 'en' ? localeEN : localePT);
+  }, [language]);
   const navigate = useNavigate();
   const { RangePicker } = DatePicker;
   const [notaPedido, setNotaPedido] = React.useState<any>(null);
@@ -333,17 +345,17 @@ export const NotasDePedidoPage: React.FC = () => {
         website: 'https://colorcor.netlify.app/',
       },
       contact: {
-        label: 'Nota de Pedido para:',
+        label: t('common.notaDePedidoPara'),
         name: data.proveedor.nombre,
         address: data.proveedor.direccion,
         phone: data.proveedor.telefono,
         email: data.proveedor.email,
       },
       invoice: {
-        label: 'Nota de Pedido N°: ',
+        label: t('common.notaDePedidoN'),
         num: `${data.id}.${data.version}`,
-        invDate: `Fecha de elaboracion: ${data.fechaLocale}`,
-        invGenDate: `Fecha de entrega: ${data.vencimientoLocale}`,
+        invDate: `${t('common.fechaElaboracion')}${data.fechaLocale}`,
+        invGenDate: `${t('common.fechaEntrega')}${data.vencimientoLocale}`,
         headerBorder: false,
         tableBodyBorder: false,
         header: [
@@ -354,20 +366,20 @@ export const NotasDePedidoPage: React.FC = () => {
             },
           },
           {
-            title: 'Producto',
+            title: t('common.producto'),
             style: {
               width: 30,
             },
           },
           {
-            title: 'Descripcion',
+            title: t('common.descripcion'),
             style: {
               width: 70,
             },
           },
-          { title: 'Precio Unitario' },
-          { title: 'Cantidad' },
-          { title: 'Total' },
+          { title: t('common.importeunitario') },
+          { title: t('common.cantidad') },
+          { title: t('common.importetotal') },
         ],
         table: Array.from(data.detalles, (item: any, index) => [
           index + 1,
@@ -379,21 +391,21 @@ export const NotasDePedidoPage: React.FC = () => {
         ]),
         additionalRows: [
           {
-            col1: 'Gravado:',
+            col1: t('common.subtotal'),
             col2: data.acumGravado.toLocaleString(),
             style: {
               fontSize: 10, //optional, default 12
             },
           },
           {
-            col1: 'IVA:',
+            col1: t('common.iva'),
             col2: data.acumIVA.toLocaleString(),
             style: {
               fontSize: 10, //optional, default 12
             },
           },
           {
-            col1: 'Total:',
+            col1: t('common.importetotal'),
             col2: data.acumTotal.toLocaleString(),
             style: {
               fontSize: 14, //optional, default 12
@@ -402,7 +414,7 @@ export const NotasDePedidoPage: React.FC = () => {
         ],
       },
       footer: {
-        text: 'Esta nota de pedido se ha creado via web y es un documento valido.',
+        text: t('common.notaPedidoFooter'),
       },
       pageEnable: true,
       pageLabel: 'Page ',
@@ -454,6 +466,7 @@ export const NotasDePedidoPage: React.FC = () => {
 
   return (
     <>
+      <PageTitle>{t('common.notapedido')}</PageTitle>
       <Modal
         title={t('notifications.cambiandoEstado')}
         visible={modalEstado}
@@ -501,7 +514,7 @@ export const NotasDePedidoPage: React.FC = () => {
           marginBottom: '1rem',
         }}
       >
-        <h1 style={{ color: 'var(--timeline-background)' }}>{t('common.notapedido')}</h1>
+        <h1 style={{ color: 'var(--timeline-background)', fontSize: '25px' }}>{t('common.notapedido')}</h1>
 
         <div>
           <Tooltip placement="left" title={t('common.crear')} trigger="hover" destroyTooltipOnHide>
@@ -738,10 +751,10 @@ export const NotasDePedidoForm: React.FC = () => {
     refetchOnWindowFocus: false,
     enabled: isImprimirPDF,
     onSuccess: (data) => {
-      const props = {
+      const props: any = {
         outputType: OutputType.Save,
         returnJsPDFDocObject: true,
-        fileName: 'Invoice 2022',
+        fileName: `ColorCor NP00${data.id}-V00${data.version}`,
         orientationLandscape: false,
         compress: true,
         logo: {
@@ -755,7 +768,7 @@ export const NotasDePedidoForm: React.FC = () => {
         },
         stamp: {
           inAllPages: true,
-          src: 'https://raw.githubusercontent.com/edisonneza/jspdf-invoice-template/demo/images/qr_code.jpg',
+          src: 'https://i.postimg.cc/YCCvCcKC/qr-code.jpg',
           width: 20, //aspect ratio = width/height
           height: 20,
           margin: {
@@ -772,18 +785,17 @@ export const NotasDePedidoForm: React.FC = () => {
           website: 'https://colorcor.netlify.app/',
         },
         contact: {
-          label: 'Nota de Pedido para:',
-          name: 'Pintureria ALBA',
-          address: 'Dean Funes 1522',
-          phone: '(+011) 155 422 222',
-          email: 'ventas@alba.com.ar',
-          otherInfo: 'www.alba.com.ar',
+          label: t('common.notaDePedidoPara'),
+          name: data.proveedor.nombre,
+          address: data.proveedor.direccion,
+          phone: data.proveedor.telefono,
+          email: data.proveedor.email,
         },
         invoice: {
-          label: 'Nota de Pedido N°: ',
-          num: 320,
-          invDate: 'Fecha de elaboracion: 01/01/2022 18:12',
-          invGenDate: 'Fecha de vencimiento: 02/02/2022 10:17',
+          label: t('common.notaDePedidoN'),
+          num: `${data.id}.${data.version}`,
+          invDate: `${t('common.fechaElaboracion')}${data.fechaLocale}`,
+          invGenDate: `${t('common.fechaEntrega')}${data.vencimientoLocale}`,
           headerBorder: false,
           tableBodyBorder: false,
           header: [
@@ -794,59 +806,55 @@ export const NotasDePedidoForm: React.FC = () => {
               },
             },
             {
-              title: 'Producto',
+              title: t('common.producto'),
               style: {
                 width: 30,
               },
             },
             {
-              title: 'Descripcion',
+              title: t('common.descripcion'),
               style: {
                 width: 70,
               },
             },
-            { title: 'Precio Unitario' },
-            { title: 'Cantidad' },
-            { title: 'Total' },
+            { title: t('common.importeunitario') },
+            { title: t('common.cantidad') },
+            { title: t('common.importetotal') },
           ],
-          table: Array.from(Array(2), (item, index) => [
+          table: Array.from(data.detalles, (item: any, index) => [
             index + 1,
-            'Pintura Exterior ',
-            'Interior / Exterior 20lt Gama Alta ',
-            200.5,
-            2,
-            401,
+            item.producto,
+            item.descripcion,
+            item.precio.toLocaleString(),
+            item.cantidadpedida,
+            (parseFloat(item.precio) * parseFloat(item.cantidadpedida)).toLocaleString(),
           ]),
           additionalRows: [
             {
-              col1: 'Total:',
-              col2: '6015',
+              col1: t('common.subtotal'),
+              col2: data.acumGravado.toLocaleString(),
+              style: {
+                fontSize: 10, //optional, default 12
+              },
+            },
+            {
+              col1: t('common.iva'),
+              col2: data.acumIVA.toLocaleString(),
+              style: {
+                fontSize: 10, //optional, default 12
+              },
+            },
+            {
+              col1: t('common.importetotal'),
+              col2: data.acumTotal.toLocaleString(),
               style: {
                 fontSize: 14, //optional, default 12
               },
             },
-            {
-              col1: 'IVA:',
-              col2: '21',
-              style: {
-                fontSize: 10, //optional, default 12
-              },
-            },
-            {
-              col1: 'SubTotal:',
-              col2: '4.751,85',
-              style: {
-                fontSize: 10, //optional, default 12
-              },
-            },
           ],
-
-          invDescLabel: 'Invoice Note',
-          invDesc:
-            "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary.",
         },
         footer: {
-          text: 'Esta nota de pedido se ha creado via web y es un documento valido.',
+          text: t('common.notaPedidoFooter'),
         },
         pageEnable: true,
         pageLabel: 'Page ',
@@ -966,17 +974,17 @@ export const NotasDePedidoForm: React.FC = () => {
         website: 'https://colorcor.netlify.app/',
       },
       contact: {
-        label: 'Nota de Pedido para:',
+        label: t('common.notaDePedidoPara'),
         name: data.proveedor.nombre,
         address: data.proveedor.direccion,
         phone: data.proveedor.telefono,
         email: data.proveedor.email,
       },
       invoice: {
-        label: 'Nota de Pedido N°: ',
+        label: t('common.notaDePedidoN'),
         num: `${data.id}.${data.version}`,
-        invDate: `Fecha de elaboracion: ${data.fechaLocale}`,
-        invGenDate: `Fecha de entrega: ${data.vencimientoLocale}`,
+        invDate: `${t('common.fechaElaboracion')}${data.fechaLocale}`,
+        invGenDate: `${t('common.fechaEntrega')}${data.vencimientoLocale}`,
         headerBorder: false,
         tableBodyBorder: false,
         header: [
@@ -987,20 +995,20 @@ export const NotasDePedidoForm: React.FC = () => {
             },
           },
           {
-            title: 'Producto',
+            title: t('common.producto'),
             style: {
               width: 30,
             },
           },
           {
-            title: 'Descripcion',
+            title: t('common.descripcion'),
             style: {
               width: 70,
             },
           },
-          { title: 'Precio Unitario' },
-          { title: 'Cantidad' },
-          { title: 'Total' },
+          { title: t('common.importeunitario') },
+          { title: t('common.cantidad') },
+          { title: t('common.importetotal') },
         ],
         table: Array.from(data.detalles, (item: any, index) => [
           index + 1,
@@ -1012,21 +1020,21 @@ export const NotasDePedidoForm: React.FC = () => {
         ]),
         additionalRows: [
           {
-            col1: 'Gravado:',
+            col1: t('common.subtotal'),
             col2: data.acumGravado.toLocaleString(),
             style: {
               fontSize: 10, //optional, default 12
             },
           },
           {
-            col1: 'IVA:',
+            col1: t('common.iva'),
             col2: data.acumIVA.toLocaleString(),
             style: {
               fontSize: 10, //optional, default 12
             },
           },
           {
-            col1: 'Total:',
+            col1: t('common.importetotal'),
             col2: data.acumTotal.toLocaleString(),
             style: {
               fontSize: 14, //optional, default 12
@@ -1035,7 +1043,7 @@ export const NotasDePedidoForm: React.FC = () => {
         ],
       },
       footer: {
-        text: 'Esta nota de pedido se ha creado via web y es un documento valido.',
+        text: t('common.notaPedidoFooter'),
       },
       pageEnable: true,
       pageLabel: 'Page ',
@@ -1131,6 +1139,7 @@ export const NotasDePedidoForm: React.FC = () => {
       render: (text: any, record: any) => {
         return (
           <InputNumber
+            size="small"
             min={0}
             max={record.stock}
             defaultValue={0}
@@ -1182,13 +1191,14 @@ export const NotasDePedidoForm: React.FC = () => {
 
   return (
     <div id="nota-de-pedido-form">
+      <PageTitle>{isEdit ? t('titles.editandoNP') : t('titles.creandoNP')}</PageTitle>
       {/* #region Formulario  */}
       <Row>
         {isTablet ? (
           <Col span={24}>
             <BaseForm layout="vertical" onFinish={handleSubmit} requiredMark="optional" form={form}>
               <Row justify="space-between">
-                <h1>{isEdit ? t('titles.editandoNP') : t('titles.creandoNP')}</h1>
+                <h1 style={{ fontSize: '25px' }}>{isEdit ? t('titles.editandoNP') : t('titles.creandoNP')}</h1>
                 <BaseForm.Item>
                   <SubmitButton
                     type="primary"
@@ -1319,7 +1329,7 @@ export const NotasDePedidoForm: React.FC = () => {
           <Col span={24}>
             <BaseForm layout="vertical" onFinish={handleSubmit} requiredMark="optional" form={form}>
               <Row justify="space-between">
-                <h1>{isEdit ? t('titles.editandoNP') : t('titles.creandoNP')}</h1>
+                <h1 style={{ fontSize: '25px' }}>{isEdit ? t('titles.editandoNP') : t('titles.creandoNP')}</h1>
                 <BaseForm.Item>
                   <SubmitButton
                     type="primary"
@@ -1463,6 +1473,7 @@ export const NotasDePedidoForm: React.FC = () => {
         <Row>
           <Col span={24}>
             <Input
+              size="small"
               placeholder={t('table.buscarProducto')}
               value={searchProducto}
               onChange={(e) => setSearchProducto(e.target.value)}
@@ -1472,6 +1483,9 @@ export const NotasDePedidoForm: React.FC = () => {
         </Row>
         <Table
           size="small"
+          pagination={{
+            pageSize: 5,
+          }}
           rowKey={(record) => record.id}
           columns={agregarProductosColumnas}
           dataSource={filteredProductos()}

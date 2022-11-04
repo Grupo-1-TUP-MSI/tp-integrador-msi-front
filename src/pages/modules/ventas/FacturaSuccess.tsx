@@ -1,5 +1,6 @@
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { getFacturaPDF } from '@app/api/facturas.api';
+import { PageTitle } from '@app/components/common/PageTitle/PageTitle';
 import { zeroPad } from '@app/utils/utils';
 import { Button, Col, Row, Typography } from 'antd';
 import jsPDFInvoiceTemplate, { OutputType } from 'jspdf-invoice-template';
@@ -49,16 +50,16 @@ export const FacturaSuccess = () => {
         website: 'https://colorcor.netlify.app/',
       },
       contact: {
-        label: 'Factura para:',
+        label: t('common.facturaPara'),
         name: data.cliente.nombre,
         address: data.cliente.direccion,
         phone: data.cliente.telefono,
         email: data.cliente.email,
       },
       invoice: {
-        label: 'Factura N°: 0008-',
+        label: `${t('common.facturaN')}0008-`,
         num: `${zeroPad(data.numero, 8)}`,
-        invDate: `Fecha de elaboracion: ${data.fechaLocale}`,
+        invDate: `${t('common.fechaElaboracion')} ${data.fechaLocale}`,
         //invGenDate: `Fecha de entrega: ${data.vencimientoLocale}`,
         headerBorder: false,
         tableBodyBorder: false,
@@ -70,20 +71,20 @@ export const FacturaSuccess = () => {
             },
           },
           {
-            title: 'Producto',
+            title: t('common.producto'),
             style: {
               width: 30,
             },
           },
           {
-            title: 'Descripcion',
+            title: t('common.descripcion'),
             style: {
               width: 70,
             },
           },
-          { title: 'Precio Unitario' },
-          { title: 'Cantidad' },
-          { title: 'Total' },
+          { title: t('common.importeunitario') },
+          { title: t('common.cantidad') },
+          { title: t('common.importetotal') },
         ],
         table: Array.from(data.detalles, (item: any, index) => [
           index + 1,
@@ -95,21 +96,21 @@ export const FacturaSuccess = () => {
         ]),
         additionalRows: [
           {
-            col1: 'Gravado:',
+            col1: t('common.subtotal'),
             col2: data.acumGravado.toLocaleString(),
             style: {
               fontSize: 10, //optional, default 12
             },
           },
           {
-            col1: 'IVA:',
+            col1: t('common.iva'),
             col2: data.acumIVA.toLocaleString(),
             style: {
               fontSize: 10, //optional, default 12
             },
           },
           {
-            col1: 'Total:',
+            col1: t('common.importetotal'),
             col2: data.acumTotal.toLocaleString(),
             style: {
               fontSize: 14, //optional, default 12
@@ -118,7 +119,7 @@ export const FacturaSuccess = () => {
         ],
       },
       footer: {
-        text: 'Esta factura se ha creado via web y es un documento valido.',
+        text: t('common.notaPedidoFooter'),
       },
       pageEnable: true,
       pageLabel: 'Page ',
@@ -128,6 +129,7 @@ export const FacturaSuccess = () => {
 
   return (
     <Row align="middle" justify="start">
+      <PageTitle>{t('notifications.facturaCreadaConExito')}</PageTitle>
       <Button
         style={{
           color: 'var(--primary-color)',

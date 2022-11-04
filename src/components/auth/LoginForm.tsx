@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { BaseForm } from '@app/components/common/forms/BaseForm/BaseForm';
-import { useAppDispatch } from '@app/hooks/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@app/hooks/reduxHooks';
 import { doLogin } from '@app/store/slices/authSlice';
 import { notificationController } from '@app/controllers/notificationController';
 import * as S from './LoginForm.styles';
 import * as Auth from '@app/components/layouts/AuthLayout/AuthLayout.styles';
+import logo from 'assets/logo.png';
+import logoDark from 'assets/logo-dark.png';
 
 interface LoginFormData {
   usuario: string;
@@ -17,7 +19,8 @@ export const LoginForm: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
-
+  const theme = useAppSelector((state) => state.theme.theme);
+  const img = theme === 'dark' ? logoDark : logo;
   const [isLoading, setLoading] = useState(false);
 
   const handleSubmit = (values: LoginFormData) => {
@@ -33,6 +36,13 @@ export const LoginForm: React.FC = () => {
   return (
     <Auth.FormWrapper>
       <BaseForm layout="vertical" onFinish={handleSubmit} requiredMark="optional">
+        <img
+          src={img}
+          alt="Colorcor"
+          width={150}
+          height={150}
+          style={{ position: 'absolute', left: 0, right: 0, top: -60, marginLeft: 'auto', marginRight: 'auto' }}
+        />
         <Auth.FormTitle>{t('login.login')}</Auth.FormTitle>
         <S.LoginDescription>{t('login.loginInfo')}</S.LoginDescription>
         <Auth.FormItem

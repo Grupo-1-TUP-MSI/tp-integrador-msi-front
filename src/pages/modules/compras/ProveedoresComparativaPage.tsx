@@ -8,6 +8,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircleOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { PageTitle } from '@app/components/common/PageTitle/PageTitle';
 
 export const ProveedoresComparativaPage = () => {
   const { t } = useTranslation();
@@ -112,6 +113,7 @@ export const ProveedoresComparativaPage = () => {
 
   return (
     <>
+      <PageTitle>{t('common.comparativaProveedores')}</PageTitle>
       <div
         style={{
           display: 'flex',
@@ -120,7 +122,7 @@ export const ProveedoresComparativaPage = () => {
           marginBottom: '1rem',
         }}
       >
-        <h1 style={{ color: 'var(--timeline-background)' }}>{t('common.comparativaProveedores')}</h1>
+        <h1 style={{ color: 'var(--timeline-background)', fontSize: '25px' }}>{t('common.comparativaProveedores')}</h1>
         <Button
           type="primary"
           onClick={() => navigate('/compras/notaPedido/alta', { state: { productos: productosNota } })}

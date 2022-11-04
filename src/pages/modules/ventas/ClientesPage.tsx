@@ -13,6 +13,7 @@ import { Table } from '@app/components/common/Table/Table';
 import { getClientes, getCliente, postCliente, putCliente, deleteCliente } from '../../../api/clientes.api';
 import { useResponsive } from '@app/hooks/useResponsive';
 import { BotonCSV } from '@app/components/shared/BotonCSV';
+import { PageTitle } from '@app/components/common/PageTitle/PageTitle';
 
 export const ClientesPage: React.FC = () => {
   const { t } = useTranslation();
@@ -152,6 +153,7 @@ export const ClientesPage: React.FC = () => {
 
   return (
     <>
+      <PageTitle>{t('common.clientes')}</PageTitle>
       <Modal
         title={t('notifications.eliminandoElemento')}
         visible={isModalOpen}
@@ -173,7 +175,7 @@ export const ClientesPage: React.FC = () => {
           marginBottom: '1rem',
         }}
       >
-        <h1 style={{ color: 'var(--timeline-background)' }}>{t('common.clientes')}</h1>
+        <h1 style={{ color: 'var(--timeline-background)', fontSize: '25px' }}>{t('common.clientes')}</h1>
 
         <div>
           <Tooltip placement="left" title={t('common.crear')} trigger="hover" destroyTooltipOnHide>
@@ -378,11 +380,12 @@ export const ClientesForm: React.FC = () => {
 
   return (
     <div>
+      <PageTitle>{isEdit ? t('titles.editandoCliente') : t('titles.creandoCliente')}</PageTitle>
       <Row>
         {isTablet ? (
           <Col offset={6} span={12}>
             <BaseForm layout="vertical" onFinish={handleSubmit} requiredMark="optional" form={form}>
-              <h1>{isEdit ? t('titles.editandoCliente') : t('titles.creandoCliente')}</h1>
+              <h1 style={{ fontSize: '25px' }}>{isEdit ? t('titles.editandoCliente') : t('titles.creandoCliente')}</h1>
               <Row>
                 <Col span={6}>
                   <FormItem
@@ -473,7 +476,17 @@ export const ClientesForm: React.FC = () => {
               </Row>
               <Row>
                 <Col span={11}>
-                  <FormItem requiredMark name="telefono" label={t('common.telefono')}>
+                  <FormItem
+                    requiredMark
+                    name="telefono"
+                    label={t('common.telefono')}
+                    rules={[
+                      {
+                        pattern: new RegExp('^[0-9]*$'),
+                        message: t('common.invalidPhone'),
+                      },
+                    ]}
+                  >
                     <FormInput />
                   </FormItem>
                 </Col>
@@ -504,7 +517,7 @@ export const ClientesForm: React.FC = () => {
         ) : (
           <Col span={24}>
             <BaseForm layout="vertical" onFinish={handleSubmit} requiredMark="optional" form={form}>
-              <h1>{isEdit ? t('titles.editandoCliente') : t('titles.creandoCliente')}</h1>
+              <h1 style={{ fontSize: '25px' }}>{isEdit ? t('titles.editandoCliente') : t('titles.creandoCliente')}</h1>
               <Row>
                 <Col span={24}>
                   <FormItem
@@ -595,7 +608,17 @@ export const ClientesForm: React.FC = () => {
               </Row>
               <Row>
                 <Col span={24}>
-                  <FormItem requiredMark name="telefono" label={t('common.telefono')}>
+                  <FormItem
+                    requiredMark
+                    name="telefono"
+                    label={t('common.telefono')}
+                    rules={[
+                      {
+                        pattern: new RegExp('^[0-9]*$'),
+                        message: t('common.invalidPhone'),
+                      },
+                    ]}
+                  >
                     <FormInput />
                   </FormItem>
                 </Col>

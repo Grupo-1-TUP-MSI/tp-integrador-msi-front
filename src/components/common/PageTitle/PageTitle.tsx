@@ -5,7 +5,7 @@ import { Helmet } from 'react-helmet';
 export const PageTitle: React.FC<WithChildrenProps> = ({ children }) => {
   return (
     <Helmet>
-      <title>{children} | TPI Admin Panel</title>
+      <title>{children} | Colorcor</title>
     </Helmet>
   );
 };
