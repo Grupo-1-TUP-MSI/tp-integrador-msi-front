@@ -47,6 +47,7 @@ export const LoginForm: React.FC = () => {
         <S.LoginDescription>{t('login.loginInfo')}</S.LoginDescription>
         <Auth.FormItem
           name="usuario"
+          data-testId="login--usuario"
           label={t('login.email')}
           rules={[
             { required: true, message: t('common.requiredField') },
@@ -61,13 +62,14 @@ export const LoginForm: React.FC = () => {
         <Auth.FormItem
           label={t('login.password')}
           name="password"
+          data-testId="login--password"
           rules={[{ required: true, message: t('common.requiredField') }]}
         >
           <Auth.FormInputPassword placeholder={t('login.password')} />
         </Auth.FormItem>
 
         <BaseForm.Item noStyle>
-          <Auth.SubmitButton type="primary" htmlType="submit" loading={isLoading}>
+          <Auth.SubmitButton type="primary" htmlType="submit" loading={isLoading} data-testId="login--loginBtn">
             {t('login.login')}
           </Auth.SubmitButton>
         </BaseForm.Item>

@@ -318,7 +318,7 @@ export const UsuariosForm: React.FC = () => {
         usuario: values.usuario,
         nombrecompleto: values.nombrecompleto,
         password: values.password,
-        idRol: values.rol,
+        idRol: Roles.indexOf(values.rol) + 1,
       };
       handleEdit(user);
     } else {
