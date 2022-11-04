@@ -246,6 +246,7 @@ export const ProductosPage: React.FC = () => {
           </Tooltip>
           <Tooltip placement="top" title={t('common.editar')} trigger="hover" destroyTooltipOnHide>
             <Button
+              data-testId={`productos--edit-${record.id}`}
               size="small"
               icon={<EditOutlined />}
               disabled={!record.estado}
@@ -256,6 +257,7 @@ export const ProductosPage: React.FC = () => {
             ></Button>
           </Tooltip>
           <Button
+            data-testId={`productos--delete-${record.id}`}
             size="small"
             icon={<DeleteOutlined />}
             disabled={!record.estado}
@@ -527,6 +529,7 @@ export const ProductosPage: React.FC = () => {
         </Row>
       )}
       <Table
+        data-testId="productos--productTable"
         size="small"
         pagination={{
           pageSize: 5,
@@ -575,6 +578,9 @@ export const ProductosForm: React.FC = () => {
       keepPreviousData: false,
       refetchOnWindowFocus: false,
       enabled: !!id,
+      onSuccess: (data) => {
+        console.log(data);
+      },
     },
   );
 
