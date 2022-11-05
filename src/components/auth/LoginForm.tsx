@@ -9,6 +9,7 @@ import * as S from './LoginForm.styles';
 import * as Auth from '@app/components/layouts/AuthLayout/AuthLayout.styles';
 import logo from 'assets/logo.png';
 import logoDark from 'assets/logo-dark.png';
+import { readRole } from '@app/services/localStorage.service';
 
 interface LoginFormData {
   usuario: string;
@@ -26,7 +27,13 @@ export const LoginForm: React.FC = () => {
   const handleSubmit = (values: LoginFormData) => {
     setLoading(true);
     dispatch(doLogin(values))
-      .then(() => navigate('/'))
+      .then(() => {
+        readRole() === 'VENDEDOR'
+          ? navigate('/ventas/facturacion')
+          : readRole() === 'COMPRADOR'
+          ? navigate('/compras/notapedido')
+          : navigate('/');
+      })
       .catch((err) => {
         notificationController.error({ message: err.message });
         setLoading(false);
