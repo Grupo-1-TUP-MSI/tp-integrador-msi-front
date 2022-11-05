@@ -21,6 +21,7 @@
     }
   },
   "common": {
+    "codigoProductoProveedor": "Código do produto do provedor",
     "pagina": "items p/pág",
     "ocultarProveedores": "Ocultar Provedores",
     "mostrarProveedores": "Mostrar Provedores",

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Button, Checkbox, Col, Form, Input, Modal, Row, Select, Space, Spin, Tooltip } from 'antd';
+import { Button, Checkbox, Col, Form, Input, Modal, Row, Select, Space, Spin, Table, Tooltip } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -9,7 +9,6 @@ import { notificationController } from '@app/controllers/notificationController'
 import { BaseForm } from '@app/components/common/forms/BaseForm/BaseForm';
 import FormItem from 'antd/es/form/FormItem';
 import { FormInput, FormInputPassword, SubmitButton } from '@app/components/layouts/AuthLayout/AuthLayout.styles';
-import { Table } from '@app/components/common/Table/Table';
 import { getClientes, getCliente, postCliente, putCliente, deleteCliente } from '../../../api/clientes.api';
 import { useResponsive } from '@app/hooks/useResponsive';
 import { BotonCSV } from '@app/components/shared/BotonCSV';
@@ -247,7 +246,6 @@ export const ClientesPage: React.FC = () => {
         dataSource={clientesFiltrados()}
         loading={isLoadingClientes || isRefetchingClientes}
         pagination={{
-          pageSize: 10,
           pageSizeOptions: ['5', '10', '20'],
           showSizeChanger: true,
           locale: {

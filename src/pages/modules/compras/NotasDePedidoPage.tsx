@@ -11,6 +11,7 @@ import {
   Select,
   Space,
   Spin,
+  Table,
   Tooltip,
   Typography,
 } from 'antd';
@@ -31,7 +32,6 @@ import { notificationController } from '@app/controllers/notificationController'
 import { BaseForm } from '@app/components/common/forms/BaseForm/BaseForm';
 import FormItem from 'antd/es/form/FormItem';
 import { SubmitButton } from '@app/components/layouts/AuthLayout/AuthLayout.styles';
-import { Table } from '@app/components/common/Table/Table';
 import { getProveedores } from '../../../api/proveedores.api';
 import {
   getNotasPedidos,
@@ -657,7 +657,6 @@ export const NotasDePedidoPage: React.FC = () => {
         columns={columns}
         dataSource={npFiltradas()}
         pagination={{
-          pageSize: 10,
           pageSizeOptions: ['5', '10', '20'],
           showSizeChanger: true,
           locale: {
@@ -1160,7 +1159,6 @@ export const NotasDePedidoForm: React.FC = () => {
       dataIndex: 'idproducto',
       key: 'idproducto',
       width: '5%',
-
       sorter: (a: any, b: any) => a.idproducto - b.idproducto,
     },
     {
@@ -1168,14 +1166,12 @@ export const NotasDePedidoForm: React.FC = () => {
       dataIndex: 'productoNombre',
       key: 'productoNombre',
       width: '70%',
-
       sorter: (a: any, b: any) => a.productoNombre.localeCompare(b.productoNombre),
     },
     {
       title: t('common.importeunitario'),
       dataIndex: 'precio',
       key: 'precio',
-
       sorter: (a: any, b: any) => a.precio - b.precio,
       render: (text: any, record: any) => {
         return <span>${record.precio}</span>;
@@ -1351,7 +1347,6 @@ export const NotasDePedidoForm: React.FC = () => {
                     dataSource={detalles}
                     loading={isEdit && isLoadingNP}
                     pagination={{
-                      pageSize: 10,
                       pageSizeOptions: ['5', '10', '20'],
                       showSizeChanger: true,
                       locale: {
@@ -1491,7 +1486,6 @@ export const NotasDePedidoForm: React.FC = () => {
                     dataSource={detalles}
                     loading={isEdit && isLoadingNP}
                     pagination={{
-                      pageSize: 10,
                       pageSizeOptions: ['5', '10', '20'],
                       showSizeChanger: true,
                       locale: {

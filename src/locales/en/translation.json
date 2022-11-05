@@ -21,6 +21,7 @@
     }
   },
   "common": {
+    "codigoProductoProveedor": "Product code for this provider",
     "pagina": "items per page.",
     "ocultarProveedores": "Hide providers",
     "mostrarProveedores": "Show providers",
