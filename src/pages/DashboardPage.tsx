@@ -231,18 +231,46 @@ const DashboardPage: React.FC = () => {
       >
         <Col xs={24} md={12} lg={12}>
           <Card style={{ margin: 20 }} title={t('titles.tiposCompraMonto')}>
-            <PieChart data={pieChartsData?.comprasMonto.map((d: any) => ({ ...d, name: TipoCompra[d.idTipo - 1] }))} />
+            <PieChart
+              data={pieChartsData?.comprasMonto.map((d: any) => ({
+                ...d,
+                value: d.value.toFixed(2),
+                name: TipoCompra[d.idTipo - 1],
+              }))}
+            />
             <Legend
-              legendItems={generateLegendData(pieChartsData?.comprasMonto, true) || []}
+              legendItems={
+                generateLegendData(
+                  pieChartsData?.comprasMonto.map((m: any) => ({
+                    ...m,
+                    value: `$${m.value.toFixed(2)}`,
+                  })),
+                  true,
+                ) || []
+              }
               activeItemIndex={activeItemIndex}
             />
           </Card>
         </Col>
         <Col xs={24} md={12} lg={12}>
           <Card style={{ margin: 20 }} title={t('titles.tiposVentaMonto')}>
-            <PieChart data={pieChartsData?.ventasMonto.map((d: any) => ({ ...d, name: TipoVenta[d.idTipo - 1] }))} />
+            <PieChart
+              data={pieChartsData?.ventasMonto.map((d: any) => ({
+                ...d,
+                value: d.value.toFixed(2),
+                name: TipoVenta[d.idTipo - 1],
+              }))}
+            />
             <Legend
-              legendItems={generateLegendData(pieChartsData?.ventasMonto, false) || []}
+              legendItems={
+                generateLegendData(
+                  pieChartsData?.ventasMonto.map((m: any) => ({
+                    ...m,
+                    value: `$${m.value.toFixed(2)}`,
+                  })),
+                  false,
+                ) || []
+              }
               activeItemIndex={activeItemIndex}
             />
           </Card>

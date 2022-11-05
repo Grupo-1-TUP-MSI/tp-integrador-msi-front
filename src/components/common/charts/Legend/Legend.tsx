@@ -1,6 +1,5 @@
 import React from 'react';
 import * as S from './Legend.styles';
-import { Popover } from '@app/components/common/Popover/Popover';
 import { getChartColors } from '@app/components/common/charts/BaseChart';
 import { useAppSelector } from '@app/hooks/reduxHooks';
 import { themeObject } from '@app/styles/themes/themeVariables';
