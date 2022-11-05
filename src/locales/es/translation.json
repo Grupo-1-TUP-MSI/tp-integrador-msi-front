@@ -21,6 +21,9 @@
     }
   },
   "common": {
+    "pagina": "items p/pág",
+    "ocultarProveedores": "Ocultar proveedores",
+    "mostrarProveedores": "Mostrar proveedores",
     "invalidPhone": "El número de teléfono no es válido",
     "notaDePedidoPara": "Nota de Pedido para:",
     "notaDePedidoN": "Nota de Pedido N°: ",

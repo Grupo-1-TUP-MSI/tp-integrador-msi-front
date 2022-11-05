@@ -23,7 +23,7 @@ export const FacturaSuccess = () => {
       orientationLandscape: false,
       compress: true,
       logo: {
-        src: 'https://i.postimg.cc/3w2KmPdm/logo.png',
+        src: 'https://i.ibb.co/6r9YkfP/logo.png',
         width: 25, //aspect ratio = width/height
         height: 25,
         margin: {
@@ -33,7 +33,7 @@ export const FacturaSuccess = () => {
       },
       stamp: {
         inAllPages: true,
-        src: 'https://i.postimg.cc/YCCvCcKC/qr-code.jpg',
+        src: '',
         width: 20, //aspect ratio = width/height
         height: 20,
         margin: {

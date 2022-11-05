@@ -64,18 +64,24 @@ export const UsuariosPage: React.FC = () => {
       title: t('common.nombre'),
       dataIndex: 'nombrecompleto',
       key: 'nombrecompleto',
+
+      sorter: (a: any, b: any) => a.nombrecompleto.localeCompare(b.nombrecompleto),
     },
     {
       title: t('common.email'),
       dataIndex: 'usuario',
       key: 'email',
       width: '25%',
+
+      sorter: (a: any, b: any) => a.usuario.localeCompare(b.usuario),
     },
     {
       title: t('common.rol'),
       dataIndex: 'rol',
       key: 'rol',
       width: '25%',
+
+      sorter: (a: any, b: any) => a.rol.localeCompare(b.rol),
     },
     {
       title: t('common.acciones'),
@@ -212,9 +218,18 @@ export const UsuariosPage: React.FC = () => {
         rowKey={(record) => record.id}
         rowClassName={(record) => (!record.estado ? 'deleted-row' : '')}
         columns={columns}
+        pagination={{
+          pageSize: 10,
+          pageSizeOptions: ['5', '10', '20'],
+          showSizeChanger: true,
+          locale: {
+            items_per_page: t('common.pagina'),
+          },
+        }}
         dataSource={usuariosFiltrados()}
         loading={isLoadingUsuarios || isRefetchingUsuarios}
         scroll={{ x: 800 }}
+        showSorterTooltip={false}
         locale={{
           filterTitle: t('table.filterTitle'),
           filterConfirm: t('table.filterConfirm'),
