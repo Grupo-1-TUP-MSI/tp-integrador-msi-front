@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 // no lazy loading for auth pages to avoid flickering
 const AuthLayout = React.lazy(() => import('@app/components/layouts/AuthLayout/AuthLayout'));
@@ -26,6 +26,8 @@ import { GananciasPage } from '@app/pages/modules/ventas/GananciasPage';
 import { FacturaSuccess } from '@app/pages/modules/ventas/FacturaSuccess';
 import RequireVentasRole from './RequireVentasRole';
 import RequireComprasRole from './RequireComprasRole';
+import { readRole } from '@app/services/localStorage.service';
+import RequireAdminRole from './RequireAdminRole';
 
 const ServerErrorPage = React.lazy(() => import('@app/pages/ServerErrorPage'));
 const Error404Page = React.lazy(() => import('@app/pages/Error404Page'));
@@ -58,6 +60,12 @@ export const AppRouter: React.FC = () => {
     </RequireAuth>
   );
 
+  const protectedLayoutDashboard = (
+    <RequireAdminRole>
+      <DashboardPage />
+    </RequireAdminRole>
+  );
+
   const protectedVentasLayout = (
     <RequireVentasRole>
       <MainLayout />
@@ -78,7 +86,7 @@ export const AppRouter: React.FC = () => {
         </Route>
         <Route path="/logout" element={<LogoutFallback />} />
         <Route path="/" element={protectedLayout}>
-          <Route index element={<DashboardPage />} />
+          <Route index element={protectedLayoutDashboard} />
 
           <Route path="productos" element={<ProductosP />} />
           <Route path="productos/alta" element={<ProductosF />} />
