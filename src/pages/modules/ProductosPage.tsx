@@ -12,6 +12,7 @@ import {
   Select,
   Space,
   Spin,
+  Table,
   Tooltip,
   Typography,
 } from 'antd';
@@ -42,7 +43,6 @@ import { notificationController } from '@app/controllers/notificationController'
 import { BaseForm } from '@app/components/common/forms/BaseForm/BaseForm';
 import FormItem from 'antd/es/form/FormItem';
 import { FormInput, SubmitButton } from '@app/components/layouts/AuthLayout/AuthLayout.styles';
-import { Table } from '@app/components/common/Table/Table';
 import { useResponsive } from '@app/hooks/useResponsive';
 import { getProveedores } from '@app/api/proveedores.api';
 import { BotonCSV } from '@app/components/shared/BotonCSV';
@@ -644,7 +644,6 @@ export const ProductosPage: React.FC = () => {
         data-testId="productos--productTable"
         size="small"
         pagination={{
-          pageSize: 10,
           pageSizeOptions: ['5', '10', '20'],
           showSizeChanger: true,
           locale: {

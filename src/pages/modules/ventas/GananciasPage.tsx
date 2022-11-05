@@ -1,10 +1,9 @@
 import React, { useEffect } from 'react';
-import { Button, DatePicker, InputNumber, Modal, Tooltip } from 'antd';
+import { Button, DatePicker, InputNumber, Modal, Table, Tooltip } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { PlusOutlined } from '@ant-design/icons';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { notificationController } from '@app/controllers/notificationController';
-import { Table } from '@app/components/common/Table/Table';
 import { getGanancias, postGanancia } from '@app/api/ganancias.api';
 import localeES from 'antd/es/date-picker/locale/es_ES';
 import localeEN from 'antd/es/date-picker/locale/en_US';
@@ -62,10 +61,9 @@ export const GananciasPage: React.FC = () => {
       title: t('common.vigencia'),
       dataIndex: 'vigencia',
       key: 'vigencia',
-
       sorter: (a: any, b: any) => new Date(a.vigencia).getTime() - new Date(b.vigencia).getTime(),
       render: (text: any, record: any) => {
-        return <span>{new Date(record.vigencia).toLocaleDateString('es')}</span>;
+        return <span>{new Date(record.vigencia).toLocaleDateString('es', { timeZone: 'UTC' })}</span>;
       },
     },
     {
@@ -73,7 +71,6 @@ export const GananciasPage: React.FC = () => {
       dataIndex: 'porcentaje',
       key: 'porcentaje',
       width: '25%',
-
       sorter: (a: any, b: any) => a.porcentaje - b.porcentaje,
       render: (text: any, record: any) => {
         return (
@@ -88,13 +85,15 @@ export const GananciasPage: React.FC = () => {
       dataIndex: 'usuario',
       key: 'usuario',
       width: '25%',
-
       sorter: (a: any, b: any) => a.usuario - b.usuario,
     },
   ];
 
   const mayorVigencia = () => {
-    return new Date(new Date(gananciasData[0]?.vigencia).getTime() + 86400000);
+    const sortedGanancia = gananciasData.sort(
+      (a: any, b: any) => new Date(b.vigencia).getTime() - new Date(a.vigencia).getTime(),
+    )[0];
+    return new Date(new Date(sortedGanancia?.vigencia).getTime() + 86400000);
   };
 
   return (
@@ -194,7 +193,6 @@ export const GananciasPage: React.FC = () => {
         dataSource={gananciasData}
         loading={isLoadingGanancias || isRefetchingGanancias}
         pagination={{
-          pageSize: 10,
           pageSizeOptions: ['5', '10', '20'],
           showSizeChanger: true,
           locale: {

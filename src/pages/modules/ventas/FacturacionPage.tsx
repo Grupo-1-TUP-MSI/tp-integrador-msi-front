@@ -12,6 +12,7 @@ import {
   Space,
   Spin,
   Switch,
+  Table,
   Tooltip,
   Typography,
 } from 'antd';
@@ -24,7 +25,6 @@ import { notificationController } from '@app/controllers/notificationController'
 import { BaseForm } from '@app/components/common/forms/BaseForm/BaseForm';
 import FormItem from 'antd/es/form/FormItem';
 import { SubmitButton } from '@app/components/layouts/AuthLayout/AuthLayout.styles';
-import { Table } from '@app/components/common/Table/Table';
 import { getFacturas, getFacturaPDF, postFactura } from '@app/api/facturas.api';
 import { getUsuarios } from '@app/api/usuarios.api';
 import localeES from 'antd/es/date-picker/locale/es_ES';
@@ -581,7 +581,6 @@ export const FacturacionPage: React.FC = () => {
         dataSource={facturasFiltradas()}
         loading={isLoadingFacturas || isLoadingClientes || isLoadingUsuarios}
         pagination={{
-          pageSize: 10,
           pageSizeOptions: ['5', '10', '20'],
           showSizeChanger: true,
           locale: {
@@ -1135,7 +1134,6 @@ export const FacturacionForm: React.FC = () => {
                   columns={columns}
                   dataSource={detalles}
                   pagination={{
-                    pageSize: 10,
                     pageSizeOptions: ['5', '10', '20'],
                     showSizeChanger: true,
                     locale: {

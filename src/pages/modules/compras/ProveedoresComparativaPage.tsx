@@ -41,10 +41,16 @@ export const ProveedoresComparativaPage = () => {
 
   const columns = [
     {
-      title: t('common.id'),
+      title: (text: string, record: any) => (
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <span>{t('common.id')}</span>
+          <Tooltip title={t('common.codigoProductoProveedor')} destroyTooltipOnHide>
+            <InfoCircleOutlined style={{ opacity: '0.4', marginLeft: '5px' }} />
+          </Tooltip>
+        </div>
+      ),
       dataIndex: 'id',
       width: '5%',
-
       sorter: (a: any, b: any) => a.id.localeCompare(b.id),
     },
     {
@@ -267,7 +273,6 @@ export const ProveedoresComparativaPage = () => {
         dataSource={productosFiltrados()}
         loading={isLoadingProductos}
         pagination={{
-          pageSize: 10,
           pageSizeOptions: ['5', '10', '20'],
           showSizeChanger: true,
           locale: {
