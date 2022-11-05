@@ -413,7 +413,7 @@ export const UsuariosForm: React.FC = () => {
               rules={[{ required: true, message: t('common.requiredField') }]}
             >
               <Select allowClear>
-                {Roles.filter((rol) => rol === 'ADMINISTRADOR').map((rol, i) => (
+                {Roles.filter((rol) => rol !== 'ADMINISTRADOR').map((rol, i) => (
                   <Select.Option key={i} value={i + 1}>
                     {rol}
                   </Select.Option>
