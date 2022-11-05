@@ -71,17 +71,23 @@ export const ProveedoresPage: React.FC = () => {
       title: t('common.documento'),
       dataIndex: 'documento',
       key: 'documento',
+
+      sorter: (a: any, b: any) => a.documento - b.documento,
       render: (text: any, record: any) => TiposDocumento[record.idtipodocumento - 1] + ' ' + record.documento,
     },
     {
       title: t('common.nombre'),
       dataIndex: 'nombre',
       key: 'nombre',
+
+      sorter: (a: any, b: any) => a.nombre.localeCompare(b.nombre),
     },
     {
       title: t('common.tipoiva'),
       dataIndex: 'tipoiva',
       key: 'tipoiva',
+
+      sorter: (a: any, b: any) => a.tipoiva - b.tipoiva,
       render: (text: any, record: any) => TiposIVA[record.tipoiva - 1],
     },
 
@@ -89,17 +95,23 @@ export const ProveedoresPage: React.FC = () => {
       title: t('common.direccion'),
       dataIndex: 'direccion',
       key: 'direccion',
+
+      sorter: (a: any, b: any) => a.direccion.localeCompare(b.direccion),
       render: (text: any, record: any) => record.direccion + ', CP: ' + record.cp,
     },
     {
       title: t('common.telefono'),
       dataIndex: 'telefono',
       key: 'telefono',
+
+      sorter: (a: any, b: any) => a.telefono - b.telefono,
     },
     {
       title: t('common.email'),
       dataIndex: 'email',
       key: 'email',
+
+      sorter: (a: any, b: any) => a.email.localeCompare(b.email),
     },
     {
       title: t('common.acciones'),
@@ -240,7 +252,16 @@ export const ProveedoresPage: React.FC = () => {
         columns={columns}
         dataSource={proveedoresFiltrados()}
         loading={isLoadingProveedores || isRefetchingProveedores}
+        pagination={{
+          pageSize: 10,
+          pageSizeOptions: ['5', '10', '20'],
+          showSizeChanger: true,
+          locale: {
+            items_per_page: t('common.pagina'),
+          },
+        }}
         scroll={{ x: 800 }}
+        showSorterTooltip={false}
         locale={{
           filterTitle: t('table.filterTitle'),
           filterConfirm: t('table.filterConfirm'),

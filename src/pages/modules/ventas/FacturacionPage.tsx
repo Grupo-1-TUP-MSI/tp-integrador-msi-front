@@ -76,6 +76,8 @@ export const FacturacionPage: React.FC = () => {
       title: t('common.numero'),
       dataIndex: 'id',
       key: 'id',
+
+      sorter: (a: any, b: any) => a.id - b.id,
       render: (text: any, record: any) => {
         return <span>{record.id}</span>;
       },
@@ -84,6 +86,8 @@ export const FacturacionPage: React.FC = () => {
       title: t('common.fecha'),
       dataIndex: 'fecha',
       key: 'fecha',
+
+      sorter: (a: any, b: any) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime(),
       render: (text: any, record: any) => {
         return <span>{new Date(record.fecha).toLocaleDateString('es')}</span>;
       },
@@ -92,16 +96,22 @@ export const FacturacionPage: React.FC = () => {
       title: t('common.usuario'),
       dataIndex: 'usuario',
       key: 'usuario',
+
+      sorter: (a: any, b: any) => a.usuario.localeCompare(b.usuario),
     },
     {
       title: t('common.cliente'),
       dataIndex: 'cliente',
       key: 'cliente',
+
+      sorter: (a: any, b: any) => a.cliente.localeCompare(b.cliente),
     },
     {
       title: t('common.tipoventa'),
       dataIndex: 'idTipoVenta',
       key: 'idTipoVenta',
+
+      sorter: (a: any, b: any) => a.idTipoVenta - b.idTipoVenta,
       render: (text: any, record: any) => TipoVenta[record.idTipoVenta - 1],
     },
     {
@@ -155,12 +165,16 @@ export const FacturacionPage: React.FC = () => {
         title: t('common.detalles'),
         dataIndex: 'producto',
         key: 'producto',
+
+        sorter: (a: any, b: any) => a.producto.localeCompare(b.producto),
       },
       {
         title: t('common.importeunitario'),
         dataIndex: 'precio',
         key: 'precio',
         width: '10%',
+
+        sorter: (a: any, b: any) => a.precio - b.precio,
         render: (text: any, record: any) => {
           return <span>${record.precio}</span>;
         },
@@ -169,6 +183,8 @@ export const FacturacionPage: React.FC = () => {
         title: t('common.iva'),
         key: 'iva',
         width: '10%',
+
+        sorter: (a: any, b: any) => a.precio - b.precio,
         render: (text: any, record: any) => {
           return <span>${Math.round(record.precio * 0.21)}</span>;
         },
@@ -178,12 +194,15 @@ export const FacturacionPage: React.FC = () => {
         dataIndex: 'cantidad',
         key: 'cantidad',
         width: '10%',
+
+        sorter: (a: any, b: any) => a.cantidad - b.cantidad,
       },
       {
         title: t('common.importetotal'),
         key: 'importetotal',
         width: '10%',
 
+        sorter: (a: any, b: any) => Math.round(a.precio * a.cantidad * 1.21) - Math.round(b.precio * b.cantidad * 1.21),
         render: (text: any, record: any) => {
           return <span>${Math.round(record.precio * record.cantidad * 1.21)}</span>;
         },
@@ -200,6 +219,7 @@ export const FacturacionPage: React.FC = () => {
         dataSource={data}
         pagination={false}
         scroll={{ x: 800 }}
+        showSorterTooltip={false}
         locale={{
           filterTitle: t('table.filterTitle'),
           filterConfirm: t('table.filterConfirm'),
@@ -232,7 +252,7 @@ export const FacturacionPage: React.FC = () => {
       orientationLandscape: false,
       compress: true,
       logo: {
-        src: 'https://i.postimg.cc/3w2KmPdm/logo.png',
+        src: 'https://i.ibb.co/6r9YkfP/logo.png',
         width: 25, //aspect ratio = width/height
         height: 25,
         margin: {
@@ -242,7 +262,7 @@ export const FacturacionPage: React.FC = () => {
       },
       stamp: {
         inAllPages: true,
-        src: 'https://i.postimg.cc/YCCvCcKC/qr-code.jpg',
+        src: '',
         width: 20, //aspect ratio = width/height
         height: 20,
         margin: {
@@ -560,7 +580,16 @@ export const FacturacionPage: React.FC = () => {
         columns={columns}
         dataSource={facturasFiltradas()}
         loading={isLoadingFacturas || isLoadingClientes || isLoadingUsuarios}
+        pagination={{
+          pageSize: 10,
+          pageSizeOptions: ['5', '10', '20'],
+          showSizeChanger: true,
+          locale: {
+            items_per_page: t('common.pagina'),
+          },
+        }}
         scroll={{ x: 800 }}
+        showSorterTooltip={false}
         locale={{
           filterTitle: t('table.filterTitle'),
           filterConfirm: t('table.filterConfirm'),
@@ -663,12 +692,16 @@ export const FacturacionForm: React.FC = () => {
       title: t('common.detalles'),
       dataIndex: 'nombre',
       key: 'nombre',
+
+      sorter: (a: any, b: any) => a.nombre.localeCompare(b.nombre),
     },
     {
       title: t('common.importeunitario'),
       dataIndex: 'precioVenta',
       key: 'precioVenta',
       width: '10%',
+
+      sorter: (a: any, b: any) => a.precioVenta - b.precioVenta,
       render: (text: any, record: any) => {
         return <span>${record.precioVenta}</span>;
       },
@@ -677,6 +710,8 @@ export const FacturacionForm: React.FC = () => {
       title: t('common.iva'),
       key: 'iva',
       width: '10%',
+
+      sorter: (a: any, b: any) => a.precio - b.precio,
       render: (text: any, record: any) => {
         return <span>${Math.round(record.precioVenta * 0.21)}</span>;
       },
@@ -686,12 +721,16 @@ export const FacturacionForm: React.FC = () => {
       dataIndex: 'cantidad',
       key: 'cantidad',
       width: '10%',
+
+      sorter: (a: any, b: any) => a.cantidad - b.cantidad,
     },
     {
       title: t('common.importetotal'),
       key: 'importetotal',
       width: '10%',
 
+      sorter: (a: any, b: any) =>
+        Math.round(a.precioVenta * a.cantidad * 1.21) - Math.round(b.precioVenta * b.cantidad * 1.21),
       render: (text: any, record: any) => {
         return <span>${Math.round(record.precioVenta * record.cantidad * 1.21)}</span>;
       },
@@ -722,23 +761,31 @@ export const FacturacionForm: React.FC = () => {
       dataIndex: 'id',
       key: 'id',
       width: '5%',
+
+      sorter: (a: any, b: any) => a.id - b.id,
     },
     {
       title: t('common.nombre'),
       dataIndex: 'nombre',
       key: 'nombre',
+
+      sorter: (a: any, b: any) => a.nombre.localeCompare(b.nombre),
     },
     {
       title: t('common.stock'),
       dataIndex: 'stock',
       key: 'stock',
       width: '5%',
+
+      sorter: (a: any, b: any) => a.stock - b.stock,
     },
     {
       title: t('common.importeunitario'),
       dataIndex: 'precioVenta',
       key: 'precioVenta',
       width: '5%',
+
+      sorter: (a: any, b: any) => a.precioVenta - b.precioVenta,
       render: (text: any, record: any) => {
         return <span>${record.precioVenta}</span>;
       },
@@ -1087,7 +1134,16 @@ export const FacturacionForm: React.FC = () => {
                   rowKey={(record) => record.id}
                   columns={columns}
                   dataSource={detalles}
+                  pagination={{
+                    pageSize: 10,
+                    pageSizeOptions: ['5', '10', '20'],
+                    showSizeChanger: true,
+                    locale: {
+                      items_per_page: t('common.pagina'),
+                    },
+                  }}
                   scroll={{ x: 800 }}
+                  showSorterTooltip={false}
                   locale={{
                     filterTitle: t('table.filterTitle'),
                     filterConfirm: t('table.filterConfirm'),
@@ -1140,12 +1196,18 @@ export const FacturacionForm: React.FC = () => {
           size="small"
           pagination={{
             pageSize: 5,
+            pageSizeOptions: ['5', '10', '20'],
+            showSizeChanger: true,
+            locale: {
+              items_per_page: t('common.pagina'),
+            },
           }}
           rowKey={(record) => record.id}
           columns={agregarProductosColumnas}
           dataSource={filteredProductos()}
           loading={isLoadingProductos}
           scroll={{ x: 800 }}
+          showSorterTooltip={false}
           locale={{
             filterTitle: t('table.filterTitle'),
             filterConfirm: t('table.filterConfirm'),

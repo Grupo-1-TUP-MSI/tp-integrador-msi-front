@@ -62,6 +62,8 @@ export const GananciasPage: React.FC = () => {
       title: t('common.vigencia'),
       dataIndex: 'vigencia',
       key: 'vigencia',
+
+      sorter: (a: any, b: any) => new Date(a.vigencia).getTime() - new Date(b.vigencia).getTime(),
       render: (text: any, record: any) => {
         return <span>{new Date(record.vigencia).toLocaleDateString('es')}</span>;
       },
@@ -71,6 +73,8 @@ export const GananciasPage: React.FC = () => {
       dataIndex: 'porcentaje',
       key: 'porcentaje',
       width: '25%',
+
+      sorter: (a: any, b: any) => a.porcentaje - b.porcentaje,
       render: (text: any, record: any) => {
         return (
           <span>
@@ -84,6 +88,8 @@ export const GananciasPage: React.FC = () => {
       dataIndex: 'usuario',
       key: 'usuario',
       width: '25%',
+
+      sorter: (a: any, b: any) => a.usuario - b.usuario,
     },
   ];
 
@@ -187,7 +193,16 @@ export const GananciasPage: React.FC = () => {
         columns={columns}
         dataSource={gananciasData}
         loading={isLoadingGanancias || isRefetchingGanancias}
+        pagination={{
+          pageSize: 10,
+          pageSizeOptions: ['5', '10', '20'],
+          showSizeChanger: true,
+          locale: {
+            items_per_page: t('common.pagina'),
+          },
+        }}
         scroll={{ x: 800 }}
+        showSorterTooltip={false}
         locale={{
           filterTitle: t('table.filterTitle'),
           filterConfirm: t('table.filterConfirm'),

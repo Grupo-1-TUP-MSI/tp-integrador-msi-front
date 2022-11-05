@@ -21,6 +21,9 @@
     }
   },
   "common": {
+    "pagina": "items per page.",
+    "ocultarProveedores": "Hide providers",
+    "mostrarProveedores": "Show providers",
     "invalidPhone": "Invalid phone number",
     "notaDePedidoPara": "Order note for: ",
     "notaDePedidoN": "Order note N°: ",

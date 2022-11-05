@@ -44,11 +44,15 @@ export const ProveedoresComparativaPage = () => {
       title: t('common.id'),
       dataIndex: 'id',
       width: '5%',
+
+      sorter: (a: any, b: any) => a.id.localeCompare(b.id),
     },
     {
       title: t('common.nombre'),
       dataIndex: 'nombre',
       key: 'nombre',
+
+      sorter: (a: any, b: any) => a.nombre.localeCompare(b.nombre),
       render: (text: string, record: any) => (
         <>
           {record.descripcion && (
@@ -64,12 +68,16 @@ export const ProveedoresComparativaPage = () => {
       title: t('common.proveedor'),
       dataIndex: 'nombreproveedor',
       key: 'nombreproveedor',
+
+      sorter: (a: any, b: any) => a.nombreproveedor.localeCompare(b.nombreproveedor),
     },
     {
       title: t('common.precio'),
       dataIndex: 'precio',
       key: 'precio',
       width: '10%',
+
+      sorter: (a: any, b: any) => a.precio - b.precio,
       render: (text: any, record: any) => <span>${record.precio}</span>,
     },
     {
@@ -77,6 +85,8 @@ export const ProveedoresComparativaPage = () => {
       dataIndex: 'stock',
       key: 'stock',
       width: '10%',
+
+      sorter: (a: any, b: any) => a.stock - b.stock,
     },
   ];
 
@@ -256,7 +266,16 @@ export const ProveedoresComparativaPage = () => {
         columns={columns}
         dataSource={productosFiltrados()}
         loading={isLoadingProductos}
+        pagination={{
+          pageSize: 10,
+          pageSizeOptions: ['5', '10', '20'],
+          showSizeChanger: true,
+          locale: {
+            items_per_page: t('common.pagina'),
+          },
+        }}
         scroll={{ x: 800 }}
+        showSorterTooltip={false}
         locale={{
           filterTitle: t('table.filterTitle'),
           filterConfirm: t('table.filterConfirm'),

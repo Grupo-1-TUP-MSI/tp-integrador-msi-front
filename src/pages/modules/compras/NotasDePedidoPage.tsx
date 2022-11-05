@@ -119,6 +119,8 @@ export const NotasDePedidoPage: React.FC = () => {
       title: t('common.numero'),
       dataIndex: 'id',
       key: 'id',
+
+      sorter: (a: any, b: any) => a.id - b.id,
       render: (text: any, record: any) => {
         return (
           <span>
@@ -132,6 +134,8 @@ export const NotasDePedidoPage: React.FC = () => {
       title: t('common.fecha'),
       dataIndex: 'fecha',
       key: 'fecha',
+
+      sorter: (a: any, b: any) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime(),
       render: (text: any, record: any) => {
         return <span>{new Date(record.fecha).toLocaleDateString('es')}</span>;
       },
@@ -140,6 +144,8 @@ export const NotasDePedidoPage: React.FC = () => {
       title: t('common.vencimiento'),
       dataIndex: 'vencimiento',
       key: 'vencimiento',
+
+      sorter: (a: any, b: any) => new Date(a.vencimiento).getTime() - new Date(b.vencimiento).getTime(),
       render: (text: any, record: any) => {
         return <span>{new Date(record.vencimiento).toLocaleDateString('es')}</span>;
       },
@@ -148,22 +154,30 @@ export const NotasDePedidoPage: React.FC = () => {
       title: t('common.usuario'),
       dataIndex: 'usuario',
       key: 'usuario',
+
+      sorter: (a: any, b: any) => a.usuario.localeCompare(b.usuario),
     },
     {
       title: t('common.proveedor'),
       dataIndex: 'proveedor',
       key: 'proveedor',
+
+      sorter: (a: any, b: any) => a.proveedor.localeCompare(b.proveedor),
     },
     {
       title: t('common.estadonp'),
       dataIndex: 'idestadonp',
       key: 'idestadonp',
+
+      sorter: (a: any, b: any) => a.idestadonp - b.idestadonp,
       render: (text: any, record: any) => t('common.' + EstadoNP[record.idestadonp - 1]),
     },
     {
       title: t('common.tipocompra'),
       dataIndex: 'idtipocompra',
       key: 'idtipocompra',
+
+      sorter: (a: any, b: any) => a.idtipocompra - b.idtipocompra,
       render: (text: any, record: any) => TipoCompra[record.idtipocompra - 1],
     },
     {
@@ -216,12 +230,16 @@ export const NotasDePedidoPage: React.FC = () => {
         title: t('common.detalles'),
         dataIndex: 'producto',
         key: 'producto',
+
+        sorter: (a: any, b: any) => a.producto.localeCompare(b.producto),
       },
       {
         title: t('common.importeunitario'),
         dataIndex: 'precio',
         key: 'precio',
         width: '10%',
+
+        sorter: (a: any, b: any) => a.precio - b.precio,
         render: (text: any, record: any) => {
           return <span>${record.precio}</span>;
         },
@@ -230,6 +248,8 @@ export const NotasDePedidoPage: React.FC = () => {
         title: t('common.iva'),
         key: 'iva',
         width: '10%',
+
+        sorter: (a: any, b: any) => Math.round(a.precio * 0.21) - Math.round(b.precio * 0.21),
         render: (text: any, record: any) => {
           return <span>${Math.round(record.precio * 0.21)}</span>;
         },
@@ -239,12 +259,16 @@ export const NotasDePedidoPage: React.FC = () => {
         dataIndex: 'cantidadpedida',
         key: 'cantidadpedida',
         width: '10%',
+
+        sorter: (a: any, b: any) => a.cantidadpedida - b.cantidadpedida,
       },
       {
         title: t('common.importetotal'),
         key: 'importetotal',
         width: '10%',
 
+        sorter: (a: any, b: any) =>
+          Math.round(a.precio * a.cantidadpedida * 1.21) - Math.round(b.precio * b.cantidadpedida * 1.21),
         render: (text: any, record: any) => {
           return <span>${Math.round(record.precio * record.cantidadpedida * 1.21)}</span>;
         },
@@ -262,6 +286,7 @@ export const NotasDePedidoPage: React.FC = () => {
         pagination={false}
         loading={isLoadingNotasDePedido || isLoadingProveedores || isLoadingUsuarios || isRefetchingNotasDePedido}
         scroll={{ x: 800 }}
+        showSorterTooltip={false}
         locale={{
           filterTitle: t('table.filterTitle'),
           filterConfirm: t('table.filterConfirm'),
@@ -318,7 +343,7 @@ export const NotasDePedidoPage: React.FC = () => {
       orientationLandscape: false,
       compress: true,
       logo: {
-        src: 'https://i.postimg.cc/3w2KmPdm/logo.png',
+        src: 'https://i.ibb.co/6r9YkfP/logo.png',
         width: 25, //aspect ratio = width/height
         height: 25,
         margin: {
@@ -328,7 +353,7 @@ export const NotasDePedidoPage: React.FC = () => {
       },
       stamp: {
         inAllPages: true,
-        src: 'https://i.postimg.cc/YCCvCcKC/qr-code.jpg',
+        src: '',
         width: 20, //aspect ratio = width/height
         height: 20,
         margin: {
@@ -631,8 +656,17 @@ export const NotasDePedidoPage: React.FC = () => {
         expandable={{ expandedRowRender, expandIcon }}
         columns={columns}
         dataSource={npFiltradas()}
+        pagination={{
+          pageSize: 10,
+          pageSizeOptions: ['5', '10', '20'],
+          showSizeChanger: true,
+          locale: {
+            items_per_page: t('common.pagina'),
+          },
+        }}
         loading={isLoadingNotasDePedido || isLoadingProveedores || isLoadingUsuarios || isRefetchingNotasDePedido}
         scroll={{ x: 800 }}
+        showSorterTooltip={false}
         locale={{
           filterTitle: t('table.filterTitle'),
           filterConfirm: t('table.filterConfirm'),
@@ -758,7 +792,7 @@ export const NotasDePedidoForm: React.FC = () => {
         orientationLandscape: false,
         compress: true,
         logo: {
-          src: 'https://i.postimg.cc/3w2KmPdm/logo.png',
+          src: 'https://i.ibb.co/6r9YkfP/logo.png',
           width: 25, //aspect ratio = width/height
           height: 25,
           margin: {
@@ -768,7 +802,7 @@ export const NotasDePedidoForm: React.FC = () => {
         },
         stamp: {
           inAllPages: true,
-          src: 'https://i.postimg.cc/YCCvCcKC/qr-code.jpg',
+          src: '',
           width: 20, //aspect ratio = width/height
           height: 20,
           margin: {
@@ -947,7 +981,7 @@ export const NotasDePedidoForm: React.FC = () => {
       orientationLandscape: false,
       compress: true,
       logo: {
-        src: 'https://i.postimg.cc/3w2KmPdm/logo.png',
+        src: 'https://i.ibb.co/6r9YkfP/logo.png',
         width: 25, //aspect ratio = width/height
         height: 25,
         margin: {
@@ -957,7 +991,7 @@ export const NotasDePedidoForm: React.FC = () => {
       },
       stamp: {
         inAllPages: true,
-        src: 'https://i.postimg.cc/YCCvCcKC/qr-code.jpg',
+        src: '',
         width: 20, //aspect ratio = width/height
         height: 20,
         margin: {
@@ -1058,12 +1092,16 @@ export const NotasDePedidoForm: React.FC = () => {
       title: t('common.nombre'),
       dataIndex: 'productoNombre',
       key: 'productoNombre',
+
+      sorter: (a: any, b: any) => a.productoNombre.localeCompare(b.productoNombre),
     },
     {
       title: t('common.importeunitario'),
       dataIndex: 'precio',
       key: 'precio',
       width: '5%',
+
+      sorter: (a: any, b: any) => a.precio - b.precio,
       render: (text: any, record: any) => {
         return <span>${record.precio}</span>;
       },
@@ -1072,6 +1110,8 @@ export const NotasDePedidoForm: React.FC = () => {
       title: t('common.iva'),
       key: 'iva',
       width: '5%',
+
+      sorter: (a: any, b: any) => a.precio - b.precio,
       render: (text: any, record: any) => {
         return <span>${record.precio * 0.21}</span>;
       },
@@ -1081,11 +1121,15 @@ export const NotasDePedidoForm: React.FC = () => {
       dataIndex: 'cantidad',
       key: 'cantidad',
       width: '5%',
+
+      sorter: (a: any, b: any) => a.cantidad - b.cantidad,
     },
     {
       title: t('common.importetotal'),
       key: 'importetotal',
       width: '5%',
+
+      sorter: (a: any, b: any) => Math.round(a.precio * a.cantidad * 1.21) - Math.round(b.precio * b.cantidad * 1.21),
       render: (text: any, record: any) => {
         return <span>${record.precio * record.cantidad * 1.21}</span>;
       },
@@ -1116,17 +1160,23 @@ export const NotasDePedidoForm: React.FC = () => {
       dataIndex: 'idproducto',
       key: 'idproducto',
       width: '5%',
+
+      sorter: (a: any, b: any) => a.idproducto - b.idproducto,
     },
     {
       title: t('common.nombre'),
       dataIndex: 'productoNombre',
       key: 'productoNombre',
       width: '70%',
+
+      sorter: (a: any, b: any) => a.productoNombre.localeCompare(b.productoNombre),
     },
     {
       title: t('common.importeunitario'),
       dataIndex: 'precio',
       key: 'precio',
+
+      sorter: (a: any, b: any) => a.precio - b.precio,
       render: (text: any, record: any) => {
         return <span>${record.precio}</span>;
       },
@@ -1300,7 +1350,16 @@ export const NotasDePedidoForm: React.FC = () => {
                     columns={columns}
                     dataSource={detalles}
                     loading={isEdit && isLoadingNP}
+                    pagination={{
+                      pageSize: 10,
+                      pageSizeOptions: ['5', '10', '20'],
+                      showSizeChanger: true,
+                      locale: {
+                        items_per_page: t('common.pagina'),
+                      },
+                    }}
                     scroll={{ x: 800 }}
+                    showSorterTooltip={false}
                     locale={{
                       filterTitle: t('table.filterTitle'),
                       filterConfirm: t('table.filterConfirm'),
@@ -1431,7 +1490,16 @@ export const NotasDePedidoForm: React.FC = () => {
                     columns={columns}
                     dataSource={detalles}
                     loading={isEdit && isLoadingNP}
+                    pagination={{
+                      pageSize: 10,
+                      pageSizeOptions: ['5', '10', '20'],
+                      showSizeChanger: true,
+                      locale: {
+                        items_per_page: t('common.pagina'),
+                      },
+                    }}
                     scroll={{ x: 800 }}
+                    showSorterTooltip={false}
                     locale={{
                       filterTitle: t('table.filterTitle'),
                       filterConfirm: t('table.filterConfirm'),
@@ -1485,12 +1553,18 @@ export const NotasDePedidoForm: React.FC = () => {
           size="small"
           pagination={{
             pageSize: 5,
+            pageSizeOptions: ['5', '10', '20'],
+            showSizeChanger: true,
+            locale: {
+              items_per_page: t('common.pagina'),
+            },
           }}
           rowKey={(record) => record.id}
           columns={agregarProductosColumnas}
           dataSource={filteredProductos()}
           loading={isLoadingProductosDeProveedor}
           scroll={{ x: 800 }}
+          showSorterTooltip={false}
           locale={{
             filterTitle: t('table.filterTitle'),
             filterConfirm: t('table.filterConfirm'),

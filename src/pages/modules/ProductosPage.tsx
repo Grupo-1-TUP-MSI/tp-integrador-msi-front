@@ -3,6 +3,7 @@ import {
   Button,
   Checkbox,
   Col,
+  Empty,
   Form,
   Input,
   InputNumber,
@@ -17,10 +18,12 @@ import {
 import { useTranslation } from 'react-i18next';
 import {
   DeleteOutlined,
+  DownOutlined,
   EditOutlined,
   InfoCircleOutlined,
   PlusCircleOutlined,
   PlusOutlined,
+  RightOutlined,
   UsergroupAddOutlined,
 } from '@ant-design/icons';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -179,13 +182,18 @@ export const ProductosPage: React.FC = () => {
     {
       title: t('common.id'),
       dataIndex: 'id',
+      align: 'center' as const,
       width: '5%',
+
+      sorter: (a: any, b: any) => a.id - b.id,
     },
     {
       title: t('common.nombre'),
       dataIndex: 'nombre',
       key: 'nombre',
       width: '40%',
+
+      sorter: (a: any, b: any) => a.nombre.localeCompare(b.nombre),
       render: (text: any, record: any) => (
         <>
           {record.descripcion && (
@@ -202,17 +210,23 @@ export const ProductosPage: React.FC = () => {
       dataIndex: 'preciolista',
       key: 'preciolista',
       width: '10%',
+
+      sorter: (a: any, b: any) => a.preciolista - b.preciolista,
       render: (text: any, record: any) => <span>${record.preciolista}</span>,
     },
     {
       title: t('common.stockminimo'),
       dataIndex: 'stockminimo',
       key: 'stockminimo',
+
+      sorter: (a: any, b: any) => a.stockminimo - b.stockminimo,
     },
     {
       title: t('common.stock'),
       dataIndex: 'stock',
       key: 'stock',
+
+      sorter: (a: any, b: any) => a.stock - b.stock,
     },
     {
       title: t('common.acciones'),
@@ -298,6 +312,104 @@ export const ProductosPage: React.FC = () => {
       });
 
     return arr;
+  };
+
+  const expandIcon = (props: any) => {
+    if (props.record.proveedores?.length > 0) {
+      if (props.expanded) {
+        return (
+          <Tooltip placement="top" title={t('common.ocultarProveedores')} trigger="hover" destroyTooltipOnHide>
+            <a
+              onClick={(e) => {
+                props.onExpand(props.record, e);
+              }}
+            >
+              <DownOutlined />
+            </a>
+          </Tooltip>
+        );
+      } else {
+        return (
+          <Tooltip placement="top" title={t('common.mostrarProveedores')} trigger="hover" destroyTooltipOnHide>
+            <a
+              onClick={(e) => {
+                props.onExpand(props.record, e);
+              }}
+            >
+              <RightOutlined />
+            </a>
+          </Tooltip>
+        );
+      }
+    }
+  };
+
+  const expandedRowRender = (productos: any, i: any) => {
+    const columns = [
+      {
+        title: t('common.id'),
+        dataIndex: 'idProveedor',
+        key: 'idProveedor',
+
+        sorter: (a: any, b: any) => a.idProveedor - b.idProveedor,
+        render: (text: any, record: any) => {
+          return <span>{productos?.id + '-' + record.idProveedor}</span>;
+        },
+      },
+      {
+        title: t('common.proveedor'),
+        dataIndex: 'nombre',
+        key: 'nombre',
+
+        sorter: (a: any, b: any) => a.nombre.localeCompare(b.nombre),
+      },
+      {
+        title: t('common.importeunitario'),
+        dataIndex: 'precio',
+        key: 'precio',
+        width: '10%',
+
+        sorter: (a: any, b: any) => a.precio - b.precio,
+        render: (text: any, record: any) => {
+          return <span>${record.precio}</span>;
+        },
+      },
+    ];
+
+    const data = productos?.proveedores?.sort((a: any, b: any) => {
+      return a.idProveedor - b.idProveedor;
+    });
+
+    return (
+      <Table
+        size="small"
+        rowKey={(record) => record.idProveedor}
+        columns={columns}
+        dataSource={data}
+        pagination={false}
+        scroll={{ x: 800 }}
+        showSorterTooltip={false}
+        locale={{
+          filterTitle: t('table.filterTitle'),
+          filterConfirm: t('table.filterConfirm'),
+          filterReset: t('table.filterReset'),
+          filterEmptyText: t('table.filterEmptyText'),
+          filterCheckall: t('table.filterCheckall'),
+          filterSearchPlaceholder: t('table.filterSearchPlaceholder'),
+          emptyText: t('table.emptyText'),
+          selectAll: t('table.selectAll'),
+          selectInvert: t('table.selectInvert'),
+          selectNone: t('table.selectNone'),
+          selectionAll: t('table.selectionAll'),
+          sortTitle: t('table.sortTitle'),
+          expand: t('table.expand'),
+          collapse: t('table.collapse'),
+          triggerDesc: t('table.triggerDesc'),
+          triggerAsc: t('table.triggerAsc'),
+          cancelSort: t('table.cancelSort'),
+        }}
+      />
+    );
   };
 
   return (
@@ -532,14 +644,21 @@ export const ProductosPage: React.FC = () => {
         data-testId="productos--productTable"
         size="small"
         pagination={{
-          pageSize: 5,
+          pageSize: 10,
+          pageSizeOptions: ['5', '10', '20'],
+          showSizeChanger: true,
+          locale: {
+            items_per_page: t('common.pagina'),
+          },
         }}
         rowKey={(record) => record.id}
         rowClassName={(record) => (!record.estado ? 'deleted-row' : record.stock < 0 ? 'no-stock-row' : '')}
+        expandable={{ expandedRowRender, expandIcon }}
         columns={columns}
         dataSource={productosFiltrados()}
         loading={isLoadingProductos || isRefetchingProductos}
         scroll={{ x: 800 }}
+        showSorterTooltip={false}
         locale={{
           filterTitle: t('table.filterTitle'),
           filterConfirm: t('table.filterConfirm'),
