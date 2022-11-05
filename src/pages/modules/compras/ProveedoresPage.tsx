@@ -67,6 +67,12 @@ export const ProveedoresPage: React.FC = () => {
 
   const columns = [
     {
+      title: t('common.id'),
+      dataIndex: 'id',
+      key: 'id',
+      sorter: (a: any, b: any) => a.id - b.id,
+    },
+    {
       title: t('common.documento'),
       dataIndex: 'documento',
       key: 'documento',

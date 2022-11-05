@@ -90,28 +90,28 @@ export const FacturaSuccess = () => {
           index + 1,
           item.producto,
           item.descripcion,
-          item.precio.toLocaleString(),
+          `$ ${item.precio.toFixed(2).toLocaleString()}`,
           item.cantidad,
-          (parseFloat(item.precio) * parseFloat(item.cantidad)).toLocaleString(),
+          `$ ${(parseFloat(item.precio) * parseFloat(item.cantidad)).toFixed(2).toLocaleString()}`,
         ]),
         additionalRows: [
           {
             col1: t('common.subtotal'),
-            col2: data.acumGravado.toLocaleString(),
+            col2: `$ ${data.acumGravado.toFixed(2).toLocaleString()}`,
             style: {
               fontSize: 10, //optional, default 12
             },
           },
           {
             col1: t('common.iva'),
-            col2: data.acumIVA.toLocaleString(),
+            col2: `$ ${data.acumIVA.toFixed(2).toLocaleString()}`,
             style: {
               fontSize: 10, //optional, default 12
             },
           },
           {
             col1: t('common.importetotal'),
-            col2: data.acumTotal.toLocaleString(),
+            col2: `$ ${data.acumTotal.toFixed(2).toLocaleString()}`,
             style: {
               fontSize: 14, //optional, default 12
             },

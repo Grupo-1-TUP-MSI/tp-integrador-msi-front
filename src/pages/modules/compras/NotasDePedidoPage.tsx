@@ -408,28 +408,28 @@ export const NotasDePedidoPage: React.FC = () => {
           index + 1,
           item.producto,
           item.descripcion,
-          item.precio.toLocaleString(),
+          `$ ${item.precio.toFixed(2).toLocaleString()}`,
           item.cantidadpedida,
-          (parseFloat(item.precio) * parseFloat(item.cantidadpedida)).toLocaleString(),
+          `$ ${(parseFloat(item.precio) * parseFloat(item.cantidadpedida)).toFixed(2).toLocaleString()}`,
         ]),
         additionalRows: [
           {
             col1: t('common.subtotal'),
-            col2: data.acumGravado.toLocaleString(),
+            col2: `$ ${data.acumGravado.toFixed(2).toLocaleString()}`,
             style: {
               fontSize: 10, //optional, default 12
             },
           },
           {
             col1: t('common.iva'),
-            col2: data.acumIVA.toLocaleString(),
+            col2: `$ ${data.acumIVA.toFixed(2).toLocaleString()}`,
             style: {
               fontSize: 10, //optional, default 12
             },
           },
           {
             col1: t('common.importetotal'),
-            col2: data.acumTotal.toLocaleString(),
+            col2: `$ ${data.acumTotal.toFixed(2).toLocaleString()}`,
             style: {
               fontSize: 14, //optional, default 12
             },
@@ -700,6 +700,7 @@ export const NotasDePedidoForm: React.FC = () => {
   const [form] = Form.useForm();
   const [modalVisible, setModalVisible] = React.useState(false);
   const [searchProducto, setSearchProducto] = React.useState('');
+  const [searchProveedor, setSearchProveedor] = React.useState('');
   const [proveedor, setProveedor] = React.useState(null);
   const enabledField = Form.useWatch('idProveedor', form);
   const [isImprimirPDF, setImprimirPDF] = React.useState(false);
@@ -856,28 +857,28 @@ export const NotasDePedidoForm: React.FC = () => {
             index + 1,
             item.producto,
             item.descripcion,
-            item.precio.toLocaleString(),
+            `$ ${item.precio.toFixed(2).toLocaleString()}`,
             item.cantidadpedida,
-            (parseFloat(item.precio) * parseFloat(item.cantidadpedida)).toLocaleString(),
+            `$ ${(parseFloat(item.precio) * parseFloat(item.cantidadpedida)).toFixed(2).toLocaleString()}`,
           ]),
           additionalRows: [
             {
               col1: t('common.subtotal'),
-              col2: data.acumGravado.toLocaleString(),
+              col2: `$ ${data.acumGravado.toFixed(2).toLocaleString()}`,
               style: {
                 fontSize: 10, //optional, default 12
               },
             },
             {
               col1: t('common.iva'),
-              col2: data.acumIVA.toLocaleString(),
+              col2: `$ ${data.acumIVA.toFixed(2).toLocaleString()}`,
               style: {
                 fontSize: 10, //optional, default 12
               },
             },
             {
               col1: t('common.importetotal'),
-              col2: data.acumTotal.toLocaleString(),
+              col2: `$ ${data.acumTotal.toFixed(2).toLocaleString()}`,
               style: {
                 fontSize: 14, //optional, default 12
               },
@@ -1045,28 +1046,28 @@ export const NotasDePedidoForm: React.FC = () => {
           index + 1,
           item.producto,
           item.descripcion,
-          item.precio.toLocaleString(),
+          `$ ${item.precio.toFixed(2).toLocaleString()}`,
           item.cantidadpedida,
-          (parseFloat(item.precio) * parseFloat(item.cantidadpedida)).toLocaleString(),
+          `$ ${(parseFloat(item.precio) * parseFloat(item.cantidadpedida)).toFixed(2).toLocaleString()}`,
         ]),
         additionalRows: [
           {
             col1: t('common.subtotal'),
-            col2: data.acumGravado.toLocaleString(),
+            col2: `$ ${data.acumGravado.toFixed(2).toLocaleString()}`,
             style: {
               fontSize: 10, //optional, default 12
             },
           },
           {
             col1: t('common.iva'),
-            col2: data.acumIVA.toLocaleString(),
+            col2: `$ ${data.acumIVA.toFixed(2).toLocaleString()}`,
             style: {
               fontSize: 10, //optional, default 12
             },
           },
           {
             col1: t('common.importetotal'),
-            col2: data.acumTotal.toLocaleString(),
+            col2: `$ ${data.acumTotal.toFixed(2).toLocaleString()}`,
             style: {
               fontSize: 14, //optional, default 12
             },
@@ -1229,6 +1230,18 @@ export const NotasDePedidoForm: React.FC = () => {
     return arr;
   };
 
+  const filteredProveedores = () => {
+    const arr = proveedoresData
+      ?.filter(
+        (p: any) =>
+          p.nombre.toLowerCase().includes(searchProveedor.toLowerCase()) ||
+          p.id.toString().toLowerCase().includes(searchProveedor.toLowerCase()),
+      )
+      .sort((a: any, b: any) => a.id - b.id);
+
+    return arr;
+  };
+
   if (isLoadingNP && isEdit) {
     return <Spin />;
   }
@@ -1277,6 +1290,12 @@ export const NotasDePedidoForm: React.FC = () => {
                     rules={[{ required: true, message: t('common.requiredField') }]}
                   >
                     <Select
+                      showSearch
+                      searchValue={searchProveedor}
+                      onSearch={(value) => {
+                        setSearchProveedor(value);
+                      }}
+                      filterOption={false}
                       allowClear
                       disabled={isEdit}
                       onChange={(value) => {
@@ -1284,9 +1303,9 @@ export const NotasDePedidoForm: React.FC = () => {
                         productosDeProveedorRefetch();
                       }}
                     >
-                      {proveedoresData?.map((proveedor: Proveedor, i: number) => (
+                      {filteredProveedores()?.map((proveedor: Proveedor, i: number) => (
                         <Select.Option key={i} value={proveedor?.id}>
-                          {proveedor?.nombre}
+                          {proveedor?.id} - {proveedor?.nombre}
                         </Select.Option>
                       ))}
                     </Select>
@@ -1416,6 +1435,12 @@ export const NotasDePedidoForm: React.FC = () => {
                     rules={[{ required: true, message: t('common.requiredField') }]}
                   >
                     <Select
+                      showSearch
+                      searchValue={searchProveedor}
+                      onSearch={(value) => {
+                        setSearchProveedor(value);
+                      }}
+                      filterOption={false}
                       allowClear
                       disabled={isEdit}
                       onChange={(value) => {
@@ -1423,9 +1448,9 @@ export const NotasDePedidoForm: React.FC = () => {
                         productosDeProveedorRefetch();
                       }}
                     >
-                      {proveedoresData?.map((proveedor: Proveedor, i: number) => (
+                      {filteredProveedores()?.map((proveedor: Proveedor, i: number) => (
                         <Select.Option key={i} value={proveedor?.id}>
-                          {proveedor?.nombre}
+                          {proveedor?.id} - {proveedor?.nombre}
                         </Select.Option>
                       ))}
                     </Select>

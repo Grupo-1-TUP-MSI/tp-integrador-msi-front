@@ -37,6 +37,8 @@ import { BotonCSV } from '@app/components/shared/BotonCSV';
 import { zeroPad } from '@app/utils/utils';
 import { useResponsive } from '@app/hooks/useResponsive';
 import { PageTitle } from '@app/components/common/PageTitle/PageTitle';
+import { useLanguage } from '@app/hooks/useLanguage';
+import moment from 'moment';
 
 export const FacturacionPage: React.FC = () => {
   const { t } = useTranslation();
@@ -318,28 +320,28 @@ export const FacturacionPage: React.FC = () => {
           index + 1,
           item.producto,
           item.descripcion,
-          item.precio.toLocaleString(),
+          `$ ${item.precio.toFixed(2).toLocaleString()}`,
           item.cantidad,
-          (parseFloat(item.precio) * parseFloat(item.cantidad)).toLocaleString(),
+          `$ ${(parseFloat(item.precio) * parseFloat(item.cantidad)).toFixed(2).toLocaleString()}`,
         ]),
         additionalRows: [
           {
             col1: t('common.subtotal'),
-            col2: data.acumGravado.toLocaleString(),
+            col2: `$ ${data.acumGravado.toFixed(2).toLocaleString()}`,
             style: {
               fontSize: 10, //optional, default 12
             },
           },
           {
             col1: t('common.iva'),
-            col2: data.acumIVA.toLocaleString(),
+            col2: `$ ${data.acumIVA.toFixed(2).toLocaleString()}`,
             style: {
               fontSize: 10, //optional, default 12
             },
           },
           {
             col1: t('common.importetotal'),
-            col2: data.acumTotal.toLocaleString(),
+            col2: `$ ${data.acumTotal.toFixed(2).toLocaleString()}`,
             style: {
               fontSize: 14, //optional, default 12
             },
@@ -619,13 +621,13 @@ export const FacturacionForm: React.FC = () => {
   const [locale, setLocale] = React.useState(() =>
     i18n.language === 'es' ? localeES : i18n.language === 'en' ? localeEN : localePT,
   );
-
   useEffect(() => {
     setLocale(i18n.language === 'es' ? localeES : i18n.language === 'en' ? localeEN : localePT);
   }, [i18n.language]);
   const navigate = useNavigate();
   const { id } = useParams();
   const [detalles, setDetalles] = React.useState([]);
+  const [searchCliente, setSearchCliente] = React.useState('');
   const [productos, setProductos] = React.useState([]);
   const [form] = Form.useForm();
   const [modalVisible, setModalVisible] = React.useState(false);
@@ -654,7 +656,11 @@ export const FacturacionForm: React.FC = () => {
         description: t('notifications.facturaCreada'),
         duration: 3,
       });
-      window.location.replace(res);
+      if (typeof res === 'string') {
+        window.location.replace(res);
+      } else {
+        navigate(`/ventas/facturacion/pago-exitoso/${res.id}`);
+      }
     },
     onError: (error: Error) => {
       notificationController.error({
@@ -844,6 +850,18 @@ export const FacturacionForm: React.FC = () => {
     return arr;
   };
 
+  const filteredClientes = () => {
+    const arr = clientesData
+      ?.filter(
+        (c: any) =>
+          c.nombre.toLowerCase().includes(searchCliente.toLowerCase()) ||
+          c.id.toString().toLowerCase().includes(searchCliente.toLowerCase()),
+      )
+      .sort((a: any, b: any) => a.id - b.id);
+
+    return arr;
+  };
+
   // #endregion
 
   if (isLoadingClientes || isLoadingProductos) {
@@ -857,7 +875,13 @@ export const FacturacionForm: React.FC = () => {
       {/* #region Formulario  */}
       <Row>
         <Col span={24}>
-          <BaseForm layout="vertical" onFinish={handleSubmit} requiredMark="optional" form={form}>
+          <BaseForm
+            layout="vertical"
+            onFinish={handleSubmit}
+            requiredMark="optional"
+            form={form}
+            initialValues={{ fecha: moment() }}
+          >
             <Row justify="space-between">
               <h1 style={{ fontSize: '25px' }}>{t('titles.creandoFactura')}</h1>
               <BaseForm.Item>
@@ -884,7 +908,7 @@ export const FacturacionForm: React.FC = () => {
                       requiredMark
                       name="fecha"
                       label={t('common.fecha')}
-                      rules={[{ required: true, message: t('common.required') }]}
+                      rules={[{ required: true, message: t('common.requiredField') }]}
                     >
                       <DatePicker
                         style={{
@@ -936,10 +960,18 @@ export const FacturacionForm: React.FC = () => {
                       label={t('common.clientes')}
                       rules={[{ required: true, message: t('common.requiredField') }]}
                     >
-                      <Select allowClear>
-                        {clientesData?.map((cliente: Cliente, i: number) => (
+                      <Select
+                        allowClear
+                        showSearch
+                        searchValue={searchCliente}
+                        onSearch={(value) => {
+                          setSearchCliente(value);
+                        }}
+                        filterOption={false}
+                      >
+                        {filteredClientes()?.map((cliente: Cliente, i: number) => (
                           <Select.Option key={i} value={cliente?.id}>
-                            {cliente?.nombre}
+                            {cliente?.id} - {cliente?.nombre}
                           </Select.Option>
                         ))}
                       </Select>
@@ -1014,7 +1046,7 @@ export const FacturacionForm: React.FC = () => {
                       requiredMark
                       name="fecha"
                       label={t('common.fecha')}
-                      rules={[{ required: true, message: t('common.required') }]}
+                      rules={[{ required: true, message: t('common.requiredField') }]}
                     >
                       <DatePicker
                         style={{
@@ -1067,10 +1099,18 @@ export const FacturacionForm: React.FC = () => {
                       label={t('common.clientes')}
                       rules={[{ required: true, message: t('common.requiredField') }]}
                     >
-                      <Select allowClear>
-                        {clientesData?.map((cliente: Cliente, i: number) => (
+                      <Select
+                        allowClear
+                        showSearch
+                        searchValue={searchCliente}
+                        onSearch={(value) => {
+                          setSearchCliente(value);
+                        }}
+                        filterOption={false}
+                      >
+                        {filteredClientes()?.map((cliente: Cliente, i: number) => (
                           <Select.Option key={i} value={cliente?.id}>
-                            {cliente?.nombre}
+                            {cliente?.id} - {cliente?.nombre}
                           </Select.Option>
                         ))}
                       </Select>
