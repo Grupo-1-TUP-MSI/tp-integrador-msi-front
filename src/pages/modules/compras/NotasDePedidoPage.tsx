@@ -50,19 +50,17 @@ import jsPDFInvoiceTemplate, { OutputType, jsPDF } from 'jspdf-invoice-template'
 import { BotonCSV } from '@app/components/shared/BotonCSV';
 import { useResponsive } from '@app/hooks/useResponsive';
 import { PageTitle } from '@app/components/common/PageTitle/PageTitle';
-import { useLanguage } from '@app/hooks/useLanguage';
 
 export const NotasDePedidoPage: React.FC = () => {
   const { t } = useTranslation();
-  const { language } = useLanguage();
-
+  const { i18n } = useTranslation();
   const [locale, setLocale] = React.useState(() =>
-    language === 'es' ? localeES : language === 'en' ? localeEN : localePT,
+    i18n.language === 'es' ? localeES : i18n.language === 'en' ? localeEN : localePT,
   );
 
   useEffect(() => {
-    setLocale(language === 'es' ? localeES : language === 'en' ? localeEN : localePT);
-  }, [language]);
+    setLocale(i18n.language === 'es' ? localeES : i18n.language === 'en' ? localeEN : localePT);
+  }, [i18n.language]);
   const navigate = useNavigate();
   const { RangePicker } = DatePicker;
   const [notaPedido, setNotaPedido] = React.useState<any>(null);

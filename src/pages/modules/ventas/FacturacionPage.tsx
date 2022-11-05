@@ -37,19 +37,18 @@ import { BotonCSV } from '@app/components/shared/BotonCSV';
 import { zeroPad } from '@app/utils/utils';
 import { useResponsive } from '@app/hooks/useResponsive';
 import { PageTitle } from '@app/components/common/PageTitle/PageTitle';
-import { useLanguage } from '@app/hooks/useLanguage';
 
 export const FacturacionPage: React.FC = () => {
   const { t } = useTranslation();
-  const { language } = useLanguage();
+  const { i18n } = useTranslation();
 
   const [locale, setLocale] = React.useState(() =>
-    language === 'es' ? localeES : language === 'en' ? localeEN : localePT,
+    i18n.language === 'es' ? localeES : i18n.language === 'en' ? localeEN : localePT,
   );
 
   useEffect(() => {
-    setLocale(language === 'es' ? localeES : language === 'en' ? localeEN : localePT);
-  }, [language]);
+    setLocale(i18n.language === 'es' ? localeES : i18n.language === 'en' ? localeEN : localePT);
+  }, [i18n.language]);
   const navigate = useNavigate();
   const { RangePicker } = DatePicker;
   const [filterUsuario, setFilterUsuario] = React.useState(null);
@@ -615,15 +614,15 @@ export const FacturacionPage: React.FC = () => {
 
 export const FacturacionForm: React.FC = () => {
   const { t } = useTranslation();
-  const { language } = useLanguage();
+  const { i18n } = useTranslation();
 
   const [locale, setLocale] = React.useState(() =>
-    language === 'es' ? localeES : language === 'en' ? localeEN : localePT,
+    i18n.language === 'es' ? localeES : i18n.language === 'en' ? localeEN : localePT,
   );
 
   useEffect(() => {
-    setLocale(language === 'es' ? localeES : language === 'en' ? localeEN : localePT);
-  }, [language]);
+    setLocale(i18n.language === 'es' ? localeES : i18n.language === 'en' ? localeEN : localePT);
+  }, [i18n.language]);
   const navigate = useNavigate();
   const { id } = useParams();
   const [detalles, setDetalles] = React.useState([]);

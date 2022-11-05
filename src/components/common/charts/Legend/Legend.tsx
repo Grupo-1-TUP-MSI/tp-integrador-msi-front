@@ -27,12 +27,9 @@ export const Legend: React.FC<LegendProps> = ({ legendItems, activeItemIndex }) 
           <S.LegendInfo>
             <S.LegendColor style={{ backgroundColor: colors[index] }} />
             <S.LegendDescription>
-              <S.LegendTitle>{item.name}</S.LegendTitle>
+              <S.LegendTitle>{item.value}</S.LegendTitle>
             </S.LegendDescription>
-            <S.Values>{item.value}</S.Values>
-            <Popover content={<S.PopoverContent>{item.description}</S.PopoverContent>} trigger="hover">
-              <S.InfoStyled />
-            </Popover>
+            <S.Values>{item.description}</S.Values>
           </S.LegendInfo>
         </S.LegendWrapper>
       ))}

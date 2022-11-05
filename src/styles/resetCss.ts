@@ -121,7 +121,9 @@ export const resetCss = css`
   .ant-card-head {
     border-bottom: 1px solid var(--shadow-color);
   }
-
+  .ant-table table {
+    font-size: 14px !important;
+  }
   @keyframes stroke {
     100% {
       stroke-dashoffset: 0;

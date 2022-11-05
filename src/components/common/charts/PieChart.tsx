@@ -50,7 +50,7 @@ export const PieChart: React.FC<PieChartProps> = ({ option, data, name, showLege
           borderRadius: 5,
           borderColor: theme === 'dark' ? BASE_COLORS.black : BASE_COLORS.white,
           borderWidth: 1,
-          shadowBlur: 200,
+          shadowBlur: 1000,
           shadowColor: 'rgba(0, 0, 0, 0.5)',
         },
         animationType: 'scale',
