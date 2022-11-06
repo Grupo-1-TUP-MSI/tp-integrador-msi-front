@@ -973,7 +973,6 @@ export const NotasDePedidoForm: React.FC = () => {
       handleEdit(np);
     } else {
       const np = {
-        idusuario: 6, // TODO: Remover hardcode
         plazoentrega: values?.plazoentrega,
         idproveedor: values?.idProveedor,
         idtipocompra: values?.idTipoCompra,
@@ -1130,7 +1129,7 @@ export const NotasDePedidoForm: React.FC = () => {
 
       sorter: (a: any, b: any) => a.precio - b.precio,
       render: (text: any, record: any) => {
-        return <span>${record.precio * 0.21}</span>;
+        return <span>${Math.round(record.precio * 0.21)}</span>;
       },
     },
     {
@@ -1148,7 +1147,7 @@ export const NotasDePedidoForm: React.FC = () => {
 
       sorter: (a: any, b: any) => Math.round(a.precio * a.cantidad * 1.21) - Math.round(b.precio * b.cantidad * 1.21),
       render: (text: any, record: any) => {
-        return <span>${record.precio * record.cantidad * 1.21}</span>;
+        return <span>${Math.round(record.precio * record.cantidad * 1.21)}</span>;
       },
     },
     {
