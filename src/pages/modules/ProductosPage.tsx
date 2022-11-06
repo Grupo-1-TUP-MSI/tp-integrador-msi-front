@@ -347,7 +347,14 @@ export const ProductosPage: React.FC = () => {
   const expandedRowRender = (productos: any, i: any) => {
     const columns = [
       {
-        title: t('common.id'),
+        title: () => (
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <span>{t('common.id')}</span>
+            <Tooltip title={t('common.codigoProductoProveedor')} destroyTooltipOnHide>
+              <InfoCircleOutlined style={{ opacity: '0.4', marginLeft: '5px' }} />
+            </Tooltip>
+          </div>
+        ),
         dataIndex: 'idProveedor',
         key: 'idProveedor',
 
@@ -556,7 +563,7 @@ export const ProductosPage: React.FC = () => {
               min={0}
               placeholder="Min"
               style={{ width: '150px' }}
-              prefix={'Min: $'}
+              prefix={minPrecio ? '' : 'Min: $'}
               value={minPrecio}
               onChange={setMinPrecio}
             />
@@ -565,7 +572,7 @@ export const ProductosPage: React.FC = () => {
               min={0}
               placeholder="Max"
               style={{ width: '150px' }}
-              prefix={'Max: $'}
+              prefix={maxPrecio ? '' : 'Max: $'}
               value={maxPrecio}
               onChange={setMaxPrecio}
             />

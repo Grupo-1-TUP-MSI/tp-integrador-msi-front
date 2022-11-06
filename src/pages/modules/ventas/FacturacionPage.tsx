@@ -55,6 +55,7 @@ export const FacturacionPage: React.FC = () => {
   const { RangePicker } = DatePicker;
   const [filterUsuario, setFilterUsuario] = React.useState(null);
   const [filterCliente, setFilterCliente] = React.useState(null);
+  const [searchCliente, setSearchCliente] = React.useState('');
   const [filterTipoVenta, setFilterTipoVenta] = React.useState<number | null>(null);
   const [filterDates, setFilterDates] = React.useState<any>([]);
   const { isTablet } = useResponsive();
@@ -375,8 +376,9 @@ export const FacturacionPage: React.FC = () => {
         return true;
       })
       .filter((factura: any) => {
+        console.log(filterCliente);
         if (filterCliente) {
-          return factura?.idcliente === filterCliente;
+          return factura?.idCliente === filterCliente;
         }
         return true;
       })
@@ -390,6 +392,17 @@ export const FacturacionPage: React.FC = () => {
         return (a.id as number) - (b.id as number);
       });
 
+    return arr;
+  };
+
+  const filteredClientes = () => {
+    const arr = clientesData
+      ?.filter(
+        (c: any) =>
+          c.nombre.toLowerCase().includes(searchCliente.toLowerCase()) ||
+          c.id.toString().toLowerCase().includes(searchCliente.toLowerCase()),
+      )
+      .sort((a: any, b: any) => a.id - b.id);
     return arr;
   };
 
@@ -494,10 +507,16 @@ export const FacturacionPage: React.FC = () => {
               style={{ width: '100%', marginLeft: '1rem' }}
               placeholder={t('table.filtrarClientes')}
               allowClear
+              showSearch
+              searchValue={searchCliente}
+              onSearch={(value) => {
+                setSearchCliente(value);
+              }}
+              filterOption={false}
             >
-              {clientesData?.map((proveedor: Proveedor, i: number) => (
-                <Select.Option key={i} value={proveedor?.id}>
-                  {proveedor?.nombre}
+              {filteredClientes()?.map((cliente: any, i: number) => (
+                <Select.Option key={i} value={cliente?.id}>
+                  {cliente?.id} - {cliente?.nombre}
                 </Select.Option>
               ))}
             </Select>
@@ -564,10 +583,16 @@ export const FacturacionPage: React.FC = () => {
               style={{ width: '100%' }}
               placeholder={t('table.filtrarClientes')}
               allowClear
+              showSearch
+              searchValue={searchCliente}
+              onSearch={(value) => {
+                setSearchCliente(value);
+              }}
+              filterOption={false}
             >
-              {clientesData?.map((proveedor: Proveedor, i: number) => (
-                <Select.Option key={i} value={proveedor?.id}>
-                  {proveedor?.nombre}
+              {filteredClientes()?.map((cliente: any, i: number) => (
+                <Select.Option key={i} value={cliente?.id}>
+                  {cliente?.id} - {cliente?.nombre}
                 </Select.Option>
               ))}
             </Select>
