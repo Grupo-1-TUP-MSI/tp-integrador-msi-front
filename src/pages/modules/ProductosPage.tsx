@@ -55,6 +55,7 @@ export const ProductosPage: React.FC = () => {
   const [searchProducto, setSearchProducto] = React.useState('');
   const [minPrecio, setMinPrecio] = React.useState(0);
   const [maxPrecio, setMaxPrecio] = React.useState(0);
+  const [searchProveedor, setSearchProveedor] = React.useState('');
   const [filterStock, setFilterStock] = React.useState(false);
   const [filterStockMinimo, setFilterStockMinimo] = React.useState(false);
   const [filterEstado, setFilterEstado] = React.useState(true);
@@ -418,6 +419,17 @@ export const ProductosPage: React.FC = () => {
       />
     );
   };
+  const filteredProveedores = () => {
+    const arr = proveedoresData
+      ?.filter(
+        (p: any) =>
+          p.nombre.toLowerCase().includes(searchProveedor.toLowerCase()) ||
+          p.id.toString().toLowerCase().includes(searchProveedor.toLowerCase()),
+      )
+      .sort((a: any, b: any) => a.id - b.id);
+
+    return arr;
+  };
 
   return (
     <>
@@ -455,6 +467,12 @@ export const ProductosPage: React.FC = () => {
         >
           <div style={{ marginLeft: '3rem', marginRight: '1.2rem', width: '20%' }}>{t('common.nuevoProveedor')}:</div>
           <Select
+            showSearch
+            searchValue={searchProveedor}
+            onSearch={(value) => {
+              setSearchProveedor(value);
+            }}
+            filterOption={false}
             placeholder={t('common.proveedor')}
             value={proveedor}
             onChange={(value) => setProveedor(value)}
@@ -462,7 +480,7 @@ export const ProductosPage: React.FC = () => {
             loading={isLoadingProveedores || isRefetchingProveedores}
             style={{ width: '60%' }}
           >
-            {proveedoresData
+            {filteredProveedores()
               ?.filter((p: any) => {
                 return p.estado !== false;
               })
