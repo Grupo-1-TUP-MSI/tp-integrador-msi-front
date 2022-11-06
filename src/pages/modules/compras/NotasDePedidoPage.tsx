@@ -64,6 +64,7 @@ export const NotasDePedidoPage: React.FC = () => {
   const navigate = useNavigate();
   const { RangePicker } = DatePicker;
   const [notaPedido, setNotaPedido] = React.useState<any>(null);
+  const [searchProveedor, setSearchProveedor] = React.useState('');
   const [filterUsuario, setFilterUsuario] = React.useState(null);
   const [filterProveedor, setFilterProveedor] = React.useState(null);
   const [filterEstadoNP, setFilterEstadoNP] = React.useState<number | null>(null);
@@ -487,6 +488,18 @@ export const NotasDePedidoPage: React.FC = () => {
     return arr;
   };
 
+  const filteredProveedores = () => {
+    const arr = proveedoresData
+      ?.filter(
+        (p: any) =>
+          p.nombre.toLowerCase().includes(searchProveedor.toLowerCase()) ||
+          p.id.toString().toLowerCase().includes(searchProveedor.toLowerCase()),
+      )
+      .sort((a: any, b: any) => a.id - b.id);
+
+    return arr;
+  };
+
   return (
     <>
       <PageTitle>{t('common.notapedido')}</PageTitle>
@@ -613,10 +626,16 @@ export const NotasDePedidoPage: React.FC = () => {
           style={{ width: '100%', marginLeft: '1rem' }}
           placeholder={t('table.filtrarProveedores')}
           allowClear
+          showSearch
+          searchValue={searchProveedor}
+          onSearch={(value) => {
+            setSearchProveedor(value);
+          }}
+          filterOption={false}
         >
-          {proveedoresData?.map((proveedor: Proveedor, i: number) => (
+          {filteredProveedores()?.map((proveedor: Proveedor, i: number) => (
             <Select.Option key={i} value={proveedor?.id}>
-              {proveedor?.nombre}
+              {proveedor?.id} - {proveedor?.nombre}
             </Select.Option>
           ))}
         </Select>

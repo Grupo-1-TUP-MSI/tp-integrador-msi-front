@@ -17,6 +17,7 @@ export const ProveedoresComparativaPage = () => {
   const [minPrecio, setMinPrecio] = React.useState(0);
   const [maxPrecio, setMaxPrecio] = React.useState(0);
   const [filterProveedor, setFilterProveedor] = React.useState(null);
+  const [searchProveedor, setSearchProveedor] = React.useState('');
   const [filterStock, setFilterStock] = React.useState(false);
   const [productosNota, setProductosNota] = React.useState<any>([]);
   const { isDesktop } = useResponsive();
@@ -123,6 +124,17 @@ export const ProveedoresComparativaPage = () => {
     return arr;
   };
 
+  const filteredProveedores = () => {
+    const arr = proveedoresData
+      ?.filter(
+        (p: any) =>
+          p.nombre.toLowerCase().includes(searchProveedor.toLowerCase()) ||
+          p.id.toString().toLowerCase().includes(searchProveedor.toLowerCase()),
+      )
+      .sort((a: any, b: any) => a.id - b.id);
+
+    return arr;
+  };
   if (isLoadingProductos || isLoadingProveedores) {
     return <Spin />;
   }
@@ -163,15 +175,21 @@ export const ProveedoresComparativaPage = () => {
               style={{ width: '100%' }}
             />
             <Select
+              showSearch
+              searchValue={searchProveedor}
+              onSearch={(value) => {
+                setSearchProveedor(value);
+              }}
+              filterOption={false}
               value={filterProveedor}
               onChange={(value) => setFilterProveedor(value)}
               style={{ width: '100%', marginLeft: '1rem' }}
               placeholder={t('table.filtrarProveedores')}
               allowClear
             >
-              {proveedoresData?.map((proveedor: Proveedor, i: number) => (
+              {filteredProveedores()?.map((proveedor: Proveedor, i: number) => (
                 <Select.Option key={i} value={proveedor?.id}>
-                  {proveedor?.nombre}
+                  {proveedor?.id} - {proveedor?.nombre}
                 </Select.Option>
               ))}
             </Select>
@@ -223,15 +241,21 @@ export const ProveedoresComparativaPage = () => {
               onChange={(e) => setSearchProducto(e.target.value)}
             />
             <Select
+              showSearch
+              searchValue={searchProveedor}
+              onSearch={(value) => {
+                setSearchProveedor(value);
+              }}
+              filterOption={false}
               value={filterProveedor}
               onChange={(value) => setFilterProveedor(value)}
               style={{ width: '100%', marginLeft: '1rem' }}
               placeholder={t('table.filtrarProveedores')}
               allowClear
             >
-              {proveedoresData?.map((proveedor: Proveedor, i: number) => (
+              {filteredProveedores()?.map((proveedor: Proveedor, i: number) => (
                 <Select.Option key={i} value={proveedor?.id}>
-                  {proveedor?.nombre}
+                  {proveedor?.id} - {proveedor?.nombre}
                 </Select.Option>
               ))}
             </Select>

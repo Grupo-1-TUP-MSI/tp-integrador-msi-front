@@ -158,7 +158,8 @@ export const ProveedoresPage: React.FC = () => {
           proveedor.nombre.toLowerCase().includes(searchProveedor.toLowerCase()) ||
           `${TiposDocumento[(proveedor.idtipodocumento as number) - 1]} ${proveedor.documento}`
             .toLowerCase()
-            .includes(searchProveedor.toLowerCase())
+            .includes(searchProveedor.toLowerCase()) ||
+          proveedor.id?.toString().includes(searchProveedor.toLowerCase())
         );
       })
       .filter((proveedor: Proveedor) => {
@@ -232,7 +233,7 @@ export const ProveedoresPage: React.FC = () => {
         <Select
           value={filterTipoIVA}
           onChange={(value) => setFilterTipoIVA(value)}
-          style={{ width: 200, marginLeft: '1rem' }}
+          style={{ width: 400, marginLeft: '1rem' }}
           placeholder={t('common.tipoiva')}
           allowClear
         >

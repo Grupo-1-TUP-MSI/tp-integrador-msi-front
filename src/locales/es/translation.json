@@ -21,6 +21,7 @@
     }
   },
   "common": {
+    "exportarCSV": "Exportar a CSV",
     "codigoProductoProveedor": "Código de producto del proveedor",
     "pagina": "items p/pág",
     "ocultarProveedores": "Ocultar proveedores",

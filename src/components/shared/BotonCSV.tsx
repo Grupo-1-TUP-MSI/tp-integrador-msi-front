@@ -37,7 +37,7 @@ export const BotonCSV = ({ list, fileName }: any) => {
     document.body.removeChild(link);
   };
   return (
-    <Tooltip placement="left" title={t('common.exportarPDF')} trigger="hover" destroyTooltipOnHide>
+    <Tooltip placement="left" title={t('common.exportarCSV')} trigger="hover" destroyTooltipOnHide>
       <Button
         style={{
           color: 'var(--warning-color)',

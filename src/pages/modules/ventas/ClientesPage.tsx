@@ -152,7 +152,8 @@ export const ClientesPage: React.FC = () => {
           cliente.nombre.toLowerCase().includes(searchCliente.toLowerCase()) ||
           `${TiposDocumento[(cliente.idtipodocumento as number) - 1]} ${cliente.documento}`
             .toLowerCase()
-            .includes(searchCliente.toLowerCase())
+            .includes(searchCliente.toLowerCase()) ||
+          cliente.id?.toString().toLowerCase().includes(searchCliente.toLowerCase())
         );
       })
       .filter((cliente: Cliente) => {
