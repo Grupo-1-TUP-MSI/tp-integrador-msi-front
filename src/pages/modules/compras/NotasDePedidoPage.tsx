@@ -482,7 +482,7 @@ export const NotasDePedidoPage: React.FC = () => {
         return true;
       })
       .sort((a: any, b: any) => {
-        return (a.id as number) - (b.id as number);
+        return new Date(b.fecha).getTime() - new Date(a.fecha).getTime();
       });
 
     return arr;
