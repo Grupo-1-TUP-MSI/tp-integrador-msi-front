@@ -37,12 +37,12 @@ beforeEach(() => {
     }).as('pde');
   });
   cy.fixture('reportes').then((json) => {
-    cy.intercept('GET', 'https://pintureria-api.herokuapp.com/reportes/compraventa', {
+    cy.intercept('GET', 'https://pintureria-api.herokuapp.com/reportes/compraventa*', {
       body: json.compraventa,
     }).as('compraventa');
   });
   cy.fixture('reportes').then((json) => {
-    cy.intercept('GET', 'https://pintureria-api.herokuapp.com/reportes/pie-charts', {
+    cy.intercept('GET', 'https://pintureria-api.herokuapp.com/reportes/pie-charts*', {
       body: json.pieCharts,
     }).as('pie-charts');
   });

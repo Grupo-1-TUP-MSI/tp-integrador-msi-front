@@ -39,6 +39,8 @@ const DashboardPage: React.FC = () => {
     xAxisData: [],
   });
 
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
+
   const { data: pendientesDeEntregaData, isLoading: isLoadingPendientesDeEntrega } = useQuery(
     ['getReportePendientesDeEntrega'],
     getReportePendientesDeEntrega,
@@ -95,6 +97,9 @@ const DashboardPage: React.FC = () => {
     {
       keepPreviousData: false,
       refetchOnWindowFocus: false,
+      onSuccess: (data) => {
+        setIsFirstLoad(false);
+      },
     },
   );
 
@@ -183,7 +188,7 @@ const DashboardPage: React.FC = () => {
     mouseout: onMouseOut,
   };
 
-  if (isLoadingPendientesDeEntrega || isLoadingCompraVenta || isLoadingPieCharts) {
+  if (isFirstLoad && (isLoadingPendientesDeEntrega || isLoadingCompraVenta || isLoadingPieCharts)) {
     return (
       <Row style={{ height: '80vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <Col span={24} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
