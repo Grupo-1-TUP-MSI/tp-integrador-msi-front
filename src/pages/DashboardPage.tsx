@@ -1,5 +1,5 @@
-import React, { useCallback, useState } from 'react';
-import { Avatar, Card, Col, List, Row } from 'antd';
+import React, { Suspense, useCallback, useState } from 'react';
+import { Avatar, Card, Col, DatePicker, List, Row } from 'antd';
 import { PageTitle } from '@app/components/common/PageTitle/PageTitle';
 // import { useResponsive } from '@app/hooks/useResponsive';
 import { useTranslation } from 'react-i18next';
@@ -11,14 +11,27 @@ import { getReporteCompraVenta, getReportePendientesDeEntrega, getPieCharts } fr
 import { TipoCompra, TipoVenta } from '@app/models/models';
 import { useNavigate } from 'react-router-dom';
 import { FileOutlined } from '@ant-design/icons';
-import { PieChartCustomLegend } from '@app/components/common/charts/PieChartCustomLegend';
 import { PieChart } from '@app/components/common/charts/PieChart';
 import { Legend } from '@app/components/common/charts/Legend/Legend';
+import moment from 'moment';
+import localeES from 'antd/es/date-picker/locale/es_ES';
+import localeEN from 'antd/es/date-picker/locale/en_US';
+import localePT from 'antd/es/date-picker/locale/pt_BR';
+import { Loading } from '@app/components/common/Loading';
 
 const DashboardPage: React.FC = () => {
   const { t } = useTranslation();
   const theme = useAppSelector((state) => state.theme.theme);
   const navigate = useNavigate();
+  const { i18n } = useTranslation();
+  const [locale, setLocale] = React.useState(() =>
+    i18n.language === 'es' ? localeES : i18n.language === 'en' ? localeEN : localePT,
+  );
+  const { RangePicker } = DatePicker;
+  const [desde, setDesde] = useState<any>(moment().subtract(15, 'days'));
+  const [hasta, setHasta] = useState<any>(moment());
+  const [desdeTortas, setDesdeTortas] = useState<any>(moment().subtract(15, 'days'));
+  const [hastaTortas, setHastaTortas] = useState<any>(moment());
 
   const [data, setData] = useState<{ data1: string[]; data2: string[]; xAxisData: string[] }>({
     data1: [],
@@ -35,14 +48,19 @@ const DashboardPage: React.FC = () => {
     },
   );
 
-  const { data: compraVentaData, isLoading: isLoadingCompraVenta } = useQuery(
-    ['getReporteCompraVenta'],
-    getReporteCompraVenta,
+  const {
+    data: compraVentaData,
+    isLoading: isLoadingCompraVenta,
+    refetch,
+  } = useQuery(
+    ['getReporteCompraVenta', desde, hasta],
+    () => getReporteCompraVenta({ desde: desde.format('YYYY-MM-DD'), hasta: hasta.format('YYYY-MM-DD') }),
     {
       keepPreviousData: false,
       refetchOnWindowFocus: false,
+
       onSuccess: (data) => {
-        const { compras, ventas, meses } = data;
+        const { compras, ventas, dias } = data;
         const ventasFixed: string[] = [];
         const comprasFixed: string[] = [];
 
@@ -60,46 +78,25 @@ const DashboardPage: React.FC = () => {
           comprasFixed.push(elementCompras.toFixed(2));
         });
 
-        const monthsTranslatedFromNumber = meses.map((month: number) => {
-          switch (month) {
-            case 1:
-              return t('charts.barras.meses.enero').substring(0, 3);
-            case 2:
-              return t('charts.barras.meses.febrero').substring(0, 3);
-            case 3:
-              return t('charts.barras.meses.marzo').substring(0, 3);
-            case 4:
-              return t('charts.barras.meses.abril').substring(0, 3);
-            case 5:
-              return t('charts.barras.meses.mayo').substring(0, 3);
-            case 6:
-              return t('charts.barras.meses.junio').substring(0, 3);
-            case 7:
-              return t('charts.barras.meses.julio').substring(0, 3);
-            case 8:
-              return t('charts.barras.meses.agosto').substring(0, 3);
-            case 9:
-              return t('charts.barras.meses.septiembre').substring(0, 3);
-            case 10:
-              return t('charts.barras.meses.octubre').substring(0, 3);
-            case 11:
-              return t('charts.barras.meses.noviembre').substring(0, 3);
-            case 12:
-              return t('charts.barras.meses.diciembre').substring(0, 3);
-            default:
-              return '';
-          }
-        });
+        // Crear un arreglo de meses entre las fechas seleccionadas
 
-        setData({ data1: comprasFixed, data2: ventasFixed, xAxisData: monthsTranslatedFromNumber });
+        setData({ data1: comprasFixed, data2: ventasFixed, xAxisData: dias });
       },
     },
   );
 
-  const { data: pieChartsData, isLoading: isLoadingPieCharts } = useQuery(['getPieCharts'], getPieCharts, {
-    keepPreviousData: false,
-    refetchOnWindowFocus: false,
-  });
+  const {
+    data: pieChartsData,
+    isLoading: isLoadingPieCharts,
+    refetch: refetchTortas,
+  } = useQuery(
+    ['getPieCharts', desdeTortas, hastaTortas],
+    () => getPieCharts({ desde: desdeTortas.format('YYYY-MM-DD'), hasta: hastaTortas.format('YYYY-MM-DD') }),
+    {
+      keepPreviousData: false,
+      refetchOnWindowFocus: false,
+    },
+  );
 
   const option = {
     legend: {
@@ -186,6 +183,16 @@ const DashboardPage: React.FC = () => {
     mouseout: onMouseOut,
   };
 
+  if (isLoadingPendientesDeEntrega || isLoadingCompraVenta || isLoadingPieCharts) {
+    return (
+      <Row style={{ height: '80vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <Col span={24} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <Loading />;
+        </Col>
+      </Row>
+    );
+  }
+
   return (
     <>
       <PageTitle>Dashboard</PageTitle>
@@ -219,7 +226,23 @@ const DashboardPage: React.FC = () => {
           </Card>
         </Col>
         <Col xs={24} md={24} lg={16}>
-          <Card style={{ margin: 20 }} title={t('titles.comprasVentas')}>
+          <Card
+            style={{ margin: 20 }}
+            title={t('titles.comprasVentas')}
+            actions={[
+              <RangePicker
+                locale={locale}
+                key="rangePicker"
+                disabled={isLoadingCompraVenta}
+                defaultValue={[desde, hasta]}
+                onChange={(dates: any, dateStrings) => {
+                  setDesde(dates[0]);
+                  setHasta(dates[1]);
+                  refetch();
+                }}
+              />,
+            ]}
+          >
             <BaseChart option={option} />
           </Card>
         </Col>
@@ -229,6 +252,36 @@ const DashboardPage: React.FC = () => {
           marginTop: '3rem',
         }}
       >
+        <Col
+          xs={24}
+          md={24}
+          lg={24}
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            flexDirection: 'column',
+          }}
+        >
+          <h1 style={{ color: 'var(--timeline-background)', fontSize: '25px' }}>
+            {t('titles.tiposCompraMontoCantidad')}
+          </h1>
+
+          <RangePicker
+            style={{
+              width: '400px',
+            }}
+            locale={locale}
+            key="rangePicker"
+            disabled={isLoadingPieCharts}
+            defaultValue={[desdeTortas, hastaTortas]}
+            onChange={(dates: any, dateStrings) => {
+              setDesdeTortas(dates[0]);
+              setHastaTortas(dates[1]);
+              refetchTortas();
+            }}
+          />
+        </Col>
         <Col xs={24} md={12} lg={12}>
           <Card style={{ margin: 20 }} title={t('titles.tiposCompraMonto')}>
             <PieChart
@@ -253,6 +306,32 @@ const DashboardPage: React.FC = () => {
           </Card>
         </Col>
         <Col xs={24} md={12} lg={12}>
+          <Card style={{ margin: 20 }} title={t('titles.tiposCompraCantidad')}>
+            <PieChart
+              data={pieChartsData?.comprasCantidad.map((d: any) => ({ ...d, name: TipoCompra[d.idTipo - 1] }))}
+            />
+            <Legend
+              legendItems={generateLegendData(pieChartsData?.comprasCantidad, true) || []}
+              activeItemIndex={activeItemIndex}
+            />
+          </Card>
+        </Col>
+        <Col
+          xs={24}
+          md={24}
+          lg={24}
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            flexDirection: 'column',
+          }}
+        >
+          <h1 style={{ color: 'var(--timeline-background)', fontSize: '25px' }}>
+            {t('titles.tiposVentaMontoCantidad')}
+          </h1>
+        </Col>
+        <Col xs={24} md={12} lg={12}>
           <Card style={{ margin: 20 }} title={t('titles.tiposVentaMonto')}>
             <PieChart
               data={pieChartsData?.ventasMonto.map((d: any) => ({
@@ -271,17 +350,6 @@ const DashboardPage: React.FC = () => {
                   false,
                 ) || []
               }
-              activeItemIndex={activeItemIndex}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} md={12} lg={12}>
-          <Card style={{ margin: 20 }} title={t('titles.tiposCompraCantidad')}>
-            <PieChart
-              data={pieChartsData?.comprasCantidad.map((d: any) => ({ ...d, name: TipoCompra[d.idTipo - 1] }))}
-            />
-            <Legend
-              legendItems={generateLegendData(pieChartsData?.comprasCantidad, true) || []}
               activeItemIndex={activeItemIndex}
             />
           </Card>

@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  DashboardOutlined,
-  SettingOutlined,
-  ShopOutlined,
-  ShoppingCartOutlined,
-  TagsOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
+import { DashboardOutlined, ShopOutlined, ShoppingCartOutlined, TagsOutlined, UserOutlined } from '@ant-design/icons';
 
 export interface SidebarNavigationItem {
   title: string;
@@ -29,9 +22,14 @@ export const adminSidebarNavigation: SidebarNavigationItem[] = [
     icon: <ShoppingCartOutlined />,
     children: [
       {
-        title: 'common.proveedores',
-        key: 'proveedores',
-        url: '/compras/proveedores',
+        title: 'common.comprar',
+        key: 'notapedido/alta',
+        url: '/compras/notapedido/alta',
+      },
+      {
+        title: 'common.listado',
+        key: 'notapedido',
+        url: '/compras/notapedido',
       },
       {
         title: 'common.comparativaProveedores',
@@ -39,9 +37,9 @@ export const adminSidebarNavigation: SidebarNavigationItem[] = [
         url: '/compras/proveedores/comparativa',
       },
       {
-        title: 'common.notapedido',
-        key: 'notapedido',
-        url: '/compras/notapedido',
+        title: 'common.proveedores',
+        key: 'proveedores',
+        url: '/compras/proveedores',
       },
     ],
   },
@@ -51,15 +49,21 @@ export const adminSidebarNavigation: SidebarNavigationItem[] = [
     icon: <ShopOutlined />,
     children: [
       {
+        title: 'common.vender',
+        key: 'facturacion/alta',
+        url: '/ventas/facturacion/alta',
+      },
+      {
+        title: 'common.listado',
+        key: 'facturacion',
+        url: '/ventas/facturacion',
+      },
+      {
         title: 'common.clientes',
         key: 'clientes',
         url: '/ventas/clientes',
       },
-      {
-        title: 'common.facturacion',
-        key: 'facturacion',
-        url: '/ventas/facturacion',
-      },
+
       {
         title: 'common.ganancias',
         key: 'ganancias',
@@ -88,9 +92,9 @@ export const compradorSidebarNavigation: SidebarNavigationItem[] = [
     icon: <ShoppingCartOutlined />,
     children: [
       {
-        title: 'common.proveedores',
-        key: 'proveedores',
-        url: '/compras/proveedores',
+        title: 'common.comprar',
+        key: 'notapedido/alta',
+        url: '/compras/notapedido/alta',
       },
       {
         title: 'common.comparativaProveedores',
@@ -98,9 +102,14 @@ export const compradorSidebarNavigation: SidebarNavigationItem[] = [
         url: '/compras/proveedores/comparativa',
       },
       {
-        title: 'common.notapedido',
+        title: 'common.listado',
         key: 'notapedido',
         url: '/compras/notapedido',
+      },
+      {
+        title: 'common.proveedores',
+        key: 'proveedores',
+        url: '/compras/proveedores',
       },
     ],
   },
@@ -120,14 +129,19 @@ export const vendedorSidebarNavigation: SidebarNavigationItem[] = [
     icon: <ShopOutlined />,
     children: [
       {
+        title: 'common.vender',
+        key: 'facturacion/alta',
+        url: '/ventas/facturacion/alta',
+      },
+      {
+        title: 'common.listado',
+        key: 'facturacion',
+        url: '/ventas/facturacion',
+      },
+      {
         title: 'common.clientes',
         key: 'clientes',
         url: '/ventas/clientes',
-      },
-      {
-        title: 'common.facturacion',
-        key: 'facturacion',
-        url: '/ventas/facturacion',
       },
     ],
   },
