@@ -21,6 +21,8 @@
     }
   },
   "common": {
+    "vender": "Sell",
+    "listado": "List",
     "exportarCSV": "Export to CSV",
     "codigoProductoProveedor": "Product code for this provider",
     "pagina": "items per page.",
@@ -249,7 +251,7 @@
     "cancelSort": "Click to cancel sorting"
   },
   "titles": {
-    "comprasVentas": "Purchases and Sales of the last 12 months",
+    "comprasVentas": "Purchases and Sales",
     "creandoCliente": "Creating client",
     "editandoCliente": "Editing client",
     "eliminandoCliente": "Deleting client",
@@ -265,10 +267,12 @@
     "editandoNP": "Editing order note",
     "creandoNP": "Creating order note",
     "creandoFactura": "Creating invoice",
-    "tiposCompraMonto": "Purchase types by amount",
-    "tiposVentaMonto": "Sell types by amount",
-    "tiposVentaCantidad": "Sell types by quantity",
+    "tiposCompraMontoCantidad": "Purchase types by value and quantity",
     "tiposCompraCantidad": "Purchase types by quantity",
+    "tiposCompraMonto": "Purchase types by value",
+    "tiposVentaMontoCantidad": "Sell types by value and quantity",
+    "tiposVentaCantidad": "Sell types by quantity",
+    "tiposVentaMonto": "Sell types by value",
     "ultimosPendientesEntrega": "Last pending deliveries"
   },
   "serverError": {

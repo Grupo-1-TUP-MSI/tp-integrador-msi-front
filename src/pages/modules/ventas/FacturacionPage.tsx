@@ -117,6 +117,25 @@ export const FacturacionPage: React.FC = () => {
       render: (text: any, record: any) => TipoVenta[record.idTipoVenta - 1],
     },
     {
+      title: t('common.importetotal'),
+      key: 'total',
+      sorter: (a: any, b: any) =>
+        Math.floor(
+          a.detalles.reduce((acc: any, detalle: any) => (acc += detalle.cantidad * detalle.precio * 1.21), 0),
+        ) -
+        Math.floor(b.detalles.reduce((acc: any, detalle: any) => (acc += detalle.cantidad * detalle.precio * 1.21), 0)),
+      render: (text: any, record: any) => {
+        return (
+          <span>
+            $
+            {Math.floor(
+              record.detalles.reduce((acc: any, detalle: any) => (acc += detalle.cantidad * detalle.precio * 1.21), 0),
+            ).toFixed(0)}
+          </span>
+        );
+      },
+    },
+    {
       title: t('common.acciones'),
       width: '10%',
       key: 'acciones',
@@ -204,9 +223,9 @@ export const FacturacionPage: React.FC = () => {
         key: 'importetotal',
         width: '10%',
 
-        sorter: (a: any, b: any) => Math.round(a.precio * a.cantidad * 1.21) - Math.round(b.precio * b.cantidad * 1.21),
+        sorter: (a: any, b: any) => Math.floor(a.precio * a.cantidad * 1.21) - Math.floor(b.precio * b.cantidad * 1.21),
         render: (text: any, record: any) => {
-          return <span>${Math.round(record.precio * record.cantidad * 1.21)}</span>;
+          return <span>${Math.floor(record.precio * record.cantidad * 1.21)}</span>;
         },
       },
     ];
@@ -376,7 +395,6 @@ export const FacturacionPage: React.FC = () => {
         return true;
       })
       .filter((factura: any) => {
-        console.log(filterCliente);
         if (filterCliente) {
           return factura?.idCliente === filterCliente;
         }
@@ -759,9 +777,9 @@ export const FacturacionForm: React.FC = () => {
       width: '10%',
 
       sorter: (a: any, b: any) =>
-        Math.round(a.precioVenta * a.cantidad * 1.21) - Math.round(b.precioVenta * b.cantidad * 1.21),
+        Math.floor(a.precioVenta * a.cantidad * 1.21) - Math.floor(b.precioVenta * b.cantidad * 1.21),
       render: (text: any, record: any) => {
-        return <span>${Math.round(record.precioVenta * record.cantidad * 1.21)}</span>;
+        return <span>${Math.floor(record.precioVenta * record.cantidad * 1.21)}</span>;
       },
     },
     {
@@ -1203,6 +1221,46 @@ export const FacturacionForm: React.FC = () => {
                     locale: {
                       items_per_page: t('common.pagina'),
                     },
+                  }}
+                  summary={() => {
+                    const subtotal = detalles.reduce((acc: any, curr: any) => {
+                      return acc + curr.cantidad * curr.precioVenta;
+                    }, 0);
+
+                    const iva = subtotal * 0.21;
+                    const total = subtotal + iva;
+
+                    return (
+                      <>
+                        <Table.Summary.Row>
+                          <Table.Summary.Cell index={1} colSpan={2}></Table.Summary.Cell>
+                          <Table.Summary.Cell index={0} colSpan={2}>
+                            Subtotal
+                          </Table.Summary.Cell>
+                          <Table.Summary.Cell index={1} colSpan={2}>
+                            ${Math.floor(subtotal)}
+                          </Table.Summary.Cell>
+                        </Table.Summary.Row>
+                        <Table.Summary.Row>
+                          <Table.Summary.Cell index={1} colSpan={2}></Table.Summary.Cell>
+                          <Table.Summary.Cell index={0} colSpan={2}>
+                            IVA
+                          </Table.Summary.Cell>
+                          <Table.Summary.Cell index={1} colSpan={2}>
+                            ${Math.floor(iva)}
+                          </Table.Summary.Cell>
+                        </Table.Summary.Row>
+                        <Table.Summary.Row>
+                          <Table.Summary.Cell index={1} colSpan={2}></Table.Summary.Cell>
+                          <Table.Summary.Cell index={0} colSpan={2}>
+                            Total
+                          </Table.Summary.Cell>
+                          <Table.Summary.Cell index={1} colSpan={2}>
+                            ${Math.floor(total)}
+                          </Table.Summary.Cell>
+                        </Table.Summary.Row>
+                      </>
+                    );
                   }}
                   scroll={{ x: 800 }}
                   showSorterTooltip={false}

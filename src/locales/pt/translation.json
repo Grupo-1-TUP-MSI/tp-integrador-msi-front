@@ -21,6 +21,8 @@
     }
   },
   "common": {
+    "vender": "Vender",
+    "listado": "Listagem",
     "exportarCSV": "Exportar CSV",
     "codigoProductoProveedor": "Código do produto do provedor",
     "pagina": "items p/pág",
@@ -249,7 +251,7 @@
     "cancelSort": "Clique para cancelar a classificação"
   },
   "titles": {
-    "comprasVentas": "Compras e Vendas dos últimos 12 meses",
+    "comprasVentas": "Compras e Vendas",
     "creandoCliente": "Criando cliente",
     "editandoCliente": "Editando cliente",
     "eliminandoCliente": "Excluindo cliente",
@@ -265,10 +267,12 @@
     "editandoNP": "Editando nota de pedido",
     "creandoNP": "Criando nota de pedido",
     "creandoFactura": "Criando fatura",
+    "tiposCompraMontoCantidad": "Tipos de compra por valor e quantidade",
     "tiposCompraMonto": "Tipos de compra por valor",
+    "tiposCompraCantidad": "Tipos de compra por quantidade",
+    "tiposVentaMontoCantidad": "Tipos de venda por valor e quantidade",
     "tiposVentaMonto": "Tipos de venda por valor",
     "tiposVentaCantidad": "Tipos de venda por quantidade",
-    "tiposCompraCantidad": "Tipos de compra por quantidade",
     "ultimosPendientesEntrega": "Últimos itens com entrega pendente"
   },
   "serverError": {
