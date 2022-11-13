@@ -415,13 +415,13 @@ export const NotasDePedidoPage: React.FC = () => {
           {
             title: t('common.producto'),
             style: {
-              width: 30,
+              width: 50,
             },
           },
           {
             title: t('common.descripcion'),
             style: {
-              width: 70,
+              width: 50,
             },
           },
           { title: t('common.importeunitario') },
@@ -882,13 +882,13 @@ export const NotasDePedidoForm: React.FC = () => {
             {
               title: t('common.producto'),
               style: {
-                width: 30,
+                width: 50,
               },
             },
             {
               title: t('common.descripcion'),
               style: {
-                width: 70,
+                width: 50,
               },
             },
             { title: t('common.importeunitario') },
@@ -1070,13 +1070,13 @@ export const NotasDePedidoForm: React.FC = () => {
           {
             title: t('common.producto'),
             style: {
-              width: 30,
+              width: 50,
             },
           },
           {
             title: t('common.descripcion'),
             style: {
-              width: 70,
+              width: 50,
             },
           },
           { title: t('common.importeunitario') },

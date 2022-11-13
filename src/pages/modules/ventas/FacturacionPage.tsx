@@ -323,13 +323,13 @@ export const FacturacionPage: React.FC = () => {
           {
             title: t('common.producto'),
             style: {
-              width: 30,
+              width: 50,
             },
           },
           {
             title: t('common.descripcion'),
             style: {
-              width: 70,
+              width: 50,
             },
           },
           { title: t('common.importeunitario') },
